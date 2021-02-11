@@ -31,9 +31,9 @@ import org.springframework.util.StringUtils;
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @since 1.1
  * @see PropertiesBeanDefinitionReader
  * @see org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader
+ * @since 1.1
  */
 public abstract class BeanDefinitionReaderUtils {
 
@@ -43,10 +43,10 @@ public abstract class BeanDefinitionReaderUtils {
 	 */
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;
 
-
 	/**
 	 * Create a new GenericBeanDefinition for the given parent name and class name,
 	 * eagerly loading the bean class if a ClassLoader has been specified.
+	 *
 	 * @param parentName the name of the parent bean, if any
 	 * @param className the name of the bean class, if any
 	 * @param classLoader the ClassLoader to use for loading bean classes
@@ -62,8 +62,7 @@ public abstract class BeanDefinitionReaderUtils {
 		if (className != null) {
 			if (classLoader != null) {
 				bd.setBeanClass(ClassUtils.forName(className, classLoader));
-			}
-			else {
+			} else {
 				bd.setBeanClassName(className);
 			}
 		}
@@ -73,6 +72,7 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Generate a bean name for the given top-level bean definition,
 	 * unique within the given bean factory.
+	 *
 	 * @param beanDefinition the bean definition to generate a bean name for
 	 * @param registry the bean factory that the definition is going to be
 	 * registered with (to check for existing bean names)
@@ -90,6 +90,7 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Generate a bean name for the given bean definition, unique within the
 	 * given bean factory.
+	 *
 	 * @param definition the bean definition to generate a bean name for
 	 * @param registry the bean factory that the definition is going to be
 	 * registered with (to check for existing bean names)
@@ -108,8 +109,7 @@ public abstract class BeanDefinitionReaderUtils {
 		if (generatedBeanName == null) {
 			if (definition.getParentName() != null) {
 				generatedBeanName = definition.getParentName() + "$child";
-			}
-			else if (definition.getFactoryBeanName() != null) {
+			} else if (definition.getFactoryBeanName() != null) {
 				generatedBeanName = definition.getFactoryBeanName() + "$created";
 			}
 		}
@@ -130,6 +130,7 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Turn the given bean name into a unique bean name for the given bean factory,
 	 * appending a unique counter as suffix if necessary.
+	 *
 	 * @param beanName the original bean name
 	 * @param registry the bean factory that the definition is going to be
 	 * registered with (to check for existing bean names)
@@ -151,6 +152,7 @@ public abstract class BeanDefinitionReaderUtils {
 
 	/**
 	 * Register the given bean definition with the given bean factory.
+	 *
 	 * @param definitionHolder the bean definition including name and aliases
 	 * @param registry the bean factory to register with
 	 * @throws BeanDefinitionStoreException if registration failed
@@ -175,6 +177,7 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Register the given bean definition with a generated name,
 	 * unique within the given bean factory.
+	 *
 	 * @param definition the bean definition to generate a bean name for
 	 * @param registry the bean factory to register with
 	 * @return the generated bean name
