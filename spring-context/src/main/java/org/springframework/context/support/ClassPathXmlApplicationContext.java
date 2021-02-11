@@ -82,7 +82,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
-		this(new String[] {configLocation}, true, null);
+		this(new String[] { configLocation }, true, null);
+		System.out.println("done by zcj:" + configLocation);
 	}
 
 	/**
