@@ -1,38 +1,31 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
- * Factory hook that allows for custom modification of new bean instances &mdash;
- * for example, checking for marker interfaces or wrapping beans with proxies.
+ * 这是一个spring的扩展点
  *
- * <p>Typically, post-processors that populate beans via marker interfaces
+ * Factory hook that allows for custom modification of new bean instances &mdash;
+ * -- 工厂挂钩，允许自定义修改新的bean实例
+ *
+ * for example, checking for marker interfaces or wrapping beans with proxies.
+ * -- 例如，检查标记界面或使用代理包装bean。
+ *
+ * <p>
+ * Typically, post-processors that populate beans via marker interfaces
  * or the like will implement {@link #postProcessBeforeInitialization},
  * while post-processors that wrap beans with proxies will normally
  * implement {@link #postProcessAfterInitialization}.
+ * -- 通常，通过标记接口等填充bean的后处理器将实现{@link #postProcessBeforeInitialization}，而使用代理包装bean的后处理器通常将实现{@link #postProcessAfterInitialization}。
  *
  * <h3>Registration</h3>
- * <p>An {@code ApplicationContext} can autodetect {@code BeanPostProcessor} beans
+ * <p>
+ * An {@code ApplicationContext} can autodetect {@code BeanPostProcessor} beans
  * in its bean definitions and apply those post-processors to any beans subsequently
  * created. A plain {@code BeanFactory} allows for programmatic registration of
  * post-processors, applying them to all beans created through the bean factory.
+ * -- {@code ApplicationContext}可以在其bean定义中自动检测{@code BeanPostProcessor} bean，并将这些后处理器应用于随后创建的任何bean。普通的{@code BeanFactory}允许以编程方式注册后处理器，并将其应用于通过bean工厂创建的所有bean。
  *
  * <h3>Ordering</h3>
  * <p>{@code BeanPostProcessor} beans that are autodetected in an
@@ -49,11 +42,11 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 10.10.2003
  * @see InstantiationAwareBeanPostProcessor
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ * @since 10.10.2003
  */
 public interface BeanPostProcessor {
 
@@ -63,6 +56,7 @@ public interface BeanPostProcessor {
 	 * or a custom init-method). The bean will already be populated with property values.
 	 * The returned bean instance may be a wrapper around the original.
 	 * <p>The default implementation returns the given {@code bean} as-is.
+	 *
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one;
@@ -88,6 +82,7 @@ public interface BeanPostProcessor {
 	 * {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,
 	 * in contrast to all other {@code BeanPostProcessor} callbacks.
 	 * <p>The default implementation returns the given {@code bean} as-is.
+	 *
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one;
