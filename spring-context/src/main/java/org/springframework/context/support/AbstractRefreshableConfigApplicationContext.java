@@ -31,14 +31,18 @@ import org.springframework.util.StringUtils;
  * {@link org.springframework.web.context.support.XmlWebApplicationContext}.
  *
  * @author Juergen Hoeller
- * @since 2.5.2
  * @see #setConfigLocation
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
+ * @since 2.5.2
  */
 public abstract class AbstractRefreshableConfigApplicationContext
 		extends AbstractRefreshableApplicationContext implements BeanNameAware, InitializingBean {
 
+	/**
+	 * ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring-test.xml");
+	 * 该局部变量存放的就是只有的路径
+	 */
 	@Nullable
 	private String[] configLocations;
 
@@ -52,12 +56,12 @@ public abstract class AbstractRefreshableConfigApplicationContext
 
 	/**
 	 * Create a new AbstractRefreshableConfigApplicationContext with the given parent context.
+	 *
 	 * @param parent the parent context
 	 */
 	public AbstractRefreshableConfigApplicationContext(@Nullable ApplicationContext parent) {
 		super(parent);
 	}
-
 
 	/**
 	 * Set the config locations for this application context in init-param style,
@@ -69,8 +73,11 @@ public abstract class AbstractRefreshableConfigApplicationContext
 	}
 
 	/**
+	 * 使用方法：new ClassPathXmlApplicationContext("classpath:spring-test.xml");
+	 *
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
+	 * -- 如果未设置，则实现可酌情使用默认值。
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
@@ -79,8 +86,7 @@ public abstract class AbstractRefreshableConfigApplicationContext
 			for (int i = 0; i < locations.length; i++) {
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
-		}
-		else {
+		} else {
 			this.configLocations = null;
 		}
 	}
@@ -91,6 +97,7 @@ public abstract class AbstractRefreshableConfigApplicationContext
 	 * patterns, which will get resolved via a ResourcePatternResolver.
 	 * <p>The default implementation returns {@code null}. Subclasses can override
 	 * this to provide a set of resource locations to load bean definitions from.
+	 *
 	 * @return an array of resource locations, or {@code null} if none
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
@@ -105,6 +112,7 @@ public abstract class AbstractRefreshableConfigApplicationContext
 	 * explicit config locations have been specified.
 	 * <p>The default implementation returns {@code null},
 	 * requiring explicit config locations.
+	 *
 	 * @return an array of default config locations, if any
 	 * @see #setConfigLocations
 	 */
@@ -116,6 +124,7 @@ public abstract class AbstractRefreshableConfigApplicationContext
 	/**
 	 * Resolve the given path, replacing placeholders with corresponding
 	 * environment property values if necessary. Applied to config locations.
+	 *
 	 * @param path the original file path
 	 * @return the resolved file path
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
@@ -123,7 +132,6 @@ public abstract class AbstractRefreshableConfigApplicationContext
 	protected String resolvePath(String path) {
 		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
-
 
 	@Override
 	public void setId(String id) {
