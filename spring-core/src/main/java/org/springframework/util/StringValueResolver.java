@@ -41,5 +41,4 @@ public interface StringValueResolver {
 	 */
 	@Nullable
 	String resolveStringValue(String strVal);
-
 }
