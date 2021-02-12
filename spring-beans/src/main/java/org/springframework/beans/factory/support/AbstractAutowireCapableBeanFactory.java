@@ -596,6 +596,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			//把早期对象封装成一个ObjectFactory塞入三级缓存
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -1354,8 +1355,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Populate the bean instance in the given BeanWrapper with the property values
-	 * from the bean definition.
+	 * 方法名称直译：装豆
+	 * 依赖注入
+	 * Populate the bean instance in the given BeanWrapper with the property values from the bean definition.
+	 * -- 使用Bean定义中的属性值填充给定BeanWrapper中的Bean实例。
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
