@@ -88,8 +88,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * Names of beans that are currently in creation.
 	 * -- 当前正在创建的bean的名称。
 	 */
-	private final Set<String> singletonsCurrentlyInCreation =
-			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+	private final Set<String> singletonsCurrentlyInCreation = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
 	/**
 	 * Names of beans currently excluded from in creation checks.
