@@ -210,10 +210,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
 
 	/**
-	 * Names of beans that are currently in creation.
+	 * Names of beans that are currently in creation. - 当前正在创建的bean的名称。
 	 */
-	private final ThreadLocal<Object> prototypesCurrentlyInCreation =
-			new NamedThreadLocal<>("Prototype beans currently in creation");
+	private final ThreadLocal<Object> prototypesCurrentlyInCreation = new NamedThreadLocal<>("Prototype beans currently in creation");
 
 	/**
 	 * Application startup metrics.
@@ -317,6 +316,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		//
 		else {
+			//原型模式会走这个分支
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 
 				/**
@@ -405,9 +405,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
 					try {
+						//把 beanName 塞入当前线程的 ThreadLocal<Object> prototypesCurrentlyInCreation
 						beforePrototypeCreation(beanName);
 						prototypeInstance = createBean(beanName, mbd, args);
 					} finally {
+						//创建原型前把 beanName 塞入，创建之后 remove
 						afterPrototypeCreation(beanName);
 					}
 					beanInstance = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
@@ -1212,21 +1214,32 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected void beforePrototypeCreation(String beanName) {
+		//从 ThreadLocal<Object> 中拿到 curVal
 		Object curVal = this.prototypesCurrentlyInCreation.get();
 		if (curVal == null) {
+			//ThreadLocal<Object> 还是空的，则直接塞进去
 			this.prototypesCurrentlyInCreation.set(beanName);
-		} else if (curVal instanceof String) {
+		}
+
+		//ThreadLocal<Object> 中有值了，并且还是字符串，说明只有一个值
+		else if (curVal instanceof String) {
+			//把他们放入set中然后塞入 ThreadLocal<Object>
+
 			Set<String> beanNameSet = new HashSet<>(2);
 			beanNameSet.add((String) curVal);
 			beanNameSet.add(beanName);
 			this.prototypesCurrentlyInCreation.set(beanNameSet);
-		} else {
+		}
+
+		//ThreadLocal<Object> 中的值已经是 Set 了
+		else {
 			Set<String> beanNameSet = (Set<String>) curVal;
 			beanNameSet.add(beanName);
 		}
 	}
 
 	/**
+	 * 创建原型前把 beanName 塞入，创建之后 remove
 	 * Callback after prototype creation.
 	 * <p>The default implementation marks the prototype as not in creation anymore.
 	 *
