@@ -965,7 +965,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							getBean(beanName);
 						}
 					}
-				} else {
+				}
+
+				//非 FactoryBean 类型的 bean 实例化
+				else {
 					getBean(beanName);
 				}
 			}
