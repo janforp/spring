@@ -39,6 +39,7 @@ import java.util.Set;
  * @author Erik Wiersma
  * @since 18.12.2003
  */
+@SuppressWarnings("all")
 public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocumentReader {
 
 	public static final String BEAN_ELEMENT = BeanDefinitionParserDelegate.BEAN_ELEMENT;
@@ -198,40 +199,77 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * Parse the elements at the root level in the document:
-	 * "import", "alias", "bean".
+	 * Parse the elements at the root level in the document: "import", "alias", "bean".
+	 * -- 在文档的根级别上解析元素：“ import”，“ alias”，“ bean”。
 	 *
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+
+		/**
+		 * 判断root是不是spring默认的命名空间
+		 */
 		if (delegate.isDefaultNamespace(root)) {
+
+			/**
+			 * <beans xmlns="http://www.springframework.org/schema/beans"
+			 * 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 * 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+			 *
+			 * 	<bean id="componentA" class="com.javaxxl.ComponentA"/>
+			 * 	<bean id="componentB" class="com.javaxxl.ComponentB"/>
+			 *
+			 * 	<alias name="componentA" alias="componentA2"/>
+			 *
+			 * 	<import resource="spring-test.xml"/>
+			 * </beans>
+			 *
+			 * 该 nl 就是 顶层标签 <beans></beans> 里面的子标签 "bean","alias","import"
+			 */
 			NodeList nl = root.getChildNodes();
+			//迭代处理每个子标签
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
+
+				//排除空格
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						//说明子标签说明也是 spring 默认标签
 						parseDefaultElement(ele, delegate);
 					} else {
+						//自定义标签
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
-		} else {
+		}
+
+		/**
+		 * 不是spring命名空间
+		 */
+		else {
+			//解析自定义标签
 			delegate.parseCustomElement(root);
 		}
 	}
 
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
+			//解析 import 标签
+			//<import resource="spring-test.xml"/>
 			importBeanDefinitionResource(ele);
 		} else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
+			//解析 alias 标签
+			//<alias name="componentA" alias="componentA2"/>
 			processAliasRegistration(ele);
 		} else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
-			//<bean  xxxxx/>
+			//解析 bean 标签
+			//<bean id="componentB" class="com.javaxxl.ComponentB"/>
 			processBeanDefinition(ele, delegate);
 		} else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse
+			// recurse -- 嵌套了一个 beans 标签
+			//解析 beans 标签
 			doRegisterBeanDefinitions(ele);
 		}
 	}
@@ -328,21 +366,34 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
+	 *
+	 * @param ele <bean id="componentB" class="com.javaxxl.ComponentB"/>
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		//通过该方法就把一个<bean>标签解析成一个 bd
+
+		/**
+		 * 解析 bean 标签
+		 * 解析完成之后返回一个 bdHolder，主要保存了别名信息
+		 */
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
+			/**
+			 * 如果该 bd 需要被装饰，则使用该方法处理，主要处理自定义属性
+			 */
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
-				// Register the final decorated instance.注册bd
+				/**
+				 * Register the final decorated instance.注册bd
+				 * 将 bd 注册到容器中
+				 */
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 				//上面代码执行之后，bd已经注册到register中了
 			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
-			// Send registration event.发送事件
+			// Send registration event.发送bd注册完成的事件
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}
