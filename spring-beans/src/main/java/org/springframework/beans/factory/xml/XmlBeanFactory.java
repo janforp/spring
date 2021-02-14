@@ -44,22 +44,23 @@ import org.springframework.core.io.Resource;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 15 April 2001
  * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
  * @see XmlBeanDefinitionReader
- * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
+ *
  * {@link XmlBeanDefinitionReader}
+ * @since 15 April 2001
  */
-@Deprecated
-@SuppressWarnings({"serial", "all"})
+// @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
+//@Deprecated
+@SuppressWarnings({ "serial", "all" })
 public class XmlBeanFactory extends DefaultListableBeanFactory {
 
 	private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this);
 
-
 	/**
 	 * Create a new XmlBeanFactory with the given resource,
 	 * which must be parsable using DOM.
+	 *
 	 * @param resource the XML resource to load bean definitions from
 	 * @throws BeansException in case of loading or parsing errors
 	 */
@@ -70,6 +71,7 @@ public class XmlBeanFactory extends DefaultListableBeanFactory {
 	/**
 	 * Create a new XmlBeanFactory with the given input stream,
 	 * which must be parsable using DOM.
+	 *
 	 * @param resource the XML resource to load bean definitions from
 	 * @param parentBeanFactory parent bean factory
 	 * @throws BeansException in case of loading or parsing errors
@@ -78,5 +80,4 @@ public class XmlBeanFactory extends DefaultListableBeanFactory {
 		super(parentBeanFactory);
 		this.reader.loadBeanDefinitions(resource);
 	}
-
 }
