@@ -609,6 +609,9 @@ public class BeanDefinitionParserDelegate {
 			 */
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			/**
+			 * 解析 constructor-arg 子标签
+			 */
 			parseConstructorArgElements(ele, bd);
 			parsePropertyElements(ele, bd);
 			parseQualifierElements(ele, bd);
