@@ -213,6 +213,9 @@ public class BeanDefinitionParserDelegate {
 
 	private final DocumentDefaultsDefinition defaults = new DocumentDefaultsDefinition();
 
+	/**
+	 * 表示当前解析器状态
+	 */
 	private final ParseState parseState = new ParseState();
 
 	/**
@@ -524,14 +527,27 @@ public class BeanDefinitionParserDelegate {
 	@Nullable
 	public AbstractBeanDefinition parseBeanDefinitionElement(Element ele, String beanName, @Nullable BeanDefinition containingBean) {
 
+		/**
+		 * 表示当前解析器状态，因为接下来要解析 bean标签，所以状态设置为了 BeanEntry，解析完成之后会 pop 出去
+		 */
 		this.parseState.push(new BeanEntry(beanName));
 
+		/**
+		 * 类全名称
+		 */
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
+			/**
+			 * bean 标签有 class 属性
+			 * 一般情况下 bean 都包含 class 属性，除非该 bean 标签作为 parent 标签，让子标签继承的时候，class 属性才为 null
+			 */
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
+			/**
+			 * parent 属性
+			 */
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
@@ -539,6 +555,13 @@ public class BeanDefinitionParserDelegate {
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+
+			/**
+			 * description 子标签
+			 * <bean id="componentA" name="a,aa, aaa" class="com.javaxxl.ComponentA">
+			 * 		<description>不可描述</description>
+			 * 	</bean>
+			 */
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
 			parseMetaElements(ele, bd);
@@ -648,16 +671,13 @@ public class BeanDefinitionParserDelegate {
 	/**
 	 * Create a bean definition for the given class name and parent name.
 	 *
-	 * @param className the name of the bean class
-	 * @param parentName the name of the bean's parent bean
+	 * @param className the name of the bean class : Bean类的名称
+	 * @param parentName the name of the bean's parent bean : Bean的父bean的名称
 	 * @return the newly created bean definition
 	 * @throws ClassNotFoundException if bean class resolution was attempted but failed
 	 */
-	protected AbstractBeanDefinition createBeanDefinition(@Nullable String className, @Nullable String parentName)
-			throws ClassNotFoundException {
-
-		return BeanDefinitionReaderUtils.createBeanDefinition(
-				parentName, className, this.readerContext.getBeanClassLoader());
+	protected AbstractBeanDefinition createBeanDefinition(@Nullable String className, @Nullable String parentName) throws ClassNotFoundException {
+		return BeanDefinitionReaderUtils.createBeanDefinition(parentName, className, this.readerContext.getBeanClassLoader());
 	}
 
 	/**

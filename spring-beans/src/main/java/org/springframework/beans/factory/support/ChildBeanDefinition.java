@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2017 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.support;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -49,10 +33,10 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private String parentName;
 
-
 	/**
 	 * Create a new ChildBeanDefinition for the given parent, to be
 	 * configured through its bean properties and configuration methods.
+	 *
 	 * @param parentName the name of the parent bean
 	 * @see #setBeanClass
 	 * @see #setScope
@@ -66,6 +50,7 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * Create a new ChildBeanDefinition for the given parent.
+	 *
 	 * @param parentName the name of the parent bean
 	 * @param pvs the additional property values of the child
 	 */
@@ -76,6 +61,7 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * Create a new ChildBeanDefinition for the given parent.
+	 *
 	 * @param parentName the name of the parent bean
 	 * @param cargs the constructor argument values to apply
 	 * @param pvs the additional property values of the child
@@ -90,6 +76,7 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	/**
 	 * Create a new ChildBeanDefinition for the given parent,
 	 * providing constructor arguments and property values.
+	 *
 	 * @param parentName the name of the parent bean
 	 * @param beanClass the class of the bean to instantiate
 	 * @param cargs the constructor argument values to apply
@@ -107,6 +94,7 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	 * Create a new ChildBeanDefinition for the given parent,
 	 * providing constructor arguments and property values.
 	 * Takes a bean class name to avoid eager loading of the bean class.
+	 *
 	 * @param parentName the name of the parent bean
 	 * @param beanClassName the name of the class to instantiate
 	 * @param cargs the constructor argument values to apply
@@ -123,12 +111,12 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	/**
 	 * Create a new ChildBeanDefinition as deep copy of the given
 	 * bean definition.
+	 *
 	 * @param original the original bean definition to copy from
 	 */
 	public ChildBeanDefinition(ChildBeanDefinition original) {
 		super(original);
 	}
-
 
 	@Override
 	public void setParentName(@Nullable String parentName) {
@@ -148,7 +136,6 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 			throw new BeanDefinitionValidationException("'parentName' must be set in ChildBeanDefinition");
 		}
 	}
-
 
 	@Override
 	public AbstractBeanDefinition cloneBeanDefinition() {
@@ -176,5 +163,4 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	public String toString() {
 		return "Child bean with parent '" + this.parentName + "': " + super.toString();
 	}
-
 }

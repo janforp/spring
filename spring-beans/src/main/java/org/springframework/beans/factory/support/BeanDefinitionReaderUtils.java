@@ -44,12 +44,18 @@ public abstract class BeanDefinitionReaderUtils {
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;
 
 	/**
+	 * 如果标签为：
+	 * <bean id="componentA" name="a,aa, aaa" class="com.javaxxl.ComponentA">
+	 * <description>不可描述</description>
+	 * </bean>
+	 *
+	 * 则参数：
 	 * Create a new GenericBeanDefinition for the given parent name and class name,
 	 * eagerly loading the bean class if a ClassLoader has been specified.
 	 *
-	 * @param parentName the name of the parent bean, if any
-	 * @param className the name of the bean class, if any
-	 * @param classLoader the ClassLoader to use for loading bean classes
+	 * @param parentName the name of the parent bean, if any 为null
+	 * @param className the name of the bean class, if any 为 com.javaxxl.ComponentA
+	 * @param classLoader the ClassLoader to use for loading bean classes 为null
 	 * (can be {@code null} to just register bean classes by name)
 	 * @return the bean definition
 	 * @throws ClassNotFoundException if the bean class could not be loaded
