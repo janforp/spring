@@ -600,7 +600,12 @@ public class BeanDefinitionParserDelegate {
 			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			/**
+			 * 解析 replace-method 子标签
+			 * <bean id="testChangeMethod" class="com.javaxxl.replacemethod.TestChangeMethod">
+			 * 		<replaced-method name="changeMe" replacer="testMethodReplacer"/>
+			 * 	</bean>
 			 *
+			 * 	<bean id="testMethodReplacer" class="com.javaxxl.replacemethod.TestMethodReplacer"/>
 			 */
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
@@ -858,6 +863,12 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse replaced-method sub-elements of the given bean element.
+	 *
+	 * <bean id="testChangeMethod" class="com.javaxxl.replacemethod.TestChangeMethod">
+	 * ---<replaced-method name="changeMe" replacer="testMethodReplacer"/>
+	 * </bean>
+	 *
+	 * <bean id="testMethodReplacer" class="com.javaxxl.replacemethod.TestMethodReplacer"/>
 	 */
 	public void parseReplacedMethodSubElements(Element beanEle, MethodOverrides overrides) {
 		NodeList nl = beanEle.getChildNodes();
