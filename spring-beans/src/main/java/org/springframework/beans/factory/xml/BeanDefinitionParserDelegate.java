@@ -20,6 +20,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionDefaults;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.LookupOverride;
 import org.springframework.beans.factory.support.ManagedArray;
 import org.springframework.beans.factory.support.ManagedList;
@@ -534,6 +535,16 @@ public class BeanDefinitionParserDelegate {
 
 		/**
 		 * 类全名称
+		 *
+		 * <bean id="child" class="com.javaxxl.parent.Child" parent="unDefineParent">
+		 * 		<property name="age" value="10"/>
+		 * 	</bean>
+		 *
+		 * 	<bean id="unDefineParent" abstract="true">
+		 * 		<property name="name" value="不存在"/>
+		 * 	</bean>
+		 *
+		 * 	bean 标签可以继承 parent 标签，类似子类继承父类，一般情况下很少用到
 		 */
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
@@ -552,11 +563,14 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
+			//返回一个 GenericBeanDefinition 对象，仅仅设置了 class 或者 className
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
+			//解析标签上的属性,比如：lazy-init,init-method,depends-on等，并且把属性值都塞入到 bd 中
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 
 			/**
+			 * 设置描述信息到 bd 中
 			 * description 子标签
 			 * <bean id="componentA" name="a,aa, aaa" class="com.javaxxl.ComponentA">
 			 * 		<description>不可描述</description>
@@ -564,6 +578,13 @@ public class BeanDefinitionParserDelegate {
 			 */
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
+			/**
+			 * 解析 bean 标签中的 meta 标签
+			 * <bean id="child" class="com.javaxxl.parent.Child">
+			 * 		<meta key="meta_1" value="val_1"/>
+			 * 		<meta key="meta_2" value="val_2"/>
+			 * 	</bean>
+			 */
 			parseMetaElements(ele, bd);
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -597,8 +618,7 @@ public class BeanDefinitionParserDelegate {
 	 * @param containingBean containing bean definition
 	 * @return a bean definition initialized according to the bean element attributes
 	 */
-	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
-			@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
+	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName, @Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
 
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
@@ -610,23 +630,30 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
+			//abstract 属性
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
 
+		//lazy-init属性
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
 		if (isDefaultValue(lazyInit)) {
+			//如果是默认值则设置为具体的默认值
 			lazyInit = this.defaults.getLazyInit();
 		}
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
 
+		//autowire属性
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 
+		//depends-on 属性
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
+			//还有多个
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
+		//autowire-candidate 属性
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
 		if (isDefaultValue(autowireCandidate)) {
 			String candidatePattern = this.defaults.getAutowireCandidates();
@@ -638,10 +665,12 @@ public class BeanDefinitionParserDelegate {
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
+		//primary 属性
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
+		//init-method 属性
 		if (ele.hasAttribute(INIT_METHOD_ATTRIBUTE)) {
 			String initMethodName = ele.getAttribute(INIT_METHOD_ATTRIBUTE);
 			bd.setInitMethodName(initMethodName);
@@ -650,6 +679,7 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceInitMethod(false);
 		}
 
+		//destroy-method 属性
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			bd.setDestroyMethodName(destroyMethodName);
@@ -658,9 +688,11 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceDestroyMethod(false);
 		}
 
+		//factory-method 属性
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
+		//factory-bean 属性
 		if (ele.hasAttribute(FACTORY_BEAN_ATTRIBUTE)) {
 			bd.setFactoryBeanName(ele.getAttribute(FACTORY_BEAN_ATTRIBUTE));
 		}
@@ -682,15 +714,38 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse the meta elements underneath the given element, if any.
+	 *
+	 * <bean id="child" class="com.javaxxl.parent.Child">
+	 * ---<meta key="meta_1" value="val_1"/>
+	 * ---<meta key="meta_2" value="val_2"/>
+	 * </bean>
+	 *
+	 * @param ele 当前 bean 标签
+	 * @param attributeAccessor 其实就是bd（GenericBeanDefinition）
+	 * @see GenericBeanDefinition 该类就继承自 BeanMetadataAttributeAccessor
 	 */
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
+		/**
+		 * 得到
+		 * <meta key="meta_1" value="val_1"/>
+		 * <meta key="meta_2" value="val_2"/>
+		 *
+		 * meta标签列表
+		 */
 		NodeList nl = ele.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
+			//<meta key="meta_1" value="val_1"/>
 			Node node = nl.item(i);
-			if (isCandidateElement(node) && nodeNameEquals(node, META_ELEMENT)) {
+			if (isCandidateElement(node)
+
+					//该节点的名称是 meta
+					&& nodeNameEquals(node, META_ELEMENT)) {
+				//说明这个节点是一个 meta 节点
+
 				Element metaElement = (Element) node;
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
 				String value = metaElement.getAttribute(VALUE_ATTRIBUTE);
+				//该对象就是用来保存 key,value
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
 				attributeAccessor.addMetadataAttribute(attribute);
@@ -1546,5 +1601,4 @@ public class BeanDefinitionParserDelegate {
 	private boolean isCandidateElement(Node node) {
 		return (node instanceof Element && (isDefaultNamespace(node) || !isDefaultNamespace(node.getParentNode())));
 	}
-
 }
