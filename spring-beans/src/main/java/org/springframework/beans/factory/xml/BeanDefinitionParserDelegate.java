@@ -584,9 +584,24 @@ public class BeanDefinitionParserDelegate {
 			 * 		<meta key="meta_1" value="val_1"/>
 			 * 		<meta key="meta_2" value="val_2"/>
 			 * 	</bean>
+			 *
+			 * 	反正就是先解析，然后都放到 bd 对象中
 			 */
 			parseMetaElements(ele, bd);
+
+			/**
+			 * <bean id="getBeanTest" class="com.javaxxl.lookup.GetBeanTest">
+			 * 		<lookup-method name="getBean" bean="teacher"/>
+			 * 	</bean>
+			 *
+			 * 	<bean id="teacher" class="com.javaxxl.lookup.Teacher"/>
+			 *
+			 * 解析 lookup-method
+			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			/**
+			 *
+			 */
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			parseConstructorArgElements(ele, bd);
@@ -748,6 +763,7 @@ public class BeanDefinitionParserDelegate {
 				//该对象就是用来保存 key,value
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
+				//其实就是放到了一个map中
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
 		}
@@ -818,6 +834,12 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse lookup-override sub-elements of the given bean element.
+	 *
+	 * <bean id="getBeanTest" class="com.javaxxl.lookup.GetBeanTest">
+	 * ---<lookup-method name="getBean" bean="teacher"/>
+	 * </bean>
+	 *
+	 * <bean id="teacher" class="com.javaxxl.lookup.Teacher"/>
 	 */
 	public void parseLookupOverrideSubElements(Element beanEle, MethodOverrides overrides) {
 		NodeList nl = beanEle.getChildNodes();
