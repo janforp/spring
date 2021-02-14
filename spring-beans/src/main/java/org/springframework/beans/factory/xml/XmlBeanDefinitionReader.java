@@ -105,8 +105,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	private boolean namespaceAware = false;
 
-	private Class<? extends BeanDefinitionDocumentReader> documentReaderClass =
-			DefaultBeanDefinitionDocumentReader.class;
+	/**
+	 * TODO 为何该实例是一个class而不是一个该class的具体对象？
+	 * 每个 document 对象都会创建一个 BeanDefinitionDocumentReader 对象去处理自己,但是当前对象(Reader)自己是可以处理多个document的，所以每处理一个document就需要实例化一个
+	 */
+	private Class<? extends BeanDefinitionDocumentReader> documentReaderClass = DefaultBeanDefinitionDocumentReader.class;
 
 	private ProblemReporter problemReporter = new FailFastProblemReporter();
 
@@ -428,6 +431,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 			/**
 			 * 将 document 解析成 bd，最终返回新注册到beanFactory中的bean的数量
+			 *
+			 * TODO 注册 BeanDefinition 到???哪里呢？
 			 */
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
@@ -471,11 +476,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		/**
 		 * 1.EntityResolver是干什么的?（一般的是使用网络文件，该对象可以避免从网络下载，提供本地解析规则）
 		 * @see DelegatingEntityResolver
-		 * 2.验证模式是如何获取的？
+		 * 2.验证模式是如何获取的 ：{@link XmlValidationModeDetector#detectValidationMode(java.io.InputStream)}
+		 * @see XmlValidationModeDetector#detectValidationMode(java.io.InputStream)
 		 */
 		return this.documentLoader.loadDocument(
 				inputSource,
-				getEntityResolver(),
+				getEntityResolver(),//其实就是用来解析
 				this.errorHandler,
 				getValidationModeForResource(resource),//当前xml是采用什么验证模式：xsd或者dtd
 				isNamespaceAware());
@@ -491,8 +497,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #detectValidationMode
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		//VALIDATION_AUTO:说明要自己去检测
 		int validationModeToUse = getValidationMode();
 		if (validationModeToUse != VALIDATION_AUTO) {
+			//如果到这里，说明set设置过默认值，一般不会这样做，都是使用 自动检测
 			return validationModeToUse;
 		}
 		int detectedMode = detectValidationMode(resource);
@@ -514,6 +522,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	protected int detectValidationMode(Resource resource) {
 		if (resource.isOpen()) {
+			//文件是打开状态，当前程序无法再读取
 			throw new BeanDefinitionStoreException(
 					"Passed-in Resource [" + resource + "] contains an open stream: " +
 							"cannot determine validation mode automatically. Either pass in a Resource " +
@@ -554,11 +563,31 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
-		//dom reader
+		/**
+		 * dom reader
+		 * 创建一个 BeanDefinitionDocumentReader ，一个 BeanDefinitionDocumentReader 只能处理一个 document 对象！！！
+		 * 每个 document 对象都会创建一个 BeanDefinitionDocumentReader 对象去处理自己
+		 */
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
-		int countBefore = getRegistry().getBeanDefinitionCount();
-		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
-		return getRegistry().getBeanDefinitionCount() - countBefore;
+		int countBefore = getRegistry().//该方法会返回beanFactory实例
+				getBeanDefinitionCount();//获取 解析该 doc 之前，bf中 已经注册过的bd数量 就是该方法返回 (countBefore)
+
+		/**
+		 * 真正的解析 doc,并且注册到 registry
+		 */
+		documentReader.registerBeanDefinitions(doc,
+
+				/**
+				 * XmlReaderContext:包含最主要的参数就是当前 this: XmlBeanDefinitionReader,
+				 * 而 XmlBeanDefinitionReader 中是包含 beanFactory 的{@link AbstractBeanDefinitionReader#registry}
+				 * 这样就能够把解析出来的bd注册到 beanFactory中去
+				 * @see XmlReaderContext#XmlReaderContext(org.springframework.core.io.Resource, org.springframework.beans.factory.parsing.ProblemReporter, org.springframework.beans.factory.parsing.ReaderEventListener, org.springframework.beans.factory.parsing.SourceExtractor, org.springframework.beans.factory.xml.XmlBeanDefinitionReader, org.springframework.beans.factory.xml.NamespaceHandlerResolver)
+				 */
+				createReaderContext(resource));
+
+		return getRegistry().getBeanDefinitionCount()//解析 当前 doc 之后的注册 bd
+
+				- countBefore;
 	}
 
 	/**
@@ -576,8 +605,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * Create the {@link XmlReaderContext} to pass over to the document reader.
 	 */
 	public XmlReaderContext createReaderContext(Resource resource) {
-		return new XmlReaderContext(resource, this.problemReporter, this.eventListener,
-				this.sourceExtractor, this, getNamespaceHandlerResolver());
+		return new XmlReaderContext(resource,
+				this.problemReporter,
+				this.eventListener,
+				this.sourceExtractor,
+				this,
+				getNamespaceHandlerResolver());
 	}
 
 	/**

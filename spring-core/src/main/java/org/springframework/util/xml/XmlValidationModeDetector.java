@@ -16,14 +16,14 @@
 
 package org.springframework.util.xml;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 
 /**
  * Detects whether an XML stream is using DTD- or XSD-based validation.
@@ -56,7 +56,6 @@ public class XmlValidationModeDetector {
 	 */
 	public static final int VALIDATION_XSD = 3;
 
-
 	/**
 	 * The token in a XML document that declares the DTD to use for validation
 	 * and thus that DTD validation is being used.
@@ -73,32 +72,33 @@ public class XmlValidationModeDetector {
 	 */
 	private static final String END_COMMENT = "-->";
 
-
 	/**
 	 * Indicates whether or not the current parse position is inside an XML comment.
 	 */
 	private boolean inComment;
 
-
 	/**
 	 * Detect the validation mode for the XML document in the supplied {@link InputStream}.
 	 * Note that the supplied {@link InputStream} is closed by this method before returning.
+	 *
 	 * @param inputStream the InputStream to parse
 	 * @throws IOException in case of I/O failure
 	 * @see #VALIDATION_DTD
 	 * @see #VALIDATION_XSD
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
-		// Peek into the file to look for DOCTYPE.
+		// Peek into the file to look for DOCTYPE.：窥视该文件以查找DOCTYPE。
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 			boolean isDtdValidated = false;
 			String content;
 			while ((content = reader.readLine()) != null) {
 				content = consumeCommentTokens(content);
 				if (this.inComment || !StringUtils.hasText(content)) {
+					//跳过注释，跳过空行
 					continue;
 				}
 				if (hasDoctype(content)) {
+					//如果包含字符串 DOCTYPE，则为 dtd 模式
 					isDtdValidated = true;
 					break;
 				}
@@ -108,14 +108,12 @@ public class XmlValidationModeDetector {
 				}
 			}
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
-		}
-		catch (CharConversionException ex) {
+		} catch (CharConversionException ex) {
 			// Choked on some character encoding...
 			// Leave the decision up to the caller.
 			return VALIDATION_AUTO;
 		}
 	}
-
 
 	/**
 	 * Does the content contain the DTD DOCTYPE declaration?
@@ -177,6 +175,7 @@ public class XmlValidationModeDetector {
 
 	/**
 	 * Try to consume the {@link #START_COMMENT} token.
+	 *
 	 * @see #commentToken(String, String, boolean)
 	 */
 	private int startComment(String line) {
@@ -194,7 +193,7 @@ public class XmlValidationModeDetector {
 	 */
 	private int commentToken(String line, String token, boolean inCommentIfPresent) {
 		int index = line.indexOf(token);
-		if (index > - 1) {
+		if (index > -1) {
 			this.inComment = inCommentIfPresent;
 		}
 		return (index == -1 ? index : index + token.length());
