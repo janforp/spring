@@ -517,6 +517,8 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * 把 bean 标签解析成 bd 的核心逻辑
+	 *
+	 * 每一步都是解析一个具体的标签，并且把解析之后的信息设置到bd中
 	 * Parse the bean definition itself, without regard to name or aliases. May return
 	 * {@code null} if problems occurred during the parsing of the bean definition.
 	 *
@@ -613,7 +615,19 @@ public class BeanDefinitionParserDelegate {
 			 * 解析 constructor-arg 子标签
 			 */
 			parseConstructorArgElements(ele, bd);
+
+			/**
+			 * 解析 property 子标签
+			 */
 			parsePropertyElements(ele, bd);
+
+			/**
+			 * 解析 qualifier 子标签
+			 *
+			 * <bean id="xxx" class="xxxxxx">
+			 * 		<qualifier type = "xxxxx" valeu = "xxxxxxx">
+			 * 	</bean>
+			 */
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -829,6 +843,9 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse qualifier sub-elements of the given bean element.
+	 * <bean id="xxx" class="xxxxxx">
+	 * ---<qualifier type = "xxxxx" valeu = "xxxxxxx">
+	 * </bean>
 	 */
 	public void parseQualifierElements(Element beanEle, AbstractBeanDefinition bd) {
 		NodeList nl = beanEle.getChildNodes();
