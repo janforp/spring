@@ -122,6 +122,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	private DocumentLoader documentLoader = new DefaultDocumentLoader();
 
+	/**
+	 * 解析xml中的任何实体
+	 */
 	@Nullable
 	private EntityResolver entityResolver;
 
@@ -465,11 +468,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see DocumentLoader#loadDocument
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
+		/**
+		 * 1.EntityResolver是干什么的?（一般的是使用网络文件，该对象可以避免从网络下载，提供本地解析规则）
+		 * @see DelegatingEntityResolver
+		 * 2.验证模式是如何获取的？
+		 */
 		return this.documentLoader.loadDocument(
 				inputSource,
 				getEntityResolver(),
 				this.errorHandler,
-				getValidationModeForResource(resource),
+				getValidationModeForResource(resource),//当前xml是采用什么验证模式：xsd或者dtd
 				isNamespaceAware());
 	}
 
