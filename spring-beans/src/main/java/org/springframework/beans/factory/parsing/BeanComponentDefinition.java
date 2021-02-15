@@ -1,23 +1,4 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.parsing;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
@@ -25,6 +6,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.lang.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ComponentDefinition based on a standard BeanDefinition, exposing the given bean
@@ -40,9 +24,9 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 
 	private BeanReference[] beanReferences;
 
-
 	/**
 	 * Create a new BeanComponentDefinition for the given bean.
+	 *
 	 * @param beanDefinition the BeanDefinition
 	 * @param beanName the name of the bean
 	 */
@@ -52,6 +36,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 
 	/**
 	 * Create a new BeanComponentDefinition for the given bean.
+	 *
 	 * @param beanDefinition the BeanDefinition
 	 * @param beanName the name of the bean
 	 * @param aliases alias names for the bean, or {@code null} if none
@@ -62,6 +47,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 
 	/**
 	 * Create a new BeanComponentDefinition for the given bean.
+	 *
 	 * @param beanDefinitionHolder the BeanDefinitionHolder encapsulating
 	 * the bean definition as well as the name of the bean
 	 */
@@ -75,18 +61,15 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 			Object value = propertyValue.getValue();
 			if (value instanceof BeanDefinitionHolder) {
 				innerBeans.add(((BeanDefinitionHolder) value).getBeanDefinition());
-			}
-			else if (value instanceof BeanDefinition) {
+			} else if (value instanceof BeanDefinition) {
 				innerBeans.add((BeanDefinition) value);
-			}
-			else if (value instanceof BeanReference) {
+			} else if (value instanceof BeanReference) {
 				references.add((BeanReference) value);
 			}
 		}
 		this.innerBeanDefinitions = innerBeans.toArray(new BeanDefinition[0]);
 		this.beanReferences = references.toArray(new BeanReference[0]);
 	}
-
 
 	@Override
 	public String getName() {
@@ -100,7 +83,7 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 
 	@Override
 	public BeanDefinition[] getBeanDefinitions() {
-		return new BeanDefinition[] {getBeanDefinition()};
+		return new BeanDefinition[] { getBeanDefinition() };
 	}
 
 	@Override
@@ -113,9 +96,9 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 		return this.beanReferences;
 	}
 
-
 	/**
 	 * This implementation returns this ComponentDefinition's description.
+	 *
 	 * @see #getDescription()
 	 */
 	@Override
@@ -131,5 +114,4 @@ public class BeanComponentDefinition extends BeanDefinitionHolder implements Com
 	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof BeanComponentDefinition && super.equals(other)));
 	}
-
 }

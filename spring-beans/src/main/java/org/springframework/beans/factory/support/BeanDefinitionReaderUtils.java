@@ -161,13 +161,11 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Register the given bean definition with the given bean factory.
 	 *
-	 * @param definitionHolder the bean definition including name and aliases
-	 * @param registry the bean factory to register with
+	 * @param definitionHolder the bean definition including name and aliases 解析xml标签得到的 bdHolder
+	 * @param registry the bean factory to register with 注册中心
 	 * @throws BeanDefinitionStoreException if registration failed
 	 */
-	public static void registerBeanDefinition(
-			BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
-			throws BeanDefinitionStoreException {
+	public static void registerBeanDefinition(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry) throws BeanDefinitionStoreException {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
