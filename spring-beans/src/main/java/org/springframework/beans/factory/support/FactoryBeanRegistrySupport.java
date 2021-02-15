@@ -81,23 +81,48 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 *
 	 * @param factory the FactoryBean instance
 	 * @param beanName the name of the bean
-	 * @param shouldPostProcess whether the bean is subject to post-processing
+	 * @param shouldPostProcess whether the bean is subject to post-processing:默认值为 true，表示这是一个用户对象，如果为 false，则表示是系统对象，大部分情况为 true
 	 * @return the object obtained from the FactoryBean
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
-		if (factory.isSingleton() && containsSingleton(beanName)) {
+
+		//CASE1:FactoryBean 实例中维护的对象是单实例
+		if (factory.isSingleton()
+
+				/**
+				 * 判断一级缓存中是否有该 FactoryBean 实例，都到这里了，当前 FactoryBean 实例肯定是有的
+				 * 因为虽然 FactoryBean 中 getObject() 对象是手动生成的，但是 FactoryBean 实例还是要交给 spring 维护的！！！
+				 */
+				&& containsSingleton(beanName)) {
+
+			/**
+			 * 获取一级缓存锁
+			 */
 			synchronized (getSingletonMutex()) {
+				//从缓存拿（考虑到并发）
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
+
+					//真正的去FactoryBean 中 getObject() 拿对象
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
+
+					/**
+					 * key:FactoryBean name
+					 * value:当前 FactoryBean 实例管理的对象
+					 */
 					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
 					if (alreadyThere != null) {
+
+						//缓存中已经有
 						object = alreadyThere;
-					} else {
+					}
+
+					//缓存中还没有！
+					else {
 						if (shouldPostProcess) {
 							if (isSingletonCurrentlyInCreation(beanName)) {
 								// Temporarily return non-post-processed object, not storing it yet..
@@ -105,6 +130,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 							}
 							beforeSingletonCreation(beanName);
 							try {
+								//执行后处理器,可能进行增强
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							} catch (Throwable ex) {
 								throw new BeanCreationException(beanName, "Post-processing of FactoryBean's singleton object failed", ex);
@@ -119,10 +145,16 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				}
 				return object;
 			}
-		} else {
+		}
+
+		//CASE2:FactoryBean 实例中维护的对象不是单实例
+		else {
+
+			//每次都是新创建
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (shouldPostProcess) {
 				try {
+					//执行后处理器,可能进行增强
 					object = postProcessObjectFromFactoryBean(object, beanName);
 				} catch (Throwable ex) {
 					throw new BeanCreationException(beanName, "Post-processing of FactoryBean's object failed", ex);
@@ -164,8 +196,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 		// initialized yet: Many FactoryBeans just return null then.
 		if (object == null) {
 			if (isSingletonCurrentlyInCreation(beanName)) {
-				throw new BeanCurrentlyInCreationException(
-						beanName, "FactoryBean which is currently in creation returned null from getObject");
+				throw new BeanCurrentlyInCreationException(beanName, "FactoryBean which is currently in creation returned null from getObject");
 			}
 			object = new NullBean();
 		}

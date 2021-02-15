@@ -1990,18 +1990,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		if (object == null) {
 			/**
-			 * 到这里说明，当前实例还没有从 {@link FactoryBean#getObject()} 获取过
+			 * 到这里说明，当前实例还没有从 {@link FactoryBean#getObject()} 获取过,缓存中没有
 			 * 下面需要 {@link FactoryBean#getObject()} 创建
 			 */
 			// Return bean instance from factory.
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
 			// Caches object obtained from FactoryBean if it is a singleton.:缓存从FactoryBean获得的对象（如果是单例）。
-			if (mbd == null && containsBeanDefinition(beanName)) {
 
-				//获取合并后的 bd
+			if (mbd == null // 大部分调用该方法的地方都会传 null
+
+					//判断spring中是否有当前 beanName 对应的 BD 信息
+					&& containsBeanDefinition(beanName)) {
+
+				/**
+				 * 获取合并后的 bd
+				 * 为什么需要合并？
+				 * 答：因为我们的 bean 标签是支持继承的(parent属性)
+				 */
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
-			//synthetic:合成的
+			//synthetic:合成的,默认值为 false，表示这是一个用户对象，如果为true，则表示是系统对象
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
 			/**
 			 * 从 {@link FactoryBean#getObject()} 获取实例
