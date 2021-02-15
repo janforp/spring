@@ -396,15 +396,41 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				/**
 				 * Guarantee initialization of beans that the current bean depends on.
 				 *  -- 确保当前bean依赖的bean的初始化。
+				 *
+				 *  <bean name = "A" depends-on = "B" .../>
+				 *  <bean name = "B" .../>
+				 *
+				 *  说明，实例化A完成之前，B必须已经实例化了
+				 *
+				 *  但是有一个循环依赖问题:
+				 *
+				 *  <bean name = "A" depends-on = "B" .../>
+				 *  <bean name = "B" depends-on = "A" .../>
+				 *  这样的情况spring是无法处理的，需要报错！
+				 *  spring是如何发现这样的错误配置，并且是如何实现的呢?
+				 *  依靠2个map!!!
+				 *  @see DefaultSingletonBeanRegistry#dependentBeanMap 记录依赖当前 beanName 的其他 beanName
+				 *  @see DefaultSingletonBeanRegistry#dependenciesForBeanMap 记录当前 beanName 依赖的其他 beanName 集合
+				 *
+				 *  具体实现如下：
 				 */
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
+						//判断循环依赖
 						if (isDependent(beanName, dep)) {
+							//发生循环依赖，类似 <bean name = "A" depends-on = "B" .../>
+							// <bean name = "B" depends-on = "A" .../>
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
+
+						/**
+						 * 假设<bean name = "A" depends-on = "B" .../>
+						 * 则 dep = B, beanName = A
+						 */
 						registerDependentBean(dep, beanName);
 						try {
+							//必须要实例化 dep
 							getBean(dep);
 						} catch (NoSuchBeanDefinitionException ex) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName, "'" + beanName + "' depends on missing bean '" + dep + "'", ex);

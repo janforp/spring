@@ -119,11 +119,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Map between dependent bean names: bean name to Set of dependent bean names.
+	 *
+	 * 记录依赖当前 beanName 的其他 beanName
 	 */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
 	/**
 	 * Map between depending bean names: bean name to Set of bean names for the bean's dependencies.
+	 *
+	 * 记录当前 beanName 依赖的其他 beanName 集合
 	 */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
@@ -513,23 +517,29 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * Register a dependent bean for the given bean,
 	 * to be destroyed before the given bean is destroyed.
 	 *
+	 * 假设<bean name = "A" depends-on = "B" .../>
+	 * 则 beanName = B, dependentBeanName = A
+	 *
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+
+		/**
+		 * 假设<bean name = "A" depends-on = "B" .../>
+		 * 则 beanName = B, dependentBeanName = A
+		 */
 		String canonicalName = canonicalName(beanName);
 
 		synchronized (this.dependentBeanMap) {
-			Set<String> dependentBeans =
-					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
+			Set<String> dependentBeans = this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
 			if (!dependentBeans.add(dependentBeanName)) {
 				return;
 			}
 		}
 
 		synchronized (this.dependenciesForBeanMap) {
-			Set<String> dependenciesForBean =
-					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
+			Set<String> dependenciesForBean = this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
 			dependenciesForBean.add(canonicalName);
 		}
 	}
@@ -549,20 +559,69 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		}
 	}
 
-	private boolean isDependent(String beanName,
-			String dependentBeanName,
-			@Nullable Set<String> alreadySeen) {
+	/**
+	 * 假设
+	 * <bean name = "A" depends-on = "B" .../>
+	 * <bean name = "B" depends-on = "A" .../>
+	 *
+	 * 先处理 A
+	 * 再处理 B
+	 *
+	 * 那么在处理 B 的时候也会来到当前方法
+	 * 当前数据情况：
+	 *
+	 * dependentBeanMap:{"B":{"A}}
+	 * dependenciesForBeanMap: {"A" : {"B"}}
+	 */
+	private boolean isDependent(
+			String beanName, // B
+			String dependentBeanName, //A
+
+			/**
+			 * <bean name = "A" depends-on = "B" .../>
+			 * <bean name = "B" depends-on = "C" .../>
+			 * <bean name = "C" depends-on = "A" .../>
+			 * 如果有这样的场景，则该参数有值
+			 */
+			@Nullable Set<String> alreadySeen) { // null
 		if (alreadySeen != null && alreadySeen.contains(beanName)) {
 			return false;
 		}
+
+		//B
 		String canonicalName = canonicalName(beanName);
+
+		//得到 {"A"}
 		Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
 		if (dependentBeans == null) {
 			return false;
 		}
+
+		//{"A"} .contains("A") == true
 		if (dependentBeans.contains(dependentBeanName)) {
+			/**
+			 * 表示发生了循环依赖
+			 * <bean name = "A" depends-on = "B" .../>
+			 * <bean name = "B" depends-on = "A" .../>
+			 *
+			 * 这种情况的循环依赖在这里就能判断出来了
+			 */
 			return true;
 		}
+
+		/**
+		 * 但是如果是一个环状的循环依赖，则需要下面的逻辑
+		 *
+		 * <bean name = "A" depends-on = "B" .../>
+		 * <bean name = "B" depends-on = "C" .../>
+		 * <bean name = "C" depends-on = "A" .../>
+		 *
+		 * 假设加载顺序为 A -> B -> C
+		 * 则加载到C的时候，数据情况为
+		 *
+		 * @see DefaultSingletonBeanRegistry#dependentBeanMap 记录依赖当前 beanName 的其他 beanName : {"B":{"A"} , "C":{"B"}}
+		 * @see DefaultSingletonBeanRegistry#dependenciesForBeanMap 记录当前 beanName 依赖的其他 beanName 集合 : {}
+		 */
 		for (String transitiveDependency : dependentBeans) {
 			if (alreadySeen == null) {
 				alreadySeen = new HashSet<>();
