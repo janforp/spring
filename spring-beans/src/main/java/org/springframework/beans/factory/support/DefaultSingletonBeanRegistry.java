@@ -265,6 +265,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 								 * @see ObjectFactory#getObject()
 								 *
 								 * 为什么要三级缓存，如果只有二级缓存的话是不是也能解决问题呢？
+								 * 答：
+								 * spring除了ioc,还有aop
+								 * AOP是通过动态代理实现的，包括(jdk跟cglib2个方式)
+								 * 静态代理：需要手动写代码，实现新类，这个类需要和代理对象实现一个接口，内部维护一个被代理(原生)对象，代理类在对应原生对象前后可以添加一些其他逻辑，实现增强，总结：代理对象和被代理对象的内存地址是不一样的
+								 * 动态代理：不需要手动写代码，而是依靠字节码框架生成class字节码文件，然后jvm再加载，然后也一样，也是去new代理对象，这个代理对象没有啥特殊的，也是内部保留；额原生对象，然后在调用原生对象前后实现字节码增强
+								 *
+								 * 三级缓存中保存的是对象工厂(ObjectFactory)，这个工厂内部保留了最原生的对象引用，{@link ObjectFactory#getObject() }方法，它需要考虑一个问题：它到底要返回一个原生的还是一个增强后的对象？
+								 * {@link ObjectFactory#getObject()} 方法会判断当前这个早期对象，是否需要被增强，如果要，则提前完成动态代理增强，返回代理对象，否则返回原生对象
 								 */
 								singletonObject = singletonFactory.getObject();
 								//创建成功放入二级缓存
