@@ -1723,6 +1723,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (mbd.hasBeanClass()) {
 				return mbd.getBeanClass();
 			}
+
+			/**
+			 * @see AbstractBeanDefinition#beanClass 该参数为null的时候 会往下执行
+			 */
+
 			if (System.getSecurityManager() != null) {
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
 						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
@@ -1739,15 +1744,23 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 	}
 
+	/**
+	 * @param mbd bd
+	 * @param typesToMatch 可能为空
+	 */
 	@Nullable
-	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch)
-			throws ClassNotFoundException {
+	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch) throws ClassNotFoundException {
 
+		/**
+		 * @see AbstractBeanFactory#beanClassLoader
+		 */
 		ClassLoader beanClassLoader = getBeanClassLoader();
 		ClassLoader dynamicLoader = beanClassLoader;
 		boolean freshResolve = false;
 
 		if (!ObjectUtils.isEmpty(typesToMatch)) {
+			//typesToMatch 不为空
+
 			// When just doing type checks (i.e. not creating an actual instance yet),
 			// use the specified temporary class loader (e.g. in a weaving scenario).
 			ClassLoader tempClassLoader = getTempClassLoader();
@@ -1765,6 +1778,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		String className = mbd.getBeanClassName();
 		if (className != null) {
+			//<bean  class = "xxxxx" /> 说明配置了 class
+
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
@@ -2242,10 +2257,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 
 	/**
-	 * Create a bean instance for the given merged bean definition (and arguments).
-	 * The bean definition will already have been merged with the parent definition
-	 * in case of a child definition.
-	 * <p>All bean retrieval methods delegate to this method for actual bean creation.
+	 * Create a bean instance for the given merged bean definition (and arguments).：为给定的 mbd（和参数）创建一个bean实例。
+	 * The bean definition will already have been merged with the parent definition in case of a child definition.：如果当前bean是一个子bd，则已经跟它的父bd合并过了
+	 * <p>All bean retrieval methods delegate to this method for actual bean creation.:所有bean检索方法都委托该方法进行实际的bean创建。!!!!!!!!!
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the merged bean definition for the bean
@@ -2253,8 +2267,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return a new instance of the bean
 	 * @throws BeanCreationException if the bean could not be created
 	 */
-	protected abstract Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
-			throws BeanCreationException;
+	protected abstract Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException;
 
 	/**
 	 * CopyOnWriteArrayList which resets the beanPostProcessorCache field on modification.
