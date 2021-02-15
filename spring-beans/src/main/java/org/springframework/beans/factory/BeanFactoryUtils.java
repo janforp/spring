@@ -16,6 +16,12 @@
 
 package org.springframework.beans.factory;
 
+import org.springframework.beans.BeansException;
+import org.springframework.core.ResolvableType;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,12 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.BeansException;
-import org.springframework.core.ResolvableType;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Convenience methods operating on bean factories, in particular
@@ -54,15 +54,19 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Cache from name with factory bean prefix to stripped name without dereference.
-	 * @since 5.1
+	 * -- 从具有工厂Bean前缀的名称缓存到剥离的名称，而无需取消引用。
+	 *
+	 * 缓存处理完 & 之后的 beanName，提供后续程序运行性能
+	 *
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
+	 * @since 5.1
 	 */
 	private static final Map<String, String> transformedBeanNameCache = new ConcurrentHashMap<>();
-
 
 	/**
 	 * Return whether the given name is a factory dereference
 	 * (beginning with the factory dereference prefix).
+	 *
 	 * @param name the name of the bean
 	 * @return whether the given name is a factory dereference
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
@@ -74,27 +78,43 @@ public abstract class BeanFactoryUtils {
 	/**
 	 * Return the actual bean name, stripping out the factory dereference
 	 * prefix (if any, also stripping repeated factory prefixes if found).
+	 *
+	 * 1.别名：重定向出来真实 beanName
+	 * 2.&开头的name：说明你要获取一个FactoryBean类型的bean
+	 * 3.真实的BeanName
+	 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+	 * 这里就涉及两种对象，一种是FactoryBean接口实现类，一种是FactoryBean实现类内部管理的对象，
+	 * 如果要拿FactoryBean接口实现类，使用getBean的时候传的name要使用 & 开头
+	 * 如果要拿FactoryBean实现类内部管理的对象，直接传name即可，不需要 & 开头
+	 *
 	 * @param name the name of the bean
-	 * @return the transformed name
+	 * @return the transformed name, 若 abc 则返回 abc;若 &abc 则返回 abc;若 &&abc 则返回 abc;
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
+			//不是 & 开头的
 			return name;
 		}
-		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
-			do {
-				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
-			}
-			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
-			return beanName;
-		});
+
+		//&开头的,说明要拿一个 FactoryBean 实例对象
+		return transformedBeanNameCache.computeIfAbsent(name,
+
+				//Function 实例：去掉 &
+				beanName -> {
+					do {
+						beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
+					} while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
+					return beanName;
+				}
+		);
 	}
 
 	/**
 	 * Return whether the given name is a bean name which has been generated
 	 * by the default naming strategy (containing a "#..." part).
+	 *
 	 * @param name the name of the bean
 	 * @return whether the given name is a generated bean name
 	 * @see #GENERATED_BEAN_NAME_SEPARATOR
@@ -108,6 +128,7 @@ public abstract class BeanFactoryUtils {
 	/**
 	 * Extract the "raw" bean name from the given (potentially generated) bean name,
 	 * excluding any "#..." suffixes which might have been added for uniqueness.
+	 *
 	 * @param name the potentially generated bean name
 	 * @return the raw bean name
 	 * @see #GENERATED_BEAN_NAME_SEPARATOR
@@ -118,7 +139,6 @@ public abstract class BeanFactoryUtils {
 		return (separatorIndex != -1 ? name.substring(0, separatorIndex) : name);
 	}
 
-
 	// Retrieval of bean names
 
 	/**
@@ -126,6 +146,7 @@ public abstract class BeanFactoryUtils {
 	 * Includes counts of ancestor bean factories.
 	 * <p>Beans that are "overridden" (specified in a descendant factory
 	 * with the same name) are only counted once.
+	 *
 	 * @param lbf the bean factory
 	 * @return count of beans including those defined in ancestor factories
 	 * @see #beanNamesIncludingAncestors
@@ -136,6 +157,7 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Return all bean names in the factory, including ancestor factories.
+	 *
 	 * @param lbf the bean factory
 	 * @return the array of matching bean names, or an empty array if none
 	 * @see #beanNamesForTypeIncludingAncestors
@@ -152,11 +174,12 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
 	 * includes prototypes and FactoryBeans.
+	 *
 	 * @param lbf the bean factory
 	 * @param type the type that beans must match (as a {@code ResolvableType})
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 4.2
 	 * @see ListableBeanFactory#getBeanNamesForType(ResolvableType)
+	 * @since 4.2
 	 */
 	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, ResolvableType type) {
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
@@ -181,6 +204,7 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
+	 *
 	 * @param lbf the bean factory
 	 * @param type the type that beans must match (as a {@code ResolvableType})
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
@@ -191,8 +215,8 @@ public abstract class BeanFactoryUtils {
 	 * eagerly initialized to determine their type: So be aware that passing in "true"
 	 * for this flag will initialize FactoryBeans and "factory-bean" references.
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 5.2
 	 * @see ListableBeanFactory#getBeanNamesForType(ResolvableType, boolean, boolean)
+	 * @since 5.2
 	 */
 	public static String[] beanNamesForTypeIncludingAncestors(
 			ListableBeanFactory lbf, ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
@@ -218,6 +242,7 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
 	 * includes prototypes and FactoryBeans.
+	 *
 	 * @param lbf the bean factory
 	 * @param type the type that beans must match (as a {@code Class})
 	 * @return the array of matching bean names, or an empty array if none
@@ -246,6 +271,7 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
+	 *
 	 * @param lbf the bean factory
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
 	 * or just singletons (also applies to FactoryBeans)
@@ -278,11 +304,12 @@ public abstract class BeanFactoryUtils {
 	 * Get all bean names whose {@code Class} has the supplied {@link Annotation}
 	 * type, including those defined in ancestor factories, without creating any bean
 	 * instances yet. Will return unique names in case of overridden bean definitions.
+	 *
 	 * @param lbf the bean factory
 	 * @param annotationType the type of annotation to look for
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 5.0
 	 * @see ListableBeanFactory#getBeanNamesForAnnotation(Class)
+	 * @since 5.0
 	 */
 	public static String[] beanNamesForAnnotationIncludingAncestors(
 			ListableBeanFactory lbf, Class<? extends Annotation> annotationType) {
@@ -300,7 +327,6 @@ public abstract class BeanFactoryUtils {
 		return result;
 	}
 
-
 	// Retrieval of bean instances
 
 	/**
@@ -315,6 +341,7 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @return the Map of matching bean instances, or an empty Map if none
@@ -356,6 +383,7 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
@@ -406,6 +434,7 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @return the matching bean instance
@@ -436,6 +465,7 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
@@ -468,6 +498,7 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanOfType} automatically includes
 	 * prototypes and FactoryBeans.
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @return the matching bean instance
@@ -492,6 +523,7 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
+	 *
 	 * @param lbf the bean factory
 	 * @param type type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
@@ -516,9 +548,9 @@ public abstract class BeanFactoryUtils {
 		return uniqueBean(type, beansOfType);
 	}
 
-
 	/**
 	 * Merge the given bean names result with the given parent result.
+	 *
 	 * @param result the local bean name result
 	 * @param parentResult the parent bean name result (possibly empty)
 	 * @param hbf the local bean factory
@@ -541,6 +573,7 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Extract a unique bean for the given type from the given Map of matching beans.
+	 *
 	 * @param type type of bean to match
 	 * @param matchingBeans all matching beans found
 	 * @return the unique bean instance
@@ -551,11 +584,9 @@ public abstract class BeanFactoryUtils {
 		int count = matchingBeans.size();
 		if (count == 1) {
 			return matchingBeans.values().iterator().next();
-		}
-		else if (count > 1) {
+		} else if (count > 1) {
 			throw new NoUniqueBeanDefinitionException(type, matchingBeans.keySet());
-		}
-		else {
+		} else {
 			throw new NoSuchBeanDefinitionException(type);
 		}
 	}

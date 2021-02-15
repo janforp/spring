@@ -16,28 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.beans.PropertyEditor;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
@@ -83,6 +61,28 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
+
+import java.beans.PropertyEditor;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 /**
  * Abstract base class for {@link org.springframework.beans.factory.BeanFactory}
@@ -285,13 +285,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(
-			String name, // 名称
-			@Nullable Class<T> requiredType, //null
+			String name, // 名称,beanName 或者 alias 或者一个 &开头的name
+			@Nullable Class<T> requiredType, //可以null，类型
 			@Nullable Object[] args, //null
 			boolean typeCheckOnly //false
 	) throws BeansException {
 
+		/**
+		 * 转换beanName
+		 *
+		 * 1.别名：重定向出来真实 beanName
+		 * 2.&开头的name：说明你要获取一个FactoryBean类型的bean
+		 * 3.真实的BeanName
+		 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+		 * 这里就涉及两种对象，一种是FactoryBean接口实现类，一种是FactoryBean实现类内部管理的对象，
+		 * 如果要拿FactoryBean接口实现类，使用getBean的时候传的name要使用 & 开头
+		 * 如果要拿FactoryBean实现类内部管理的对象，直接传name即可，不需要 & 开头
+		 */
 		String beanName = transformedBeanName(name);
+
+		//保留返回值
 		Object beanInstance;
 
 		/**
@@ -300,6 +313,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		 *  首先试图到一级缓存拿
 		 *
 		 *  一般首次创建的 bean 这里拿到的是null
+		 *
+		 *  到缓存中获取共享单实例
 		 */
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
@@ -1301,14 +1316,34 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	//---------------------------------------------------------------------
 
 	/**
-	 * Return the bean name, stripping out the factory dereference prefix if necessary,
-	 * and resolving aliases to canonical names.
+	 * Return the bean name, stripping out the factory dereference prefix if necessary, and resolving aliases to canonical names.
+	 * -- 返回Bean名称，必要时去除工厂取消引用前缀，并将别名解析为规范名称。
 	 *
-	 * @param name the user-specified name
+	 * 1.别名：重定向出来真实 beanName
+	 * 2.&开头的name：说明你要获取一个FactoryBean类型的bean
+	 * 3.真实的BeanName
+	 *
+	 *
+	 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+	 * 这里就涉及两种对象，一种是FactoryBean接口实现类，一种是FactoryBean实现类内部管理的对象，
+	 * 如果要拿FactoryBean接口实现类，使用getBean的时候传的name要使用 & 开头
+	 * 如果要拿FactoryBean实现类内部管理的对象，直接传name即可，不需要 & 开头
+	 *
+	 * @param name the user-specified name：名称,beanName 或者 alias 或者一个 &开头的name
 	 * @return the transformed bean name
 	 */
 	protected String transformedBeanName(String name) {
-		return canonicalName(BeanFactoryUtils.transformedBeanName(name));
+		/**
+		 * 假设别名aliasMap 中信息为：{"C":"B" , "B":"A"},则表示 A 有一个别名叫做 B,别名 B 有一个别名叫做 C
+		 * 假设 getBean(C),则返回 A
+		 */
+		return canonicalName(
+				/**
+				 *  若 abc 则返回 abc;若 &abc 则返回 abc;若 &&abc 则返回 abc,
+				 *  该方法返回的可能还是别名
+				 */
+				BeanFactoryUtils.transformedBeanName(name)
+		);
 	}
 
 	/**
