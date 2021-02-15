@@ -314,6 +314,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			/**
+			 * 这里为什么又要套一层，为何不直接返回呢？
+			 * 答：
+			 * 其实，你从IOC容器中拿到的对象，它可能是普通单实例，也可能是 FactoryBean 实例。
+			 * 如果是 FactoryBean 实例，这个时候还需要进行处理，主要是看 name 是否带 & 开头
+			 * &开头，则说明要拿 FactoryBean 实例，否则为 FactoryBean 实例内部管理的bean
+			 */
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
@@ -1917,29 +1924,54 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param mbd the merged bean definition
 	 * @return the object to expose for the bean
 	 */
-	protected Object getObjectForBeanInstance(
-			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
+	protected Object getObjectForBeanInstance(Object beanInstance,
+			/**缓存中拿到的实例 {@link DefaultSingletonBeanRegistry#getSingleton(java.lang.String)}, 其实，你从IOC容器中拿到的对象，
+			 * 它可能是普通单实例，也可能是 FactoryBean 实例。如果是 FactoryBean 实例，这个时候还需要进行处理，
+			 * 主要是看 name 是否带 & 开头,&开头，则说明要拿 FactoryBean 实例，否则为 FactoryBean 实例内部管理的bean*/
+			String name,  //用户传入的未处理&的nam
+			String beanName, /** 处理 & 以及 alias 的 {@link AbstractBeanFactory#transformedBeanName(java.lang.String)}  ***/
+			@Nullable RootBeanDefinition mbd) { //合并过后的bd
 
-		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		// Don't let calling code try to dereference the factory if the bean isn't a factory.-- 如果Bean不是工厂，则不要让调用代码尝试取消引用工厂。
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
+			//说明name 是 & 开头的
 			if (beanInstance instanceof NullBean) {
+				// null
 				return beanInstance;
 			}
 			if (!(beanInstance instanceof FactoryBean)) {
+				//当前的 beanInstance 实例 不是 FactoryBean 实现，则抛出异常，因为你想要的就是一个 FactoryBean 实现，但是IOC中并没有
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
+			/**
+			 * 到这里的前提
+			 * 1.beanInstance 不是 null 类型
+			 * 2.beanInstance 是一个 FactoryBean 类型
+			 */
 			if (mbd != null) {
 				mbd.isFactoryBean = true;
 			}
 			return beanInstance;
 		}
 
-		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
-		// If it's a FactoryBean, we use it to create a bean instance, unless the
-		// caller actually wants a reference to the factory.
+		/**
+		 * 到这里的前提:
+		 * 1.name 并没有 & 开头
+		 */
+
+		// Now we have the bean instance, which may be a normal bean or a FactoryBean.-- 现在我们有了bean实例，它可以是普通bean或FactoryBean。
+		// If it's a FactoryBean, we use it to create a bean instance, unless the caller actually wants a reference to the factory.
+		// -- 如果它是FactoryBean，则除非调用者实际上想要引用该工厂，否则我们将使用它创建一个bean实例。
 		if (!(beanInstance instanceof FactoryBean)) {
+			//如果不是 FactoryBean 类型，则返回当前实例
 			return beanInstance;
 		}
+
+		/**
+		 * 到这里的前提:
+		 * 1.name 并没有 & 开头
+		 * 2.当前 beanInstance 是一个 FactoryBean 实例
+		 */
 
 		Object object = null;
 		if (mbd != null) {
@@ -1954,6 +1986,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (mbd == null && containsBeanDefinition(beanName)) {
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
+			//synthetic:合成的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
