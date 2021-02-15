@@ -1459,12 +1459,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		if (mbd != null && !mbd.stale) {
 			return mbd;
 		}
-		return getMergedBeanDefinition(beanName,
+		return getMergedBeanDefinition(
+
+				beanName,
 
 				/**
 				 * 到map中拿
 				 */
-				getBeanDefinition(beanName));
+				getBeanDefinition(beanName)
+		);
 	}
 
 	/**

@@ -173,6 +173,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	/**
 	 * Map of bean definition objects, keyed by bean name.
+	 *
+	 * 读取解析配置文件之后就已经有值了，后面具体 getBean 的时候会使用到这里的数据
 	 */
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
