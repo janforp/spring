@@ -464,6 +464,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+
+					/**
+					 * 这里为什么又要套一层，为何不直接返回呢？
+					 * 答：
+					 * 其实，你从IOC容器中拿到的对象，它可能是普通单实例，也可能是 FactoryBean 实例。
+					 * 如果是 FactoryBean 实例，这个时候还需要进行处理，主要是看 name 是否带 & 开头
+					 * &开头，则说明要拿 FactoryBean 实例，否则为 FactoryBean 实例内部管理的bean
+					 */
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
