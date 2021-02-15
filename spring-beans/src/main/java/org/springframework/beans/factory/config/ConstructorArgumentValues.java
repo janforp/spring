@@ -1,20 +1,11 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.config;
+
+import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.Mergeable;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,13 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.BeanMetadataElement;
-import org.springframework.beans.Mergeable;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-
 /**
  * Holder for constructor argument values, typically as part of a bean definition.
  *
@@ -38,15 +22,14 @@ import org.springframework.util.ObjectUtils;
  * as well as for generic argument matches by type.
  *
  * @author Juergen Hoeller
- * @since 09.11.2003
  * @see BeanDefinition#getConstructorArgumentValues
+ * @since 09.11.2003
  */
 public class ConstructorArgumentValues {
 
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
 	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
-
 
 	/**
 	 * Create a new empty ConstructorArgumentValues object.
@@ -56,12 +39,12 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Deep copy constructor.
+	 *
 	 * @param original the ConstructorArgumentValues to copy
 	 */
 	public ConstructorArgumentValues(ConstructorArgumentValues original) {
 		addArgumentValues(original);
 	}
-
 
 	/**
 	 * Copy all given argument values into this object, using separate holder
@@ -73,7 +56,7 @@ public class ConstructorArgumentValues {
 	public void addArgumentValues(@Nullable ConstructorArgumentValues other) {
 		if (other != null) {
 			other.indexedArgumentValues.forEach(
-				(index, argValue) -> addOrMergeIndexedArgumentValue(index, argValue.copy())
+					(index, argValue) -> addOrMergeIndexedArgumentValue(index, argValue.copy())
 			);
 			other.genericArgumentValues.stream()
 					.filter(valueHolder -> !this.genericArgumentValues.contains(valueHolder))
@@ -81,9 +64,9 @@ public class ConstructorArgumentValues {
 		}
 	}
 
-
 	/**
 	 * Add an argument value for the given index in the constructor argument list.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param value the argument value
 	 */
@@ -93,6 +76,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Add an argument value for the given index in the constructor argument list.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param value the argument value
 	 * @param type the type of the constructor argument
@@ -103,6 +87,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Add an argument value for the given index in the constructor argument list.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param newValue the argument value in the form of a ValueHolder
 	 */
@@ -116,6 +101,7 @@ public class ConstructorArgumentValues {
 	 * Add an argument value for the given index in the constructor argument list,
 	 * merging the new value (typically a collection) with the current value
 	 * if demanded: see {@link org.springframework.beans.Mergeable}.
+	 *
 	 * @param key the index in the constructor argument list
 	 * @param newValue the argument value in the form of a ValueHolder
 	 */
@@ -132,6 +118,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Check whether an argument value has been registered for the given index.
+	 *
 	 * @param index the index in the constructor argument list
 	 */
 	public boolean hasIndexedArgumentValue(int index) {
@@ -140,6 +127,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Get argument value for the given index in the constructor argument list.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the type to match (can be {@code null} to match
 	 * untyped values only)
@@ -152,6 +140,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Get argument value for the given index in the constructor argument list.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the type to match (can be {@code null} to match
 	 * untyped values only)
@@ -175,6 +164,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Return the map of indexed argument values.
+	 *
 	 * @return unmodifiable Map with Integer index as key and ValueHolder as value
 	 * @see ValueHolder
 	 */
@@ -182,11 +172,11 @@ public class ConstructorArgumentValues {
 		return Collections.unmodifiableMap(this.indexedArgumentValues);
 	}
 
-
 	/**
 	 * Add a generic argument value to be matched by type.
 	 * <p>Note: A single generic argument value will just be used once,
 	 * rather than matched multiple times.
+	 *
 	 * @param value the argument value
 	 */
 	public void addGenericArgumentValue(Object value) {
@@ -197,6 +187,7 @@ public class ConstructorArgumentValues {
 	 * Add a generic argument value to be matched by type.
 	 * <p>Note: A single generic argument value will just be used once,
 	 * rather than matched multiple times.
+	 *
 	 * @param value the argument value
 	 * @param type the type of the constructor argument
 	 */
@@ -208,6 +199,7 @@ public class ConstructorArgumentValues {
 	 * Add a generic argument value to be matched by type or name (if available).
 	 * <p>Note: A single generic argument value will just be used once,
 	 * rather than matched multiple times.
+	 *
 	 * @param newValue the argument value in the form of a ValueHolder
 	 * <p>Note: Identical ValueHolder instances will only be registered once,
 	 * to allow for merging and re-merging of argument value definitions. Distinct
@@ -223,11 +215,12 @@ public class ConstructorArgumentValues {
 	/**
 	 * Add a generic argument value, merging the new value (typically a collection)
 	 * with the current value if demanded: see {@link org.springframework.beans.Mergeable}.
+	 *
 	 * @param newValue the argument value in the form of a ValueHolder
 	 */
 	private void addOrMergeGenericArgumentValue(ValueHolder newValue) {
 		if (newValue.getName() != null) {
-			for (Iterator<ValueHolder> it = this.genericArgumentValues.iterator(); it.hasNext();) {
+			for (Iterator<ValueHolder> it = this.genericArgumentValues.iterator(); it.hasNext(); ) {
 				ValueHolder currentValue = it.next();
 				if (newValue.getName().equals(currentValue.getName())) {
 					if (newValue.getValue() instanceof Mergeable) {
@@ -245,6 +238,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Look for a generic argument value that matches the given type.
+	 *
 	 * @param requiredType the type to match
 	 * @return the ValueHolder for the argument, or {@code null} if none set
 	 */
@@ -255,6 +249,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Look for a generic argument value that matches the given type.
+	 *
 	 * @param requiredType the type to match
 	 * @param requiredName the name to match
 	 * @return the ValueHolder for the argument, or {@code null} if none set
@@ -268,6 +263,7 @@ public class ConstructorArgumentValues {
 	 * Look for the next generic argument value that matches the given type,
 	 * ignoring argument values that have already been used in the current
 	 * resolution process.
+	 *
 	 * @param requiredType the type to match (can be {@code null} to find
 	 * an arbitrary next generic argument value)
 	 * @param requiredName the name to match (can be {@code null} to not
@@ -303,6 +299,7 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Return the list of generic argument values.
+	 *
 	 * @return unmodifiable List of ValueHolders
 	 * @see ValueHolder
 	 */
@@ -310,10 +307,10 @@ public class ConstructorArgumentValues {
 		return Collections.unmodifiableList(this.genericArgumentValues);
 	}
 
-
 	/**
 	 * Look for an argument value that either corresponds to the given index
 	 * in the constructor argument list or generically matches by type.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the parameter type to match
 	 * @return the ValueHolder for the argument, or {@code null} if none set
@@ -326,6 +323,7 @@ public class ConstructorArgumentValues {
 	/**
 	 * Look for an argument value that either corresponds to the given index
 	 * in the constructor argument list or generically matches by type.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the parameter type to match
 	 * @param requiredName the parameter name to match
@@ -339,6 +337,7 @@ public class ConstructorArgumentValues {
 	/**
 	 * Look for an argument value that either corresponds to the given index
 	 * in the constructor argument list or generically matches by type.
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the parameter type to match (can be {@code null}
 	 * to find an untyped argument value)
@@ -383,7 +382,6 @@ public class ConstructorArgumentValues {
 		this.indexedArgumentValues.clear();
 		this.genericArgumentValues.clear();
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -430,7 +428,6 @@ public class ConstructorArgumentValues {
 		return hashCode;
 	}
 
-
 	/**
 	 * Holder for a constructor argument value, with an optional type
 	 * attribute indicating the target type of the actual constructor argument.
@@ -456,6 +453,7 @@ public class ConstructorArgumentValues {
 
 		/**
 		 * Create a new ValueHolder for the given value.
+		 *
 		 * @param value the argument value
 		 */
 		public ValueHolder(@Nullable Object value) {
@@ -464,6 +462,7 @@ public class ConstructorArgumentValues {
 
 		/**
 		 * Create a new ValueHolder for the given value and type.
+		 *
 		 * @param value the argument value
 		 * @param type the type of the constructor argument
 		 */
@@ -474,6 +473,7 @@ public class ConstructorArgumentValues {
 
 		/**
 		 * Create a new ValueHolder for the given value, type and name.
+		 *
 		 * @param value the argument value
 		 * @param type the type of the constructor argument
 		 * @param name the name of the constructor argument
@@ -601,5 +601,4 @@ public class ConstructorArgumentValues {
 			return copy;
 		}
 	}
-
 }

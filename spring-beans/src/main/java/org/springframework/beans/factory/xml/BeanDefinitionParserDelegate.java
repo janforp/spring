@@ -599,8 +599,10 @@ public class BeanDefinitionParserDelegate {
 			 * 	<bean id="teacher" class="com.javaxxl.lookup.Teacher"/>
 			 *
 			 * 解析 lookup-method
+			 * 动态代理
 			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+
 			/**
 			 * 解析 replace-method 子标签
 			 * <bean id="testChangeMethod" class="com.javaxxl.replacemethod.TestChangeMethod">
@@ -797,7 +799,7 @@ public class BeanDefinitionParserDelegate {
 	 * </bean>
 	 *
 	 * @param ele 当前 bean 标签
-	 * @param attributeAccessor 其实就是bd（GenericBeanDefinition）
+	 * @param attributeAccessor meta属性访问器 - 其实就是bd（GenericBeanDefinition）
 	 * @see GenericBeanDefinition 该类就继承自 BeanMetadataAttributeAccessor
 	 */
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
@@ -822,6 +824,7 @@ public class BeanDefinitionParserDelegate {
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
 				String value = metaElement.getAttribute(VALUE_ATTRIBUTE);
 				//该对象就是用来保存 key,value
+				//将meta信息封装成 BeanMetadataAttribute 对象
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
 				//其实就是放到了一个map中
@@ -856,12 +859,38 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse constructor-arg sub-elements of the given bean element.
+	 *
+	 * constructor-arg 标签
+	 *
+	 * <bean id="teacher" class="com.jack.bean.chatpter2.autowiredBeanJava.TeacherWang">
+	 * ---<constructor-arg ref="student" />
+	 * </bean>
+	 *
+	 * <bean id="exampleBean" class="examples.ExampleBean">
+	 * ---<constructor-arg type="int" value="7500000"/>
+	 * ---<constructor-arg type="java.lang.String" value="42"/>
+	 * </bean>
+	 *
+	 * <bean id="exampleBean" class="examples.ExampleBean">
+	 * ---<constructor-arg index="0" value="7500000"/>
+	 * ---<constructor-arg index="1" value="42"/>
+	 * </bean>
+	 *
+	 * <bean name="foo" class="x.y.Foo">
+	 * ---<constructor-arg>
+	 * ------<bean class="x.y.Bar"/>
+	 * ---</constructor-arg>
+	 * ---<constructor-arg>
+	 * ------<bean class="x.y.Baz"/>
+	 * ---</constructor-arg>
+	 * </bean>
 	 */
 	public void parseConstructorArgElements(Element beanEle, BeanDefinition bd) {
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (isCandidateElement(node) && nodeNameEquals(node, CONSTRUCTOR_ARG_ELEMENT)) {
+				//解析一个 constructor-arg 子标签
 				parseConstructorArgElement((Element) node, bd);
 			}
 		}
@@ -962,30 +991,85 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * Parse constructor-arg sub-elements of the given bean element.
+	 *
+	 * constructor-arg 标签
+	 *
+	 * <bean id="teacher" class="com.jack.bean.chatpter2.autowiredBeanJava.TeacherWang">
+	 * ---<constructor-arg ref="student" />
+	 * </bean>
+	 *
+	 * <bean id="exampleBean" class="examples.ExampleBean">
+	 * ---<constructor-arg type="int" value="7500000"/>
+	 * ---<constructor-arg type="java.lang.String" value="42"/>
+	 * </bean>
+	 *
+	 * <bean id="exampleBean" class="examples.ExampleBean">
+	 * ---<constructor-arg index="0" value="7500000"/>
+	 * ---<constructor-arg index="1" value="42"/>
+	 * </bean>
+	 *
+	 * <bean name="foo" class="x.y.Foo">
+	 * ---<constructor-arg>
+	 * ------<bean class="x.y.Bar"/>
+	 * ---</constructor-arg>
+	 * ---<constructor-arg>
+	 * ------<bean class="x.y.Baz"/>
+	 * ---</constructor-arg>
+	 * </bean>
+	 *
 	 * Parse a constructor-arg element.
+	 *
+	 * @param ele <constructor-arg type="int" value="7500000"/>
+	 * @param bd 当前bd
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+		/**
+		 * <bean id="exampleBean" class="examples.ExampleBean">
+		 * ---<constructor-arg index="0" value="7500000"/>
+		 * ---<constructor-arg index="1" value="42"/>
+		 * </bean>
+		 */
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
+		/**
+		 * <bean id="exampleBean" class="examples.ExampleBean">
+		 * ---<constructor-arg type="int" value="7500000"/>
+		 * ---<constructor-arg type="java.lang.String" value="42"/>
+		 * </bean>
+		 */
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
+		/**
+		 * <bean id="exampleBean" class="examples.ExampleBean">
+		 * ---<constructor-arg name="name" value="张三"/>
+		 * </bean>
+		 */
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		if (StringUtils.hasLength(indexAttr)) {
+			//有 <constructor-arg index="0" value="7500000"/>
+
 			try {
 				int index = Integer.parseInt(indexAttr);
 				if (index < 0) {
 					error("'index' cannot be lower than 0", ele);
 				} else {
 					try {
+						//给解析起对象设置状态，表示正在解析 constructor 参数
 						this.parseState.push(new ConstructorArgumentEntry(index));
+						//解析 constructor-arg 标签完成，返回解析完成后的封装的对象
 						Object value = parsePropertyValue(ele, bd, null);
 						ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 						if (StringUtils.hasLength(typeAttr)) {
+							//<constructor-arg type="java.lang.String" value="42"/>
 							valueHolder.setType(typeAttr);
 						}
 						if (StringUtils.hasLength(nameAttr)) {
+							//<constructor-arg name="name" value="张三"/>
 							valueHolder.setName(nameAttr);
 						}
 						valueHolder.setSource(extractSource(ele));
 						if (bd.getConstructorArgumentValues().hasIndexedArgumentValue(index)) {
+							//就是 index 不能重复
+							//索引1的构造函数-arg条目不明确
 							error("Ambiguous constructor-arg entries for index " + index, ele);
 						} else {
 							bd.getConstructorArgumentValues().addIndexedArgumentValue(index, valueHolder);
@@ -1084,6 +1168,8 @@ public class BeanDefinitionParserDelegate {
 	/**
 	 * Get the value of a property element. May be a list etc.
 	 * Also used for constructor arguments, "propertyName" being null in this case.
+	 *
+	 * 解析 <property> 或者 <constructor-arg> 标签
 	 */
 	@Nullable
 	public Object parsePropertyValue(Element ele, BeanDefinition bd, @Nullable String propertyName) {
@@ -1107,15 +1193,22 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		//有 ref
 		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE);
+		//有 value
 		boolean hasValueAttribute = ele.hasAttribute(VALUE_ATTRIBUTE);
-		if ((hasRefAttribute && hasValueAttribute) ||
+		if ((hasRefAttribute && hasValueAttribute)//同时有是不行的
+				||
+
+				//有ref或者value的一个，不能再有子标签
 				((hasRefAttribute || hasValueAttribute) && subElement != null)) {
-			error(elementName +
-					" is only allowed to contain either 'ref' attribute OR 'value' attribute OR sub-element", ele);
+			error(elementName + " is only allowed to contain either 'ref' attribute OR 'value' attribute OR sub-element", ele);
 		}
 
 		if (hasRefAttribute) {
+			//有 ref
+
+			//拿到引用beanName
 			String refName = ele.getAttribute(REF_ATTRIBUTE);
 			if (!StringUtils.hasText(refName)) {
 				error(elementName + " contains empty 'ref' attribute", ele);
@@ -1124,12 +1217,17 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		} else if (hasValueAttribute) {
+			//有 value
+
 			TypedStringValue valueHolder = new TypedStringValue(ele.getAttribute(VALUE_ATTRIBUTE));
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		} else if (subElement != null) {
+			//有子标签
+
 			return parsePropertySubElement(subElement, bd);
 		} else {
+			//啥都没有也不行
 			// Neither child element nor "ref" or "value" attribute found.
 			error(elementName + " must specify a ref or value", ele);
 			return null;
@@ -1149,10 +1247,10 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a value, ref or collection sub-element of a property or
-	 * constructor-arg element.
+	 * Parse a value, ref or collection sub-element of a property or constructor-arg element.
+	 * -- 解析属性或constructor-arg元素的值，ref或collection子元素。
 	 *
-	 * @param ele subelement of property element; we don't know which yet
+	 * @param ele subElement of property element; we don't know which yet
 	 * @param bd the current bean definition (if any)
 	 * @param defaultValueType the default type (class name) for any
 	 * {@code <value>} tag that might be created
@@ -1188,6 +1286,7 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		} else if (nodeNameEquals(ele, IDREF_ELEMENT)) {
+			//idref
 			return parseIdRefElement(ele);
 		} else if (nodeNameEquals(ele, VALUE_ELEMENT)) {
 			return parseValueElement(ele, defaultValueType);

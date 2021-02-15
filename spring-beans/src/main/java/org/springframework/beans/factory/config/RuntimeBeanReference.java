@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.config;
 
 import org.springframework.lang.Nullable;
@@ -22,6 +6,7 @@ import org.springframework.util.Assert;
 /**
  * Immutable placeholder class used for a property value object when it's
  * a reference to another bean in the factory, to be resolved at runtime.
+ * -- 当引用工厂中的另一个bean时，用于属性值对象的不可变占位符类，将在运行时解析。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -41,9 +26,9 @@ public class RuntimeBeanReference implements BeanReference {
 	@Nullable
 	private Object source;
 
-
 	/**
 	 * Create a new RuntimeBeanReference to the given bean name.
+	 *
 	 * @param beanName name of the target bean
 	 */
 	public RuntimeBeanReference(String beanName) {
@@ -53,6 +38,7 @@ public class RuntimeBeanReference implements BeanReference {
 	/**
 	 * Create a new RuntimeBeanReference to the given bean name,
 	 * with the option to mark it as reference to a bean in the parent factory.
+	 *
 	 * @param beanName name of the target bean
 	 * @param toParent whether this is an explicit reference to a bean in the
 	 * parent factory
@@ -66,6 +52,7 @@ public class RuntimeBeanReference implements BeanReference {
 
 	/**
 	 * Create a new RuntimeBeanReference to a bean of the given type.
+	 *
 	 * @param beanType type of the target bean
 	 * @since 5.2
 	 */
@@ -76,6 +63,7 @@ public class RuntimeBeanReference implements BeanReference {
 	/**
 	 * Create a new RuntimeBeanReference to a bean of the given type,
 	 * with the option to mark it as reference to a bean in the parent factory.
+	 *
 	 * @param beanType type of the target bean
 	 * @param toParent whether this is an explicit reference to a bean in the
 	 * parent factory
@@ -88,10 +76,10 @@ public class RuntimeBeanReference implements BeanReference {
 		this.toParent = toParent;
 	}
 
-
 	/**
 	 * Return the requested bean name, or the fully-qualified type name
 	 * in case of by-type resolution.
+	 *
 	 * @see #getBeanType()
 	 */
 	@Override
@@ -101,6 +89,7 @@ public class RuntimeBeanReference implements BeanReference {
 
 	/**
 	 * Return the requested bean type if resolution by type is demanded.
+	 *
 	 * @since 5.2
 	 */
 	@Nullable
@@ -129,7 +118,6 @@ public class RuntimeBeanReference implements BeanReference {
 		return this.source;
 	}
 
-
 	@Override
 	public boolean equals(@Nullable Object other) {
 		if (this == other) {
@@ -154,5 +142,4 @@ public class RuntimeBeanReference implements BeanReference {
 	public String toString() {
 		return '<' + getBeanName() + '>';
 	}
-
 }

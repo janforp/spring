@@ -35,5 +35,4 @@ public interface BeanMetadataElement {
 	default Object getSource() {
 		return null;
 	}
-
 }
