@@ -29,6 +29,11 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 
 	/**
 	 * Cache of singleton objects created by FactoryBeans: FactoryBean name to object.
+	 *
+	 * key:FactoryBean name
+	 * value:当前 FactoryBean 实例管理的对象
+	 *
+	 * @see FactoryBean#getObject()
 	 */
 	private final Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<>(16);
 
@@ -59,6 +64,8 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	/**
 	 * Obtain an object to expose from the given FactoryBean, if available
 	 * in cached form. Quick check for minimal synchronization.
+	 *
+	 * 尝试到缓存中获取 FactoryBean#getObject() 返回值
 	 *
 	 * @param beanName the name of the bean
 	 * @return the object obtained from the FactoryBean,
@@ -100,8 +107,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 							try {
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							} catch (Throwable ex) {
-								throw new BeanCreationException(beanName,
-										"Post-processing of FactoryBean's singleton object failed", ex);
+								throw new BeanCreationException(beanName, "Post-processing of FactoryBean's singleton object failed", ex);
 							} finally {
 								afterSingletonCreation(beanName);
 							}

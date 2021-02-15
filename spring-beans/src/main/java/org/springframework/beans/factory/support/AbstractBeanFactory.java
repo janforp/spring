@@ -1957,13 +1957,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		/**
 		 * 到这里的前提:
 		 * 1.name 并没有 & 开头
+		 *
+		 * 则
+		 * 1.当前bean实例就是普通单实例
+		 * 2.当前bean实例是FactoryBean实例，但是本次请求要拿的是FactoryBean实现内部管理的实例
 		 */
 
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.-- 现在我们有了bean实例，它可以是普通bean或FactoryBean。
 		// If it's a FactoryBean, we use it to create a bean instance, unless the caller actually wants a reference to the factory.
 		// -- 如果它是FactoryBean，则除非调用者实际上想要引用该工厂，否则我们将使用它创建一个bean实例。
 		if (!(beanInstance instanceof FactoryBean)) {
-			//如果不是 FactoryBean 类型，则返回当前实例
+			//如果不是 FactoryBean 类型，则返回当前实例,其实是一个普通对象单实例
 			return beanInstance;
 		}
 
@@ -1973,21 +1977,35 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		 * 2.当前 beanInstance 是一个 FactoryBean 实例
 		 */
 
+		//保存 FactoryBean#getObject()方法返回值的引用
 		Object object = null;
 		if (mbd != null) {
 			mbd.isFactoryBean = true;
 		} else {
+			/**
+			 * 尝试到缓存中获取 {@link FactoryBean#getObject()} 返回值
+			 * @see FactoryBeanRegistrySupport#factoryBeanObjectCache
+			 */
 			object = getCachedObjectForFactoryBean(beanName);
 		}
 		if (object == null) {
+			/**
+			 * 到这里说明，当前实例还没有从 {@link FactoryBean#getObject()} 获取过
+			 * 下面需要 {@link FactoryBean#getObject()} 创建
+			 */
 			// Return bean instance from factory.
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
-			// Caches object obtained from FactoryBean if it is a singleton.
+			// Caches object obtained from FactoryBean if it is a singleton.:缓存从FactoryBean获得的对象（如果是单例）。
 			if (mbd == null && containsBeanDefinition(beanName)) {
+
+				//获取合并后的 bd
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
 			//synthetic:合成的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
+			/**
+			 * 从 {@link FactoryBean#getObject()} 获取实例
+			 */
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
 		return object;
