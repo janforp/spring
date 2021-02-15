@@ -325,9 +325,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				 * @see DefaultSingletonBeanRegistry#singletonsCurrentlyInCreation
 				 * 例子：
 				 * A 依赖 B，B 依赖 A (都是构造方法依赖)
-				 *
+				 * 1.加载A，{@link DefaultSingletonBeanRegistry#singletonsCurrentlyInCreation} 添加 A，依赖 A
+				 * 2.加载B，{@link DefaultSingletonBeanRegistry#singletonsCurrentlyInCreation} 添加 B，依赖 A
+				 * 3.再次加载 A,执行到下面的代码 {@link #beforeSingletonCreation} 发现 {@link DefaultSingletonBeanRegistry#singletonsCurrentlyInCreation} 中已经有 A，该方法会抛出异常
 				 */
 				beforeSingletonCreation(beanName);
+
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
@@ -339,6 +342,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					 * @see AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
 					 */
 					singletonObject = singletonFactory.getObject();
+
+					//新创建成功
 					newSingleton = true;
 				} catch (IllegalStateException ex) {
 					// Has the singleton object implicitly appeared in the meantime ->
@@ -361,6 +366,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					//添加到一级缓存，二级缓存更三级缓存都去掉
 					addSingleton(beanName, singletonObject);
 				}
 			}
