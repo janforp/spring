@@ -648,6 +648,8 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 解析标签上的属性,比如：lazy-init,init-method,depends-on等，并且把属性值都塞入到 bd 中
+	 *
 	 * Apply the attributes of the given bean element to the given bean * definition.
 	 *
 	 * @param ele bean declaration element
@@ -655,19 +657,25 @@ public class BeanDefinitionParserDelegate {
 	 * @param containingBean containing bean definition
 	 * @return a bean definition initialized according to the bean element attributes
 	 */
-	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName, @Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
+	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, //bean标签
+			String beanName,//beanName
+			@Nullable BeanDefinition containingBean, //一般为null
+			AbstractBeanDefinition bd) {//一个bd对象,该方法最终返回的就是这个对象
 
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
+			//bean 标签有 singleton 属性，已经废弃，直接给错误
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		} else if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
+			//scope,默认值为单例
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
 		} else if (containingBean != null) {
+			//如果 bean 标签中连 scope 都没有则到这里
 			// Take default from containing bean in case of an inner bean definition.
 			bd.setScope(containingBean.getScope());
 		}
 
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
-			//abstract 属性
+			//abstract 属性如果存在并且为true，说明该 bean 标签只能作为父标签存在，让子标签去继承
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
 
@@ -681,29 +689,51 @@ public class BeanDefinitionParserDelegate {
 
 		//autowire属性
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
+		//转换为 int  值之后，塞进去
 		bd.setAutowireMode(getAutowireMode(autowire));
 
 		//depends-on 属性
+		//<bean depends-on = "a,b"/>
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
+			/**
+			 * <bean depends-on = "a,b"/>
+			 * 如果这样，则在实例化当前bean的时候，需要先实例化 a,b
+			 */
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
-			//还有多个
+			//可能还有多个
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
-		//autowire-candidate 属性
+		/**
+		 * autowire-candidate 属性
+		 *  <bean autowire-candidate  = "false"/>
+		 *  表示该bean不参与其他bean的自动注入
+		 *
+		 *  bd中的autowireCandidate默认为 true
+		 */
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
 		if (isDefaultValue(autowireCandidate)) {
+			/**
+			 * 正则表达式，可以是多个
+			 */
 			String candidatePattern = this.defaults.getAutowireCandidates();
 			if (candidatePattern != null) {
+				//按逗号分开
 				String[] patterns = StringUtils.commaDelimitedListToStringArray(candidatePattern);
+				//意思就是可以配置一组正则表达式，让符合正则表达式的 beanName 的 autowireCandidate 设置为 true
 				bd.setAutowireCandidate(PatternMatchUtils.simpleMatch(patterns, beanName));
 			}
 		} else {
+			//否则就按配置的来
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
 		//primary 属性
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
+			/**
+			 * 一个接口有多个实现的时候，可以指定一个主要的
+			 * 该对象就默认参与外部BEAN的自动注入
+			 */
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
@@ -724,8 +754,17 @@ public class BeanDefinitionParserDelegate {
 			bd.setDestroyMethodName(this.defaults.getDestroyMethod());
 			bd.setEnforceDestroyMethod(false);
 		}
-
-		//factory-method 属性
+		/**
+		 *  factory-method 属性
+		 *
+		 *  1.使用实例方法创建对象
+		 *  <bean id = "personFactory" class = "xx.xx.xxx.PersonFactory"/>
+		 *  <bean id = "person" factory-bean = "personFactory"  factory-method = "buildPerson"/>
+		 *
+		 *  2.使用静态工厂方法创建对象
+		 *  <bean id = "person" class = "xx.xx.xxx.PersonFactory" factory-method = "staticBuildPerson"/>
+		 *
+		 */
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
@@ -846,6 +885,14 @@ public class BeanDefinitionParserDelegate {
 	 * <bean id="xxx" class="xxxxxx">
 	 * ---<qualifier type = "xxxxx" valeu = "xxxxxxx">
 	 * </bean>
+	 *
+	 * <bean id="xxx" class="xxxxxx">
+	 * ---<qualifier valeu = "yyyy">
+	 * </bean>
+	 *
+	 * 表示这些bean注入到容器之后，使用者可以通过
+	 *
+	 * @Qualify("xxxx")来决定具体使用哪一个
 	 */
 	public void parseQualifierElements(Element beanEle, AbstractBeanDefinition bd) {
 		NodeList nl = beanEle.getChildNodes();
@@ -1648,6 +1695,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	private boolean isDefaultValue(String value) {
+		//空或者 default 都返回 true
 		return !StringUtils.hasLength(value) || DEFAULT_VALUE.equals(value);
 	}
 
