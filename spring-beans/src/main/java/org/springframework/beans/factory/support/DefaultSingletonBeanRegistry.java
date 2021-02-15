@@ -311,15 +311,22 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				//从一级缓存中没有实例
 
 				if (this.singletonsCurrentlyInDestruction) {
+					//只有容器销毁时候该属性会设置为True，此时就不能再创建实例了
 					throw new BeanCreationNotAllowedException(beanName,
-							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
-									"(Do not request a bean from a BeanFactory in a destroy method implementation!)");
+							"Singleton bean creation not allowed while singletons of this factory are in destruction " + "(Do not request a bean from a BeanFactory in a destroy method implementation!)");
 				}
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
 
-				//做一些检查，可以防止循环依赖，如果发现了循环依赖，则直接抛出异常
+				/**
+				 * 做一些检查，可以防止循环依赖，如果发现了循环依赖，则直接抛出异常
+				 * 将当前 beanName 放入到 正在创建中的单例集合，放入成功，说明暂时没有循环依赖，如果放入失败，表示产生了循环依赖，里面会抛出异常
+				 * @see DefaultSingletonBeanRegistry#singletonsCurrentlyInCreation
+				 * 例子：
+				 * A 依赖 B，B 依赖 A (都是构造方法依赖)
+				 *
+				 */
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);

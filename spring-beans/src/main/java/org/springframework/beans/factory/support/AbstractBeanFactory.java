@@ -438,10 +438,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
+				/**
+				 * 上面是准备好 bd
+				 * 然后检查了 depends-on 的添加
+				 * 并且看看 depends-on 没有发生循环依赖
+				 *
+				 * 下面就是根据 bd 创建 bean 实例的逻辑啦
+				 */
+
 				// Create bean instance.
 				if (mbd.isSingleton()) {
 					//单实例
 
+					/**
+					 * 更倾向于创建实例并发返回
+					 */
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);
