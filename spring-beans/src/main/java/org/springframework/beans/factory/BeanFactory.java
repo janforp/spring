@@ -355,5 +355,4 @@ public interface BeanFactory {
 	 * @see #getBean
 	 */
 	String[] getAliases(String name);
-
 }
