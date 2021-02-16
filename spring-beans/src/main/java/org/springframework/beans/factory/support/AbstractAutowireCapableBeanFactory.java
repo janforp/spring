@@ -428,8 +428,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	@Override
-	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
-			throws BeansException {
+	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
 
 		Object result = existingBean;
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
@@ -536,6 +535,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
+				/**
+				 * 形成一个短路操作，直接返回，一般情况下是不会到这里的
+				 */
 				return bean;
 			}
 		} catch (Throwable ex) {
