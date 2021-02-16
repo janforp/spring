@@ -484,11 +484,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #doCreateBean
 	 */
 	@Override
-	protected Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
+	protected Object createBean(
+			String beanName, // 需要实例化的 beanName
+			RootBeanDefinition mbd, //实例化bean需要的bd
+			@Nullable Object[] args) /** {@link BeanFactory#getBean(java.lang.Class, java.lang.Object...)} 会使用到*/
+			throws BeanCreationException {
 
 		if (logger.isTraceEnabled()) {
 			logger.trace("Creating instance of bean '" + beanName + "'");
 		}
+
+		//创建实例使用的 bd
 		RootBeanDefinition mbdToUse = mbd;
 
 		/**
@@ -1200,20 +1206,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Candidate constructors for autowiring?
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
-		if (ctors != null
-				|| mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR
-				|| mbd.hasConstructorArgumentValues()
-				|| !ObjectUtils.isEmpty(args)) {
+
+		if (ctors != null // 后处理器指定了构造方法组
+				|| mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR //一般情况是 AUTOWIRE_NO
+				|| mbd.hasConstructorArgumentValues() // bean 标签有 <constructor-agr>子标签则有
+				|| !ObjectUtils.isEmpty(args)) { // args 不是 空
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
-		// Preferred constructors for default construction?
+		// Preferred constructors for default construction?：默认构造的首选构造函数？
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
-		// No special handling: simply use no-arg constructor.
+		/**
+		 * 大部分都会执行到这里
+		 * 未指定构造参数，没有@Autowired设定偏好，就是用默认构造方法创建实例
+		 *
+		 * No special handling: simply use no-arg constructor.：无需特殊处理：只需使用no-arg构造函数。
+		 */
 		return instantiateBean(beanName, mbd);
 	}
 

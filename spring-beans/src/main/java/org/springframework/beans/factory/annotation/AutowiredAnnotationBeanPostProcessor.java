@@ -146,8 +146,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		this.autowiredAnnotationTypes.add(Autowired.class);
 		this.autowiredAnnotationTypes.add(Value.class);
 		try {
-			this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
-					ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
+			this.autowiredAnnotationTypes.add(
+					(Class<? extends Annotation>) ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader())
+			);
 			logger.trace("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
 		} catch (ClassNotFoundException ex) {
 			// JSR-330 API not available - simply skip.
@@ -246,8 +247,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	@Nullable
-	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName)
-			throws BeanCreationException {
+	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName) throws BeanCreationException {
 
 		// Let's check for lookup methods here...
 		if (!this.lookupMethodsChecked.contains(beanName)) {
@@ -307,13 +307,16 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						} else if (primaryConstructor != null) {
 							continue;
 						}
+
+						/**
+						 * 如果构造方法上有 @Autowired/@Value/@Inject这里就不为null
+						 */
 						MergedAnnotation<?> ann = findAutowiredAnnotation(candidate);
 						if (ann == null) {
 							Class<?> userClass = ClassUtils.getUserClass(beanClass);
 							if (userClass != beanClass) {
 								try {
-									Constructor<?> superCtor =
-											userClass.getDeclaredConstructor(candidate.getParameterTypes());
+									Constructor<?> superCtor = userClass.getDeclaredConstructor(candidate.getParameterTypes());
 									ann = findAutowiredAnnotation(superCtor);
 								} catch (NoSuchMethodException ex) {
 									// Simply proceed, no equivalent superclass constructor found...
@@ -323,27 +326,37 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						if (ann != null) {
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
-										"Invalid autowire-marked constructor: " + candidate +
-												". Found constructor with 'required' Autowired annotation already: " +
-												requiredConstructor);
+										"Invalid autowire-marked constructor: " + candidate + ". Found constructor with 'required' Autowired annotation already: " + requiredConstructor);
 							}
+
+							//required的值
 							boolean required = determineRequiredStatus(ann);
 							if (required) {
+								//如果required = true
+
 								if (!candidates.isEmpty()) {
+									/**
+									 * @Autowired(required = true) 这种注解的class，就只能有一个构造方法上可以使用，如果
+									 * 还有其他构造方法上还有@Autowired那就报错！
+									 */
 									throw new BeanCreationException(beanName,
-											"Invalid autowire-marked constructors: " + candidates +
-													". Found constructor with 'required' Autowired annotation: " +
-													candidate);
+											"Invalid autowire-marked constructors: " + candidates + ". Found constructor with 'required' Autowired annotation: " + candidate);
 								}
 								requiredConstructor = candidate;
 							}
 							candidates.add(candidate);
-						} else if (candidate.getParameterCount() == 0) {
+						}
+
+						//ann 为 null 就走下面的分支
+						else if (candidate.getParameterCount() == 0) {
+							//当前遍历到的构造器就是默认的无参数的构造器
 							defaultConstructor = candidate;
 						}
 					}
+					/** rawCandidates 的 for 循环结束了 ***********************/
+
 					if (!candidates.isEmpty()) {
-						// Add default constructor to list of optional constructors, as fallback.
+						// Add default constructor to list of optional constructors, as fallback.:将默认构造函数添加到可选构造函数列表中，作为后备。
 						if (requiredConstructor == null) {
 							if (defaultConstructor != null) {
 								candidates.add(defaultConstructor);
@@ -365,6 +378,8 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					} else {
 						candidateConstructors = new Constructor<?>[0];
 					}
+
+					//放入缓存
 					this.candidateConstructorsCache.put(beanClass, candidateConstructors);
 				}
 			}
@@ -495,7 +510,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Nullable
 	private MergedAnnotation<?> findAutowiredAnnotation(AccessibleObject ao) {
+		//该方法拿到当前构造方法上注解信息的集合：MergedAnnotations
 		MergedAnnotations annotations = MergedAnnotations.from(ao);
+
 		for (Class<? extends Annotation> type : this.autowiredAnnotationTypes) {
 			MergedAnnotation<?> annotation = annotations.get(type);
 			if (annotation.isPresent()) {
@@ -517,8 +534,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	@SuppressWarnings({ "deprecation", "cast" })
 	protected boolean determineRequiredStatus(MergedAnnotation<?> ann) {
 		// The following (AnnotationAttributes) cast is required on JDK 9+.
-		return determineRequiredStatus((AnnotationAttributes)
-				ann.asMap(mergedAnnotation -> new AnnotationAttributes(mergedAnnotation.getType())));
+		return determineRequiredStatus(
+				(AnnotationAttributes) ann.asMap(mergedAnnotation -> new AnnotationAttributes(mergedAnnotation.getType()))
+		);
 	}
 
 	/**
