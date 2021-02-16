@@ -27,6 +27,7 @@ public class MyInstantiationAwareBeanPostProcessor implements InstantiationAware
 				System.out.println("目标方法执行后：" + method + "\n");
 				return invokeSuper;
 			});
+			//创建Student对象的时候，返回的bean其实就是这个方法创建的
 			return e.create();
 		}
 		return null;
