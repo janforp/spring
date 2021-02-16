@@ -27,8 +27,14 @@ import java.util.Set;
  */
 public class ConstructorArgumentValues {
 
+	/**
+	 * 指定了 index  的
+	 */
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
+	/**
+	 * 没有指定 index 的时候
+	 */
 	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
 
 	/**
@@ -443,9 +449,17 @@ public class ConstructorArgumentValues {
 		@Nullable
 		private String name;
 
+		/**
+		 * 当前对象极有可能是通过另一个对象转换而来的，这个字段就是转换之前的对象
+		 */
 		@Nullable
 		private Object source;
 
+		/**
+		 * 该值是否已经转换过了
+		 *
+		 * 因为配置中不管是什么类型都可能配置成String，在使用的时候需要做转换
+		 */
 		private boolean converted = false;
 
 		@Nullable

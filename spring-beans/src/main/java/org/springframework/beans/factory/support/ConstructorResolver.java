@@ -87,6 +87,8 @@ class ConstructorResolver {
 	/**
 	 * Marker for autowired arguments in a cached argument array, to be replaced
 	 * by a {@linkplain #resolveAutowiredArgument resolved autowired argument}.
+	 *
+	 * 是不是可以理解为一个占位符?
 	 */
 	private static final Object autowiredArgumentMarker = new Object();
 
@@ -180,6 +182,7 @@ class ConstructorResolver {
 				}
 			}
 			if (argsToResolve != null) {
+				//preparedConstructorArguments 不是完全解析好的参数，还需要进一步解析
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve);
 			}
 
@@ -189,44 +192,67 @@ class ConstructorResolver {
 		if (constructorToUse == null || argsToUse == null) {
 			/**
 			 * 说明缓存没有命中，可能是第一次创建该类型的实例
+			 *
+			 * 下面需要从头找到一个可以使用的构造器
 			 */
 
 			// Take specified constructors, if any.
+			//对应的构造方法上有@Autowired的时候该 chosenCtors 就会有值
 			Constructor<?>[] candidates = chosenCtors;
+
 			if (candidates == null) {
+				//说明外部程序调用当前方法的时候，并没有提供可以选用的构造方法，咱们需要提供class拿到构造器信息
+
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
-					candidates = (mbd.isNonPublicAccessAllowed() ?
-							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
+					candidates = (
+							mbd.isNonPublicAccessAllowed() ? //非public的构造方法是否能够访问？
+									beanClass.getDeclaredConstructors()//如果可以，则拿到所有的构造方法
+									: beanClass.getConstructors()//否则只能获取public的构造方法
+					);
 				} catch (Throwable ex) {
-					throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-							"Resolution of declared constructors on bean Class [" + beanClass.getName() +
-									"] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
+					throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Resolution of declared constructors on bean Class [" + beanClass.getName() + "] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
 				}
 			}
 
-			if (candidates.length == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
+			//执行到此，可供选用的构造方法已经准备好，下面具体选一个
+
+			if (candidates.length == 1 //可以选用的构造方法只要一个
+					&& explicitArgs == null //并且没有指定参数
+					&& !mbd.hasConstructorArgumentValues())  //并且bd中也没有构造参数
+
+			//说明 可能 要使用无参数构造器了
+			{
+
 				Constructor<?> uniqueCandidate = candidates[0];
 				if (uniqueCandidate.getParameterCount() == 0) {
+					//无参数构造器
 					synchronized (mbd.constructorArgumentLock) {
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
 						mbd.constructorArgumentsResolved = true;
-						mbd.resolvedConstructorArguments = EMPTY_ARGS;
+						mbd.resolvedConstructorArguments = EMPTY_ARGS;//哨兵
 					}
+					//使用无参数构造器实例化对象即可
 					bw.setBeanInstance(instantiate(beanName, mbd, uniqueCandidate, EMPTY_ARGS));
 					return bw;
 				}
 			}
 
 			// Need to resolve the constructor.
-			boolean autowiring = (chosenCtors != null ||
-					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
+			boolean autowiring = (
+					chosenCtors != null
+							|| mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR
+			);
+
+			//表示已经解析完成后的构造器参数值
 			ConstructorArgumentValues resolvedValues = null;
 
+			//表示构造器参数个数
 			int minNrOfArgs;
 			if (explicitArgs != null) {
 				minNrOfArgs = explicitArgs.length;
 			} else {
+				//bean标签中配置的
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				resolvedValues = new ConstructorArgumentValues();
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
@@ -323,6 +349,7 @@ class ConstructorResolver {
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
+		//进行反射创建实例
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
 	}
@@ -681,47 +708,57 @@ class ConstructorResolver {
 	 * This may involve looking up other beans.
 	 * <p>This method is also used for handling invocations of static factory methods.
 	 */
-	private int resolveConstructorArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw,
-			ConstructorArgumentValues cargs, ConstructorArgumentValues resolvedValues) {
+	private int resolveConstructorArguments(
+			String beanName, RootBeanDefinition mbd, BeanWrapper bw,
+			ConstructorArgumentValues cargs, //bean标签中配置的 constructor-arg 子标签的内容
+			ConstructorArgumentValues resolvedValues // 该方法会向这个参数中放入解析好之后的数据,也就是该方法在返回 minNrOfArgs 的同时还做了其他的事情，并没有遵守单一职责原则！！！！
+	) {
 
 		TypeConverter customConverter = this.beanFactory.getCustomTypeConverter();
 		TypeConverter converter = (customConverter != null ? customConverter : bw);
-		BeanDefinitionValueResolver valueResolver =
-				new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
+		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
 
 		int minNrOfArgs = cargs.getArgumentCount();
 
+		/**
+		 * @see ConstructorArgumentValues#indexedArgumentValues 先遍历 index 的
+		 */
 		for (Map.Entry<Integer, ConstructorArgumentValues.ValueHolder> entry : cargs.getIndexedArgumentValues().entrySet()) {
 			int index = entry.getKey();
 			if (index < 0) {
-				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-						"Invalid constructor argument index: " + index);
+				throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Invalid constructor argument index: " + index);
 			}
 			if (index + 1 > minNrOfArgs) {
+				//实时更新数量
 				minNrOfArgs = index + 1;
 			}
+			//拿到value
 			ConstructorArgumentValues.ValueHolder valueHolder = entry.getValue();
 			if (valueHolder.isConverted()) {
+				//如果已经转换，则直接使用
 				resolvedValues.addIndexedArgumentValue(index, valueHolder);
 			} else {
-				Object resolvedValue =
-						valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
-				ConstructorArgumentValues.ValueHolder resolvedValueHolder =
-						new ConstructorArgumentValues.ValueHolder(resolvedValue, valueHolder.getType(), valueHolder.getName());
+				//还没有转换，则转换，最主要的还是将 ref 引用转换为真实对象
+				Object resolvedValue = valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
+				ConstructorArgumentValues.ValueHolder resolvedValueHolder = new ConstructorArgumentValues.ValueHolder(resolvedValue, valueHolder.getType(), valueHolder.getName());
 				resolvedValueHolder.setSource(valueHolder);
+				//转换成功之后，再使用
 				resolvedValues.addIndexedArgumentValue(index, resolvedValueHolder);
 			}
 		}
 
+		/**
+		 * @see ConstructorArgumentValues#genericArgumentValues 再遍历 没有index 的
+		 */
 		for (ConstructorArgumentValues.ValueHolder valueHolder : cargs.getGenericArgumentValues()) {
 			if (valueHolder.isConverted()) {
+				//如果已经转换，则直接使用
 				resolvedValues.addGenericArgumentValue(valueHolder);
 			} else {
-				Object resolvedValue =
-						valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
-				ConstructorArgumentValues.ValueHolder resolvedValueHolder = new ConstructorArgumentValues.ValueHolder(
-						resolvedValue, valueHolder.getType(), valueHolder.getName());
+				Object resolvedValue = valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
+				ConstructorArgumentValues.ValueHolder resolvedValueHolder = new ConstructorArgumentValues.ValueHolder(resolvedValue, valueHolder.getType(), valueHolder.getName());
 				resolvedValueHolder.setSource(valueHolder);
+				//转换成功之后，再使用
 				resolvedValues.addGenericArgumentValue(resolvedValueHolder);
 			}
 		}
@@ -826,19 +863,28 @@ class ConstructorResolver {
 
 	/**
 	 * Resolve the prepared arguments stored in the given bean definition.
+	 * -- 解决存储在给定bean定义中的准备好的参数。
 	 */
-	private Object[] resolvePreparedArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw,
-			Executable executable, Object[] argsToResolve) {
+	private Object[] resolvePreparedArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw, Executable executable, Object[] argsToResolve) {
 
+		//类型转换器
 		TypeConverter customConverter = this.beanFactory.getCustomTypeConverter();
+		//bw 也实现了类型转换接口
 		TypeConverter converter = (customConverter != null ? customConverter : bw);
-		BeanDefinitionValueResolver valueResolver =
-				new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
+
+		/**
+		 *
+		 */
+		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
+		//参数类型数组
 		Class<?>[] paramTypes = executable.getParameterTypes();
 
 		Object[] resolvedArgs = new Object[argsToResolve.length];
+
+		//遍历要解析的参数数组
 		for (int argIndex = 0; argIndex < argsToResolve.length; argIndex++) {
 			Object argValue = argsToResolve[argIndex];
+			//其实就是Method或者Constructor的包装类
 			MethodParameter methodParam = MethodParameter.forExecutable(executable, argIndex);
 			if (argValue == autowiredArgumentMarker) {
 				argValue = resolveAutowiredArgument(methodParam, beanName, null, converter, true);
