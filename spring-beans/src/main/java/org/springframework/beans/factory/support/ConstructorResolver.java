@@ -121,23 +121,42 @@ class ConstructorResolver {
 	 * @param explicitArgs argument values passed in programmatically via the getBean method,
 	 * or {@code null} if none (-> use constructor argument values from bean definition)
 	 * @return a BeanWrapper for the new instance
+	 * @see AbstractAutowireCapableBeanFactory#autowireConstructor(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.reflect.Constructor[], java.lang.Object[])
 	 */
 	public BeanWrapper autowireConstructor(
 			String beanName,
 			RootBeanDefinition mbd,
-			@Nullable Constructor<?>[] chosenCtors,
+			@Nullable Constructor<?>[] chosenCtors, //配置的时候有 @Autowired 的时候该参数不为空
 			@Nullable Object[] explicitArgs) {
+		/**
+		 * 该方法想做的事情
+		 * 1.根据构造器集合，以及当前 bd 的配置筛选出来一个优先级最高的构造器
+		 * 2.根据构造器反射创建实例
+		 * 3.并且考虑一些特殊细节
+		 */
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
+		/**
+		 * 1.设置类型转换器
+		 * 2.注册自定义的属性编辑器
+		 */
 		this.beanFactory.initBeanWrapper(bw);
 
+		/**
+		 * 实例化使用的构造器
+		 */
 		Constructor<?> constructorToUse = null;
+		//实例化真正使用的参数持有对象
 		ArgumentsHolder argsHolderToUse = null;
+		//实例化的时候使用的参数
 		Object[] argsToUse = null;
 
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		} else {
+			/**
+			 * 表示构造器参数需要做转换的参数引用
+			 */
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
@@ -889,10 +908,19 @@ class ConstructorResolver {
 	 */
 	private static class ArgumentsHolder {
 
+		/**
+		 * 原始参数
+		 */
 		public final Object[] rawArguments;
 
+		/**
+		 * 类型转换后的参数
+		 */
 		public final Object[] arguments;
 
+		/**
+		 * 跟原始的差不多
+		 */
 		public final Object[] preparedArguments;
 
 		public boolean resolveNecessary = false;

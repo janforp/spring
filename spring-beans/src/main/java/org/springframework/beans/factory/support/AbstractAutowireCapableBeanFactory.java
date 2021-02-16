@@ -1512,9 +1512,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return a BeanWrapper for the new instance
 	 */
 	protected BeanWrapper autowireConstructor(
-			String beanName, RootBeanDefinition mbd, @Nullable Constructor<?>[] ctors, @Nullable Object[] explicitArgs) {
+			String beanName,
+			RootBeanDefinition mbd,
+			@Nullable Constructor<?>[] ctors,
+			@Nullable Object[] explicitArgs) {
 
-		return new ConstructorResolver(this).autowireConstructor(beanName, mbd, ctors, explicitArgs);
+		/**
+		 * ConstructorResolver 代理实现
+		 */
+		return new ConstructorResolver(this)
+				.autowireConstructor(beanName, mbd, ctors, explicitArgs);
 	}
 
 	/**
