@@ -1156,7 +1156,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
 						/**
-						 * 在实例化之后执行后处理器
+						 * 在实例化之后执行后处理器，如果此处不执行就没机会了，因为上层就直接返回了
 						 */
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 					}

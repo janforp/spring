@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+		<constructor-arg index="0" value="1"/>
+		<constructor-arg index="1" value="小刘"/>
+	</bean>
+
+	<!--	<bean class="com.javaxxl.bpp.Teacher" id="teacher">-->
+	<!--		<property name="id" value="1"/>-->
+	<!--		<property name="name" value="小刘"/>-->
+	<!--		<property name="subject" value="脱发小刘"/>-->
+	<!--	</bean>-->
+
+	<bean class="com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor"/>
+
+</beans>
