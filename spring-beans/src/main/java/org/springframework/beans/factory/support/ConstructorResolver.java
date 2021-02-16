@@ -255,15 +255,38 @@ class ConstructorResolver {
 				//bean标签中配置的
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				resolvedValues = new ConstructorArgumentValues();
+
+				//返回构造器参数个数，并且把转换后的参数放到 resolvedValues 中
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 
+			/**
+			 * 给可供选用构造器数组排序，排序规则
+			 * public > nonPublic > 参数多的 > 参数少的
+			 * @see AutowireUtils#EXECUTABLE_COMPARATOR
+			 */
 			AutowireUtils.sortConstructors(candidates);
+
+			/**
+			 * 很重要！！！！但是这个是什么呢？
+			 * 答：
+			 * 这个值越低，说明当前构造器参数列表类型和构造器参数匹配度越高
+			 * 这个值越高，说明当前构造器参数列表类型和构造器参数匹配度越低
+			 * 我们希望该参数越低越好！
+			 */
 			int minTypeDiffWeight = Integer.MAX_VALUE;
+
+			/**
+			 * 不好确定的/模棱两可的构造器
+			 * 假设第二个构造器的 diffWeight 值与上一个一直，则将其放入该集合
+			 */
 			Set<Constructor<?>> ambiguousConstructors = null;
 			Deque<UnsatisfiedDependencyException> causes = null;
 
 			for (Constructor<?> candidate : candidates) {
+				//遍历可供选择的构造器，找出 diffWeight 最低的构造器
+
+				//当前遍历构造器参数个数
 				int parameterCount = candidate.getParameterCount();
 
 				if (constructorToUse != null && argsToUse != null && argsToUse.length > parameterCount) {
@@ -271,23 +294,55 @@ class ConstructorResolver {
 					// do not look any further, there are only less greedy constructors left.
 					break;
 				}
+
+				/**
+				 * minNrOfArgs：表示bd中配置的构造器参数个数
+				 * parameterCount：表示当前构造器参数个数
+				 * 如果当前构造器参数个数小于配置，则直接跳过
+				 */
 				if (parameterCount < minNrOfArgs) {
+					//如果当前构造器参数个数小于配置，则直接跳过
 					continue;
 				}
 
+				//下面：parameterCount >= minNrOfArgs
+
 				ArgumentsHolder argsHolder;
+
+				//构造器参数类型数组
 				Class<?>[] paramTypes = candidate.getParameterTypes();
-				if (resolvedValues != null) {
+
+				if (resolvedValues != null) {//表示已经解析完成后的构造器参数值不为空
+					//说明bd中配置了构造参数
+
 					try {
+						/**
+						 * 例子：
+						 * @ConstructorProperties(value = ["a", "b"])
+						 * public Student(String name, String sex) {xxxxx}
+						 * 如果在构造方法上有注解 ConstructorProperties ,则参数的名称以注解中的数组为准
+						 * @see ConstructorProperties
+						 *
+						 * 则 paramNames = ["a", "b"]，否则 paramNames = ["name"，"sex"]
+						 */
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, parameterCount);
 						if (paramNames == null) {
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
+								//正常拿到
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
-						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
-								getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
+						argsHolder = createArgumentArray(
+								beanName,
+								mbd,
+								resolvedValues,
+								bw,
+								paramTypes,
+								paramNames,
+								getUserDeclaredConstructor(candidate),
+								autowiring,
+								candidates.length == 1);
 					} catch (UnsatisfiedDependencyException ex) {
 						if (logger.isTraceEnabled()) {
 							logger.trace("Ignoring constructor [" + candidate + "] of bean '" + beanName + "': " + ex);
