@@ -33,6 +33,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.config.DependencyDescriptor;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.NamedThreadLocal;
@@ -289,9 +290,14 @@ class ConstructorResolver {
 				//当前遍历构造器参数个数
 				int parameterCount = candidate.getParameterCount();
 
-				if (constructorToUse != null && argsToUse != null && argsToUse.length > parameterCount) {
+				if (constructorToUse != null //可以使用的构造器,之前循环筛选得到的
+						&& argsToUse != null //可以使用的参数,之前循环筛选得到的
+						&& argsToUse.length > parameterCount) //并且可以使用的参数大于当前构造器参数数量(因为构造器是按参数个数排序过的，前面循环处理的构造器的参数是更多的)
+				//if中的几个参数都是在下面的循环体中确定的，所以在下一次循环开始的时候进行判断，如果已经满足条件，则不必继续循环了
+				{
 					// Already found greedy constructor that can be satisfied ->
 					// do not look any further, there are only less greedy constructors left.
+					//已经发现可以满足的贪婪构造函数->看起来不再赘述，只剩下更少的贪婪构造函数。
 					break;
 				}
 
@@ -336,10 +342,10 @@ class ConstructorResolver {
 						argsHolder = createArgumentArray(
 								beanName,
 								mbd,
-								resolvedValues,
+								resolvedValues,//解析出来的参数列表
 								bw,
-								paramTypes,
-								paramNames,
+								paramTypes,//参数类型
+								paramNames,//参数名称
 								getUserDeclaredConstructor(candidate),
 								autowiring,
 								candidates.length == 1);
@@ -362,25 +368,41 @@ class ConstructorResolver {
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
-				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
-						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
+				/**
+				 * 该数值与构造器参数类型与当前构造器参数类型匹配度成反比
+				 */
+				int typeDiffWeight = (
+						mbd.isLenientConstructorResolution() ? // 当前构造器是否是宽松策略还是狭窄策略
+								argsHolder.getTypeDifferenceWeight(paramTypes) //宽松，可以容错，ambiguousConstructors 列表中允许有数据
+								: argsHolder.getAssignabilityWeight(paramTypes) //狭窄，不容错，ambiguousConstructors 列表中不允许有数据,否则报错
+				);
 				// Choose this constructor if it represents the closest match.
 				if (typeDiffWeight < minTypeDiffWeight) {
+					//说明当前构造器匹配度比上一个构造器高，则替换
 					constructorToUse = candidate;
 					argsHolderToUse = argsHolder;
 					argsToUse = argsHolder.arguments;
+					//关系匹配度，方便下一个使用
 					minTypeDiffWeight = typeDiffWeight;
 					ambiguousConstructors = null;
-				} else if (constructorToUse != null && typeDiffWeight == minTypeDiffWeight) {
+				}
+
+				//前提：当前处理的构造器匹配度与上一次筛选出的最优构造器一直，说明有模棱两可的情况
+				else if (constructorToUse != null && typeDiffWeight == minTypeDiffWeight) {
 					if (ambiguousConstructors == null) {
 						ambiguousConstructors = new LinkedHashSet<>();
+						//有模棱两可的情况
 						ambiguousConstructors.add(constructorToUse);
 					}
+					//有模棱两可的情况
 					ambiguousConstructors.add(candidate);
 				}
 			}
 
+			/** 循环处理构造方法结束，已经找到了最优的可以使用的构造方法 循环结束 ********/
+
 			if (constructorToUse == null) {
+				//还是没有找到构造器，报错！
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
 					for (Exception cause : causes) {
@@ -391,21 +413,33 @@ class ConstructorResolver {
 				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 						"Could not resolve matching constructor " +
 								"(hint: specify index/type/name arguments for simple parameters to avoid type ambiguities)");
-			} else if (ambiguousConstructors != null && !mbd.isLenientConstructorResolution()) {
+			} else if (
+					ambiguousConstructors != null //有模棱两可的构造器
+							&& !mbd.isLenientConstructorResolution()//并且不允许有模棱两可的构造器，也要报错
+			) {
 				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 						"Ambiguous constructor matches found in bean '" + beanName + "' " +
 								"(hint: specify index/type/name arguments for simple parameters to avoid type ambiguities): " +
 								ambiguousConstructors);
 			}
 
+			//到这里，就表示匹配构造器成功了,需要进行缓存，方便后来者
+
 			if (explicitArgs == null && argsHolderToUse != null) {
+				//缓存
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
 		//进行反射创建实例
-		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
+		bw.setBeanInstance(
+
+				/**
+				 * 反射创建实例
+				 */
+				instantiate(beanName, mbd, constructorToUse, argsToUse)
+		);
 		return bw;
 	}
 
@@ -1037,7 +1071,9 @@ class ConstructorResolver {
 		public final Object[] arguments;
 
 		/**
-		 * 跟原始的差不多
+		 * bd当中原始的封装的参数
+		 *
+		 * @see TypedStringValue
 		 */
 		public final Object[] preparedArguments;
 
@@ -1079,6 +1115,11 @@ class ConstructorResolver {
 			return Integer.MAX_VALUE - 1024;
 		}
 
+		/**
+		 * 匹配构造器成功了,需要进行缓存，方便后来者
+		 *
+		 * @see ConstructorResolver#autowireConstructor(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.reflect.Constructor[], java.lang.Object[])
+		 */
 		public void storeCache(RootBeanDefinition mbd, Executable constructorOrFactoryMethod) {
 			synchronized (mbd.constructorArgumentLock) {
 				mbd.resolvedConstructorOrFactoryMethod = constructorOrFactoryMethod;
