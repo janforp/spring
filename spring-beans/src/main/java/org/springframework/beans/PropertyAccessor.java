@@ -1,25 +1,9 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans;
-
-import java.util.Map;
 
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
+
+import java.util.Map;
 
 /**
  * Common interface for classes that can access named properties
@@ -27,10 +11,10 @@ import org.springframework.lang.Nullable;
  * Serves as base interface for {@link BeanWrapper}.
  *
  * @author Juergen Hoeller
- * @since 1.1
  * @see BeanWrapper
  * @see PropertyAccessorFactory#forBeanPropertyAccess
  * @see PropertyAccessorFactory#forDirectFieldAccess
+ * @since 1.1
  */
 public interface PropertyAccessor {
 
@@ -70,10 +54,10 @@ public interface PropertyAccessor {
 	 */
 	char PROPERTY_KEY_SUFFIX_CHAR = ']';
 
-
 	/**
 	 * Determine whether the specified property is readable.
 	 * <p>Returns {@code false} if the property doesn't exist.
+	 *
 	 * @param propertyName the property to check
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return whether the property is readable
@@ -83,6 +67,7 @@ public interface PropertyAccessor {
 	/**
 	 * Determine whether the specified property is writable.
 	 * <p>Returns {@code false} if the property doesn't exist.
+	 *
 	 * @param propertyName the property to check
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return whether the property is writable
@@ -93,6 +78,7 @@ public interface PropertyAccessor {
 	 * Determine the property type for the specified property,
 	 * either checking the property descriptor or checking the value
 	 * in case of an indexed or mapped element.
+	 *
 	 * @param propertyName the property to check
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return the property type for the particular property,
@@ -106,6 +92,7 @@ public interface PropertyAccessor {
 	/**
 	 * Return a type descriptor for the specified property:
 	 * preferably from the read method, falling back to the write method.
+	 *
 	 * @param propertyName the property to check
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return the property type for the particular property,
@@ -118,6 +105,7 @@ public interface PropertyAccessor {
 
 	/**
 	 * Get the current value of the specified property.
+	 *
 	 * @param propertyName the name of the property to get the value of
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return the value of the property
@@ -131,6 +119,7 @@ public interface PropertyAccessor {
 
 	/**
 	 * Set the specified value as current property value.
+	 *
 	 * @param propertyName the name of the property to set the value of
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @param value the new value
@@ -143,6 +132,7 @@ public interface PropertyAccessor {
 
 	/**
 	 * Set the specified value as current property value.
+	 *
 	 * @param pv an object containing the new property value
 	 * @throws InvalidPropertyException if there is no such property or
 	 * if the property isn't writable
@@ -156,6 +146,7 @@ public interface PropertyAccessor {
 	 * <p>Bulk updates from PropertyValues are more powerful: This method is
 	 * provided for convenience. Behavior will be identical to that of
 	 * the {@link #setPropertyValues(PropertyValues)} method.
+	 *
 	 * @param map a Map to take properties from. Contains property value objects,
 	 * keyed by property name
 	 * @throws InvalidPropertyException if there is no such property or
@@ -177,6 +168,7 @@ public interface PropertyAccessor {
 	 * This exception can be examined later to see all binding errors.
 	 * Properties that were successfully updated remain changed.
 	 * <p>Does not allow unknown fields or invalid fields.
+	 *
 	 * @param pvs a PropertyValues to set on the target object
 	 * @throws InvalidPropertyException if there is no such property or
 	 * if the property isn't writable
@@ -197,6 +189,7 @@ public interface PropertyAccessor {
 	 * {@link PropertyBatchUpdateException} containing all the individual errors.
 	 * This exception can be examined later to see all binding errors.
 	 * Properties that were successfully updated remain changed.
+	 *
 	 * @param pvs a PropertyValues to set on the target object
 	 * @param ignoreUnknown should we ignore unknown properties (not found in the bean)
 	 * @throws InvalidPropertyException if there is no such property or
@@ -219,6 +212,7 @@ public interface PropertyAccessor {
 	 * {@link PropertyBatchUpdateException} containing all the individual errors.
 	 * This exception can be examined later to see all binding errors.
 	 * Properties that were successfully updated remain changed.
+	 *
 	 * @param pvs a PropertyValues to set on the target object
 	 * @param ignoreUnknown should we ignore unknown properties (not found in the bean)
 	 * @param ignoreInvalid should we ignore invalid properties (found but not accessible)
@@ -231,5 +225,4 @@ public interface PropertyAccessor {
 	 */
 	void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean ignoreInvalid)
 			throws BeansException;
-
 }

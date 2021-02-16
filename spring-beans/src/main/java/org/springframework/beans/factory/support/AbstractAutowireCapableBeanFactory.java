@@ -546,6 +546,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			/**
+			 * 核心方法，创建对象，并且生命周期大部分动作再次执行
+			 * 1.创建实例
+			 * 2.依赖注入
+			 * 3.执行初始化方法
+			 */
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
@@ -562,10 +568,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Actually create the specified bean. Pre-creation processing has already happened
-	 * at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
-	 * <p>Differentiates between default bean instantiation, use of a
+	 * Actually create the specified bean. -- 实际创建指定的bean。
+	 *
+	 * Pre-creation processing has already happened at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
+	 * -- 此时，预创建处理已经发生，例如检查{@code postProcessBeforeInstantiation}回调。
+	 *
+	 * <p>
+	 * Differentiates between default bean instantiation, use of a
 	 * factory method, and autowiring a constructor.
+	 * -- 区分默认bean实例化，使用工厂方法和自动装配构造函数。
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the merged bean definition for the bean
@@ -576,8 +587,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateUsingFactoryMethod
 	 * @see #autowireConstructor
 	 */
-	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
-			throws BeanCreationException {
+	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
 
 		// Instantiate the bean.
 		BeanWrapper instanceWrapper = null;
@@ -608,8 +618,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				try {
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				} catch (Throwable ex) {
-					throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-							"Post-processing of merged bean definition failed", ex);
+					throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", ex);
 				}
 				mbd.postProcessed = true;
 			}
@@ -617,8 +626,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
-		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-				isSingletonCurrentlyInCreation(beanName));
+		boolean earlySingletonExposure = (
+				mbd.isSingleton()
+						&& this.allowCircularReferences
+						&& isSingletonCurrentlyInCreation(beanName)
+		);
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
