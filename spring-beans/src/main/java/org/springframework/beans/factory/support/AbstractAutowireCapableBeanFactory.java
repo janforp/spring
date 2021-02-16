@@ -590,12 +590,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
 
 		// Instantiate the bean.
+
+		/**
+		 * 包装 bean
+		 * 并且提供了一些属性访问器，属性编辑，类型转换
+		 */
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
 			/**
+			 * 该方法创建出来真实的bean实例，并且将其包装到 BeanWrapper 实例中！
+			 *
 			 * 非常复杂：通过反射实现
 			 * 1.通常是通过反射的方式拿到该bean的一个构造方法
 			 * 此时，如果是无参数的构造方法，则问题补打
@@ -1220,7 +1227,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
+	 * 该方法创建出来真实的bean实例，并且将其包装到 BeanWrapper 实例中！
+	 *
+	 * Create a new instance for the specified bean, using an appropriate(适当的) instantiation(实例化) strategy:
+	 * -- 使用适当的实例化策略为指定的bean创建一个新实例：
 	 * factory method, constructor autowiring, or simple instantiation.
 	 *
 	 * @param beanName the name of the bean
@@ -1234,42 +1244,81 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
+
+		//确保class已经加载到jvm了
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
-		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
-			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
+		if (beanClass != null
+				&& !Modifier.isPublic(beanClass.getModifiers()) // beanClass 不是 public
+				&& !mbd.isNonPublicAccessAllowed()) { //不是 public
+			//无法访问
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
 
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
+			//新加功能
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
 		if (mbd.getFactoryMethodName() != null) {
+			//说明 bean 标签中配置了 factory-method 属性
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
-		// Shortcut when re-creating the same bean...
+		/** 重新创建相同bean时的快捷方式... start ******************/
+
+		/**
+		 * 因为解析可以直接反射调用的构造方法是比较费性能的
+		 * 所以第一次解析完成会缓存，后面再次创建相同的实例
+		 * 就可以直接从缓存中获取了
+		 */
+		// Shortcut when re-creating the same bean...：重新创建相同bean时的快捷方式...
+
+		/**
+		 * 表示bd对应的构造信息是否已经解析成可以反射调用的构造方法method信息了
+		 * 如果是，可以直接创建了
+		 */
 		boolean resolved = false;
+		/**
+		 * 是否自动匹配构造方法
+		 */
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
+
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
+					//说明该 bd 的构造信息已经转换为可以反射调用的 method 了
 					resolved = true;
+					/**
+					 * 当 resolvedConstructorOrFactoryMethod 有值，并且构造方法有参数，那么认为这个找到就是 true
+					 * 何时为false呢？
+					 * 1.resolvedConstructorOrFactoryMethod 为 null
+					 * 2.当 resolvedConstructorOrFactoryMethod 表示的是默认构造方法，无参数构造方法
+					 */
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
 		}
 		if (resolved) {
+			//构造信息解析过了，就走快捷路径
+
 			if (autowireNecessary) {
+				/**
+				 * 有参数构造方法实例化，需要根据参数去匹配合适的构造方法，因为构造方法可能不止一个
+				 * 拿出当前class的所有构造方法
+				 * 需要根据参数去匹配到一个最优的构造方法来创建实例
+				 */
 				return autowireConstructor(beanName, mbd, null, null);
 			} else {
+				//默认构造方法实例化
 				return instantiateBean(beanName, mbd);
 			}
 		}
 
-		// Candidate constructors for autowiring?
+		/** 重新创建相同bean时的快捷方式... end ******************/
+
+		// Candidate constructors for autowiring?：自动装配的候选构造函数
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 
 		if (ctors != null // 后处理器指定了构造方法组
@@ -1347,8 +1396,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Determine candidate constructors to use for the given bean, checking all registered
-	 * {@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}.
+	 * Determine candidate constructors to use for the given bean,
+	 * -- 确定要用于给定bean的候选构造函数
+	 * checking all registered {@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}.
 	 *
 	 * @param beanClass the raw class of the bean
 	 * @param beanName the name of the bean
@@ -1357,8 +1407,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
 	 */
 	@Nullable
-	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName)
-			throws BeansException {
+	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName) throws BeansException {
 
 		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {

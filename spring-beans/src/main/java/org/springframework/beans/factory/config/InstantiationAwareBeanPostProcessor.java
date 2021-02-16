@@ -100,9 +100,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @since 5.1
 	 */
 	@Nullable
-	default PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
-			throws BeansException {
-
+	default PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
 		return null;
 	}
 
@@ -129,10 +127,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 */
 	@Deprecated
 	@Nullable
-	default PropertyValues postProcessPropertyValues(
-			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
-
+	default PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
 		return pvs;
 	}
-
 }
