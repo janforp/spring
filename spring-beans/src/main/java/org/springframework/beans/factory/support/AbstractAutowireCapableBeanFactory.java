@@ -502,13 +502,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		 * clone the bean definition in case of a dynamically resolved Class
 		 * which cannot be stored in the shared merged bean definition.
 		 * -- 确保此时确实解析了bean类，并在无法动态存储的Class不能存储在共享合并bean定义中的情况下克隆bean定义。
+		 *
+		 * 加载class到jvm中
 		 */
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
-		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+		if (resolvedClass != null // 拿到了 mbd 实例化对象的时候使用的class
+				&& !mbd.hasBeanClass() //说明 mbd 在 resolveBeanClass 之前是没有 beanClass 的
+				&& mbd.getBeanClassName() != null) // 说明 bean 标签中有 class 属性
+		{
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
+		/** ignore STart********/
 		// Prepare method overrides.
 		try {
 			mbdToUse.prepareMethodOverrides();
@@ -516,9 +522,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throw new BeanDefinitionStoreException(mbdToUse.getResourceDescription(),
 					beanName, "Validation of method overrides failed", ex);
 		}
+		/** ignore end********/
 
 		try {
-			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			/**
+			 * 可以通过后处理器，在这一步返回一个代理实例对象
+			 * 注意：这里的代理并不是 spring aop 代理 逻辑实现的地方
+			 * Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.：给BeanPostProcessors一个返回代理而不是目标bean实例的机会。
+			 *
+			 * Instantiation:实例化，不要和 init 搞混
+			 *
+			 * 后处理器调用点：这是一个创建前的调用点
+			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -684,7 +699,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Determine the target type for the given bean definition.
+	 * Determine the target type for the given bean definition.:确定给定bean定义的目标类型。
 	 *
 	 * @param beanName the name of the bean (for error handling purposes)
 	 * @param mbd the merged bean definition for the bean
@@ -1105,6 +1120,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 可以通过后处理器，在这一步返回一个代理实例对象
+	 * 注意：这里的代理并不是 spring aop 代理 逻辑实现的地方
+	 * Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.：给BeanPostProcessors一个返回代理而不是目标bean实例的机会。
+	 * Instantiation:实例化，不要和 init 搞混
+	 *
 	 * Apply before-instantiation post-processors, resolving whether there is a
 	 * before-instantiation shortcut for the specified bean.
 	 *
@@ -1117,11 +1137,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object bean = null;
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
 			// Make sure bean class is actually resolved at this point.
-			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			if (!mbd.isSynthetic()
+
+					/**
+					 * Instantiation 阶段执行的后处理器存在
+					 * @see BeanPostProcessorCache#instantiationAware
+					 */
+					&& hasInstantiationAwareBeanPostProcessors()) {
+
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
+
+					/**
+					 * 在实例化之前执行后处理器
+					 */
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
+						/**
+						 * 在实例化之后执行后处理器
+						 */
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 					}
 				}
@@ -1132,6 +1166,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 在实例化之前执行后处理器
+	 *
 	 * Apply InstantiationAwareBeanPostProcessors to the specified bean definition
 	 * (by class and name), invoking their {@code postProcessBeforeInstantiation} methods.
 	 * <p>Any returned object will be used as the bean instead of actually instantiating
@@ -1145,9 +1181,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	@Nullable
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+
+		//遍历后处理器集合
 		for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+
+			/**
+			 * @see InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation(java.lang.Class, java.lang.String) 默认返回 null，程序员可以自己实现不返回null的子类
+			 */
 			Object result = bp.postProcessBeforeInstantiation(beanClass, beanName);
 			if (result != null) {
+				/**
+				 * 如果有多个，只要有一个返回不为空就ok了，因为一般来说
+				 * 支持注入多个自己实现的后处理器
+				 * 但是一般一个后处理器处理一种类型的 bean（因为后处理器是知道 beanClass 的）
+				 * 当然也支持一个后处理器通过 beanClass if..else if ... else 这样去判断来间接处理多个
+				 * 类型的bean，但是对于一个类型的bean来说，它只能被一个后处理器处理
+				 *
+				 * 所以只要返回不为null就可以直接返回了！！！！！
+				 */
 				return result;
 			}
 		}

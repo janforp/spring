@@ -1727,6 +1727,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected Class<?> resolveBeanClass(RootBeanDefinition mbd, String beanName, Class<?>... typesToMatch) throws CannotLoadBeanClassException {
 		try {
 			if (mbd.hasBeanClass()) {
+				//如果有直接返回
 				return mbd.getBeanClass();
 			}
 
@@ -1738,6 +1739,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
 						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
 			} else {
+
+				//如果没有则解析并加载
 				return doResolveBeanClass(mbd, typesToMatch);
 			}
 		} catch (PrivilegedActionException pae) {
@@ -1782,6 +1785,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
+		/**
+		 * bean中的 class 属性
+		 */
 		String className = mbd.getBeanClassName();
 		if (className != null) {
 			//<bean  class = "xxxxx" /> 说明配置了 class
@@ -1810,6 +1816,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						}
 					}
 				}
+
+				//加载到jvm中
 				return ClassUtils.forName(className, dynamicLoader);
 			}
 		}
@@ -2373,12 +2381,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Internal cache of pre-filtered post-processors.
 	 *
+	 * 后处理器缓存
+	 *
 	 * @since 5.3
 	 */
 	static class BeanPostProcessorCache {
 
+		/**
+		 * Instantiation 阶段执行的后处理器
+		 */
 		final List<InstantiationAwareBeanPostProcessor> instantiationAware = new ArrayList<>();
 
+		/**
+		 * Instantiation 阶段执行的后处理器
+		 */
 		final List<SmartInstantiationAwareBeanPostProcessor> smartInstantiationAware = new ArrayList<>();
 
 		final List<DestructionAwareBeanPostProcessor> destructionAware = new ArrayList<>();

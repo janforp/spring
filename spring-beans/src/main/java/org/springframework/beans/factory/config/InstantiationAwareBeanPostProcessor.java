@@ -1,26 +1,10 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.config;
-
-import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.lang.Nullable;
+
+import java.beans.PropertyDescriptor;
 
 /**
  * Subinterface of {@link BeanPostProcessor} that adds a before-instantiation callback,
@@ -40,9 +24,9 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
- * @since 1.2
  * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#setCustomTargetSourceCreators
  * @see org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator
+ * @since 1.2
  */
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
@@ -61,6 +45,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * {@link SmartInstantiationAwareBeanPostProcessor} interface in order
 	 * to predict the type of the bean object that they are going to return here.
 	 * <p>The default implementation returns {@code null}.
+	 *
 	 * @param beanClass the class of the bean to be instantiated
 	 * @param beanName the name of the bean
 	 * @return the bean object to expose instead of a default instance of the target bean,
@@ -81,6 +66,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * <p>This is the ideal callback for performing custom field injection on the given bean
 	 * instance, right before Spring's autowiring kicks in.
 	 * <p>The default implementation returns {@code true}.
+	 *
 	 * @param bean the bean instance created, with properties not having been set yet
 	 * @param beanName the name of the bean
 	 * @return {@code true} if properties should be set on the bean; {@code false}
@@ -101,6 +87,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * {@link #postProcessPropertyValues} implementation, and {@code pvs} otherwise.
 	 * In a future version of this interface (with {@link #postProcessPropertyValues} removed),
 	 * the default implementation will return the given {@code pvs} as-is directly.
+	 *
 	 * @param pvs the property values that the factory is about to apply (never {@code null})
 	 * @param bean the bean instance created, but whose properties have not yet been set
 	 * @param beanName the name of the bean
@@ -109,8 +96,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * but specifically continues with a call to {@link #postProcessPropertyValues}
 	 * (requiring initialized {@code PropertyDescriptor}s for the current bean class)
 	 * @throws org.springframework.beans.BeansException in case of errors
-	 * @since 5.1
 	 * @see #postProcessPropertyValues
+	 * @since 5.1
 	 */
 	@Nullable
 	default PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
@@ -127,6 +114,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * creating a new MutablePropertyValues instance based on the original PropertyValues,
 	 * adding or removing specific values.
 	 * <p>The default implementation returns the given {@code pvs} as-is.
+	 *
 	 * @param pvs the property values that the factory is about to apply (never {@code null})
 	 * @param pds the relevant property descriptors for the target bean (with ignored
 	 * dependency types - which the factory handles specifically - already filtered out)
