@@ -1329,9 +1329,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 
 		if (ctors != null // 后处理器指定了构造方法组
-				|| mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR //一般情况是 AUTOWIRE_NO
-				|| mbd.hasConstructorArgumentValues() // bean 标签有 <constructor-agr>子标签则有
-				|| !ObjectUtils.isEmpty(args)) { // args 不是 空
+
+				/**
+				 * <bean class = "xxx" autowire = "byType/byName/constructor/no/default" />
+				 * 一般情况是 AUTOWIRE_NO
+				 */
+				|| mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR
+
+				/**
+				 * bean 标签有 <constructor-agr>子标签则有
+				 * xml解析成 bd 的时候会塞入到 bd
+				 */
+				|| mbd.hasConstructorArgumentValues()
+
+				/**
+				 * getBean的时候 args 中是否有参数
+				 */
+				|| !ObjectUtils.isEmpty(args)) {
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
@@ -1460,8 +1474,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			initBeanWrapper(bw);
 			return bw;
 		} catch (Throwable ex) {
-			throw new BeanCreationException(
-					mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
 		}
 	}
 
