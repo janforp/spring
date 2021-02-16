@@ -49,8 +49,7 @@ public interface InstantiationStrategy {
 	 * @throws BeansException if the instantiation attempt failed
 	 * @see ConstructorResolver#instantiate(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.reflect.Constructor, java.lang.Object[])
 	 */
-	Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
-			Constructor<?> ctor, Object... args) throws BeansException;
+	Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) throws BeansException;
 
 	/**
 	 * Return an instance of the bean with the given name in this factory,

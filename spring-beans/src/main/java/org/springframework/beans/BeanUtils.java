@@ -66,6 +66,11 @@ public abstract class BeanUtils {
 	private static final Set<Class<?>> unknownEditorTypes =
 			Collections.newSetFromMap(new ConcurrentReferenceHashMap<>(64));
 
+	/**
+	 * 构造方法中是原始类型，但是参数数组中是null，进行 null 跟原始类型的转换
+	 *
+	 * @see BeanUtils#instantiateClass(java.lang.reflect.Constructor, java.lang.Object...)
+	 */
 	private static final Map<Class<?>, Object> DEFAULT_TYPE_VALUES;
 
 	static {
@@ -177,10 +182,18 @@ public abstract class BeanUtils {
 			ReflectionUtils.makeAccessible(ctor);
 			if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass())) {
 				return KotlinDelegate.instantiateClass(ctor, args);
-			} else {
+			}
+			//看这个分支
+			else {
 				Class<?>[] parameterTypes = ctor.getParameterTypes();
 				Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
 				Object[] argsWithDefaultValues = new Object[args.length];
+
+				/**
+				 * 下面处理的事情：
+				 * 构造方法中是原始类型，但是参数数组中是null，进行 null 跟原始类型的转换
+				 * @see BeanUtils#DEFAULT_TYPE_VALUES
+				 */
 				for (int i = 0; i < args.length; i++) {
 					if (args[i] == null) {
 						Class<?> parameterType = parameterTypes[i];
@@ -189,6 +202,7 @@ public abstract class BeanUtils {
 						argsWithDefaultValues[i] = args[i];
 					}
 				}
+				//其实就是通过这个方法实例化
 				return ctor.newInstance(argsWithDefaultValues);
 			}
 		} catch (InstantiationException ex) {

@@ -444,9 +444,16 @@ class ConstructorResolver {
 	}
 
 	private Object instantiate(
-			String beanName, RootBeanDefinition mbd, Constructor<?> constructorToUse, Object[] argsToUse) {
+			String beanName,
+			RootBeanDefinition mbd,
+			Constructor<?> constructorToUse,//实例化使用的构造器
+			Object[] argsToUse //构造器使用的参数,可能是空数组
+	) {
 
 		try {
+			/**
+			 * @see CglibSubclassingInstantiationStrategy
+			 */
 			InstantiationStrategy strategy = this.beanFactory.getInstantiationStrategy();
 			if (System.getSecurityManager() != null) {
 				return AccessController.doPrivileged((PrivilegedAction<Object>) () ->
