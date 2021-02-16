@@ -22,6 +22,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.AutowiredPropertyMarker;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -1319,6 +1320,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/** 重新创建相同bean时的快捷方式... end ******************/
 
 		// Candidate constructors for autowiring?：自动装配的候选构造函数
+
+		/**
+		 * 该方法返回可能为null
+		 * 典型应用：@Autowired注解打在了构造方法上
+		 * @see AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors(java.lang.Class, java.lang.String)
+		 */
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 
 		if (ctors != null // 后处理器指定了构造方法组
@@ -1409,8 +1416,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Nullable
 	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName) throws BeansException {
 
-		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
+		if (beanClass != null
+
+				/**
+				 * @see BeanPostProcessorCache#instantiationAware 判断是这个
+				 * @see BeanPostProcessorCache#smartInstantiationAware 使用的是这个
+				 */
+				&& hasInstantiationAwareBeanPostProcessors()) {
+
+			//遍历 smartInstantiationAware
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				/**
+				 * 典型应用：@Autowired注解打在了构造方法上
+				 * @see AutowiredAnnotationBeanPostProcessor#determineCandidateConstructors(java.lang.Class, java.lang.String)
+				 */
 				Constructor<?>[] ctors = bp.determineCandidateConstructors(beanClass, beanName);
 				if (ctors != null) {
 					return ctors;
