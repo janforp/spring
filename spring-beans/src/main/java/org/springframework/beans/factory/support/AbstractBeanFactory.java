@@ -451,7 +451,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					//单实例
 
 					/**
-					 * 更倾向于创建实例并发返回
+					 * 该方法虽然也会看缓存
+					 * 但是更倾向于创建实例并返回
+					 * 大概率此时缓存中也是没有的
+					 * 当然出了并发的情况
+					 *
+					 * 该方法还处理了循环依赖的问题
+					 *
 					 */
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
