@@ -157,11 +157,22 @@ class ConstructorResolver {
 			/**
 			 * 表示构造器参数需要做转换的参数引用
 			 */
+
+			/** 如果不是第一次创建该类型的实例，先走缓存 start ****/
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
-				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
-					// Found a cached constructor...
+
+				if (constructorToUse != null//构造方法不是空
+
+						//并且构造参数已经被解析过了
+						&& mbd.constructorArgumentsResolved) {
+
+					// Found a cached constructor... 找到了一个缓存的构造函数...
+					/**
+					 * 缓存命中！！！！缓存中有已经有解析好的构造器方法了
+					 * 说明当前 bd 不是第一次生成实例
+					 */
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
 						argsToResolve = mbd.preparedConstructorArguments;
@@ -171,9 +182,15 @@ class ConstructorResolver {
 			if (argsToResolve != null) {
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve);
 			}
+
+			/** 如果不是第一次创建该类型的实例，先走缓存 end ****/
 		}
 
 		if (constructorToUse == null || argsToUse == null) {
+			/**
+			 * 说明缓存没有命中，可能是第一次创建该类型的实例
+			 */
+
 			// Take specified constructors, if any.
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
