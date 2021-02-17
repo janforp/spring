@@ -629,14 +629,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Allow post-processors to modify the merged bean definition.:允许后处理器修改合并的bean定义。
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
+				//如果还没有执行，则执行
+
 				try {
 					/**
+					 * 后处理器调用点：
+					 * 合并 bd 信息，因为接下来马上要调用 populate 处理依赖了
+					 * @see AutowiredAnnotationBeanPostProcessor#postProcessMergedBeanDefinition(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Class, java.lang.String)
 					 *
+					 * 该方法做的事情:提前出来当前 beanType 类型整个继承体系内的  @Autowired,@Value,@Inject 信息，并且包装成一个 InjectionMetadata 对象
+					 * 存放到 AutowiredAnnotationBeanPostProcessor 缓存中了
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				} catch (Throwable ex) {
 					throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", ex);
 				}
+
+				//执行成功，设置已经执行过，每个 bd 只执行一次
 				mbd.postProcessed = true;
 			}
 		}
@@ -1146,6 +1155,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName) {
 		for (MergedBeanDefinitionPostProcessor processor : getBeanPostProcessorCache().mergedDefinition) {
+			/**
+			 * @see AutowiredAnnotationBeanPostProcessor#postProcessMergedBeanDefinition(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Class, java.lang.String)
+			 * 该方法做的事情:提前出来当前 beanType 类型整个继承体系内的  @Autowired,@Value,@Inject 信息，并且包装成一个 InjectionMetadata 对象
+			 * 存放到 AutowiredAnnotationBeanPostProcessor 缓存中了
+			 */
 			processor.postProcessMergedBeanDefinition(mbd, beanType, beanName);
 		}
 	}

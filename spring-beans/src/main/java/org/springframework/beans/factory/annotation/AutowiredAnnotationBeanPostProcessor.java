@@ -239,6 +239,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	/**
 	 * 在实例化之前会被调用
 	 *
+	 * 该方法做的事情:提前出来当前 beanType 类型整个继承体系内的  @Autowired,@Value,@Inject 信息，并且包装成一个 InjectionMetadata 对象
+	 * 存放到 AutowiredAnnotationBeanPostProcessor 缓存中了
+	 *
 	 * @param beanDefinition the merged bean definition for the bean 当前要实例化的bd
 	 * @param beanType the actual type of the managed bean instance
 	 * @param beanName the name of the bean
@@ -489,7 +492,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
+					//查询出当前clazz的整个继承体系的Autowire注解信息
 					metadata = buildAutowiringMetadata(clazz);
+					//当前clazz关注的注解信息缓存
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
 			}
@@ -499,58 +504,80 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {
 		if (!AnnotationUtils.isCandidateClass(clazz, this.autowiredAnnotationTypes)) {
+			//看看有没有我们感兴趣的注解:@Autowired，@Value，@Inject
 			return InjectionMetadata.EMPTY;
 		}
 
 		List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
 		Class<?> targetClass = clazz;
 
+		/**
+		 * do while 循环做的事情：
+		 * 1.循环当前class以及它的父类class
+		 * 2.找到这些class的所有的注解信息
+		 * 3.循环终点：class为null或者class为Object.class为止
+		 */
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
-			ReflectionUtils.doWithLocalFields(targetClass, field -> {
-				MergedAnnotation<?> ann = findAutowiredAnnotation(field);
-				if (ann != null) {
-					if (Modifier.isStatic(field.getModifiers())) {
-						if (logger.isInfoEnabled()) {
-							logger.info("Autowired annotation is not supported on static fields: " + field);
-						}
-						return;
-					}
-					boolean required = determineRequiredStatus(ann);
-					currElements.add(new AutowiredFieldElement(field, required));
-				}
-			});
+			ReflectionUtils.doWithLocalFields(targetClass,
 
-			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
-				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
-				if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
-					return;
-				}
-				MergedAnnotation<?> ann = findAutowiredAnnotation(bridgedMethod);
-				if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
-					if (Modifier.isStatic(method.getModifiers())) {
-						if (logger.isInfoEnabled()) {
-							logger.info("Autowired annotation is not supported on static methods: " + method);
+					/**
+					 * 每个字段都会执行该方法
+					 * @see ReflectionUtils.FieldCallback#doWith(java.lang.reflect.Field)
+					 */
+					field -> {
+						MergedAnnotation<?> ann = findAutowiredAnnotation(field);
+						if (ann != null) {
+							if (Modifier.isStatic(field.getModifiers())) {
+								if (logger.isInfoEnabled()) {
+									logger.info("Autowired annotation is not supported on static fields: " + field);
+								}
+								return;
+							}
+							//required 值
+							boolean required = determineRequiredStatus(ann);
+							currElements.add(new AutowiredFieldElement(field, required));
 						}
-						return;
-					}
-					if (method.getParameterCount() == 0) {
-						if (logger.isInfoEnabled()) {
-							logger.info("Autowired annotation should only be used on methods with parameters: " +
-									method);
+					});
+
+			ReflectionUtils.doWithLocalMethods(targetClass,
+					/**
+					 * 每个方法都会执行
+					 * @see ReflectionUtils.MethodCallback#doWith(java.lang.reflect.Method)
+					 */
+					method -> {
+						Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
+						if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
+							return;
 						}
-					}
-					boolean required = determineRequiredStatus(ann);
-					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
-					currElements.add(new AutowiredMethodElement(method, required, pd));
-				}
-			});
+						MergedAnnotation<?> ann = findAutowiredAnnotation(bridgedMethod);
+						if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
+							if (Modifier.isStatic(method.getModifiers())) {
+								if (logger.isInfoEnabled()) {
+									logger.info("Autowired annotation is not supported on static methods: " + method);
+								}
+								return;
+							}
+							if (method.getParameterCount() == 0) {
+								if (logger.isInfoEnabled()) {
+									logger.info("Autowired annotation should only be used on methods with parameters: " +
+											method);
+								}
+							}
+							boolean required = determineRequiredStatus(ann);
+							PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
+							currElements.add(new AutowiredMethodElement(method, required, pd));
+						}
+					});
+
+			//到此，当前循环处理的class的所有字段，所有方法上的注解都处理完毕了，下面就要把他们放到集合中去
 
 			elements.addAll(0, currElements);
+
+			//开始下一次循环
 			targetClass = targetClass.getSuperclass();
-		}
-		while (targetClass != null && targetClass != Object.class);
+		} while (targetClass != null && targetClass != Object.class);//循环终点：class为null或者class为Object.class为止
 
 		return InjectionMetadata.forElements(elements, clazz);
 	}
