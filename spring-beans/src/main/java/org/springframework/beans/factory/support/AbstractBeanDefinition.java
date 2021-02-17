@@ -145,6 +145,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private Boolean lazyInit;
 
+	/**
+	 * autowire="byName"
+	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start" autowire="byName">
+	 * 		<constructor-arg index="0" value="1"/>
+	 * 		<constructor-arg index="1" value="小刘"/>
+	 * 	</bean>
+	 */
 	private int autowireMode = AUTOWIRE_NO;
 
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;

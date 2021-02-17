@@ -569,9 +569,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Override
 	public boolean containsBean(String name) {
 		String beanName = transformedBeanName(name);
-		if (containsSingleton(beanName) || containsBeanDefinition(beanName)) {
-			return (!BeanFactoryUtils.isFactoryDereference(name) || isFactoryBean(name));
+		if (containsSingleton(beanName) //  一级缓存中是否存在
+
+				//beanName 是否有对应的 bd
+				|| containsBeanDefinition(beanName)) {
+
+			//如果一级缓存中有，或者有对应的 bd，则进来这里
+			return (
+					!BeanFactoryUtils.isFactoryDereference(name)
+							|| isFactoryBean(name)
+			);
 		}
+
+		//到此，一级缓存没有并且也没有beanName对应的 bd
+
 		// Not found -> check parent.
 		BeanFactory parentBeanFactory = getParentBeanFactory();
 		return (parentBeanFactory != null && parentBeanFactory.containsBean(originalBeanName(name)));

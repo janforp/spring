@@ -2,6 +2,7 @@ package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.lang.Nullable;
 
 import java.beans.PropertyDescriptor;
@@ -77,6 +78,9 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @see #postProcessBeforeInstantiation
 	 */
 	default boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+		/**
+		 * @see AbstractAutowireCapableBeanFactory#populateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, org.springframework.beans.BeanWrapper)
+		 */
 		return true;
 	}
 

@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.core;
 
 /**
@@ -34,26 +18,27 @@ package org.springframework.core;
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 07.04.2003
  * @see PriorityOrdered
  * @see OrderComparator
  * @see org.springframework.core.annotation.Order
  * @see org.springframework.core.annotation.AnnotationAwareOrderComparator
+ * @since 07.04.2003
  */
 public interface Ordered {
 
 	/**
-	 * Useful constant for the highest precedence value.
+	 * Useful constant for the highest precedence(优先权) value.
+	 *
 	 * @see java.lang.Integer#MIN_VALUE
 	 */
 	int HIGHEST_PRECEDENCE = Integer.MIN_VALUE;
 
 	/**
 	 * Useful constant for the lowest precedence value.
+	 *
 	 * @see java.lang.Integer#MAX_VALUE
 	 */
 	int LOWEST_PRECEDENCE = Integer.MAX_VALUE;
-
 
 	/**
 	 * Get the order value of this object.
@@ -62,10 +47,10 @@ public interface Ordered {
 	 * analogous to Servlet {@code load-on-startup} values).
 	 * <p>Same order values will result in arbitrary sort positions for the
 	 * affected objects.
+	 *
 	 * @return the order value
 	 * @see #HIGHEST_PRECEDENCE
 	 * @see #LOWEST_PRECEDENCE
 	 */
 	int getOrder();
-
 }

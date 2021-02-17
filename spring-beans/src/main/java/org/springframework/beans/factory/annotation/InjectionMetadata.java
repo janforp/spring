@@ -41,8 +41,8 @@ import org.springframework.util.ReflectionUtils;
  * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
  *
  * @author Juergen Hoeller
- * @since 2.5
  * @see AutowiredAnnotationBeanPostProcessor#buildAutowiringMetadata(java.lang.Class)
+ * @since 2.5
  */
 public class InjectionMetadata {
 
@@ -117,12 +117,20 @@ public class InjectionMetadata {
 		this.checkedElements = checkedElements;
 	}
 
-	public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+	/**
+	 * @see AutowiredAnnotationBeanPostProcessor#postProcessProperties(org.springframework.beans.PropertyValues, java.lang.Object, java.lang.String)
+	 */
+	public void inject(Object target /** bean 对象 ****/, @Nullable String beanName, @Nullable PropertyValues pvs /** property ****/) throws Throwable {
 		Collection<InjectedElement> checkedElements = this.checkedElements;
+
 		Collection<InjectedElement> elementsToIterate =
-				(checkedElements != null ? checkedElements : this.injectedElements);
+				(checkedElements != null ?
+						checkedElements
+						: this.injectedElements); //继承体系上的所有的 @Autowired @Value @Inject 注解的缓存
+
 		if (!elementsToIterate.isEmpty()) {
 			for (InjectedElement element : elementsToIterate) {
+				//循环处理注入
 				element.inject(target, beanName, pvs);
 			}
 		}

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.LookupOverride;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -437,10 +438,19 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		return (candidateConstructors.length > 0 ? candidateConstructors : null);
 	}
 
+	/**
+	 * @see AbstractAutowireCapableBeanFactory#populateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, org.springframework.beans.BeanWrapper)
+	 */
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+
+		//包装了当前 bd 需要注入的注解信息集合 @Autowired @Value @Inject 信息元数据
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
+			/**
+			 * 注入啦
+			 * 将注解信息解析后注入到 PVs 中
+			 */
 			metadata.inject(bean, beanName, pvs);
 		} catch (BeanCreationException ex) {
 			throw ex;
@@ -703,26 +713,43 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 		@Override
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+			/**
+			 * @see InjectionMetadata#inject(java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues)
+			 */
+
+			/**
+			 * 要解析的字段
+			 */
 			Field field = (Field) this.member;
 			Object value;
 			if (this.cached) {
 				value = resolvedCachedArgument(beanName, this.cachedFieldValue);
 			} else {
+
+				//
 				DependencyDescriptor desc = new DependencyDescriptor(field, this.required);
 				desc.setContainingClass(bean.getClass());
 				Set<String> autowiredBeanNames = new LinkedHashSet<>(1);
 				Assert.state(beanFactory != null, "No BeanFactory available");
 				TypeConverter typeConverter = beanFactory.getTypeConverter();
 				try {
+
+					/**
+					 * 解析出来依赖对象
+					 * TODO
+					 */
 					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 				} catch (BeansException ex) {
 					throw new UnsatisfiedDependencyException(null, beanName, new InjectionPoint(field), ex);
 				}
+
 				synchronized (this) {
 					if (!this.cached) {
 						Object cachedFieldValue = null;
 						if (value != null || this.required) {
 							cachedFieldValue = desc;
+
+							//注册记录依赖关系
 							registerDependentBeans(beanName, autowiredBeanNames);
 							if (autowiredBeanNames.size() == 1) {
 								String autowiredBeanName = autowiredBeanNames.iterator().next();
@@ -739,6 +766,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				}
 			}
 			if (value != null) {
+
+				/**
+				 * 说明根据依赖信息都容器中获取到了依赖对象，加下来使用反射技术赋值
+				 */
 				ReflectionUtils.makeAccessible(field);
 				field.set(bean, value);
 			}
