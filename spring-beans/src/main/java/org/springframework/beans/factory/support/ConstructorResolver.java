@@ -440,7 +440,7 @@ class ConstructorResolver {
 			//到这里，就表示匹配构造器成功了,需要进行缓存，方便后来者
 
 			if (explicitArgs == null && argsHolderToUse != null) {
-				//缓存
+				//缓存，方便后面的使用
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
@@ -463,8 +463,12 @@ class ConstructorResolver {
 			String beanName,
 			RootBeanDefinition mbd,
 			Constructor<?> constructorToUse,//实例化使用的构造器
-			Object[] argsToUse //构造器使用的参数,可能是空数组
-	) {
+
+			/**
+			 * 构造器使用的参数,可能是空数组
+			 * @see ConstructorResolver#EMPTY_ARGS
+			 */
+			Object[] argsToUse) {
 
 		try {
 			/**
