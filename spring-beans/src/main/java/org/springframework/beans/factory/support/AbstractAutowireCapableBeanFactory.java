@@ -736,10 +736,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Register bean as disposable.
 		try {
+			/**
+			 * 判断当前bean是否要注册析构回调
+			 *
+			 * 析构回调：当容器销毁的时候会调用该方法
+			 *
+			 * 注册到 org.springframework.beans.factory.support.DefaultSingletonBeanRegistry#registerDisposableBean(java.lang.String, org.springframework.beans.factory.DisposableBean)
+			 * @see DefaultSingletonBeanRegistry#registerDisposableBean(java.lang.String, org.springframework.beans.factory.DisposableBean)
+			 */
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		} catch (BeanDefinitionValidationException ex) {
-			throw new BeanCreationException(
-					mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
 		}
 
 		return exposedObject;

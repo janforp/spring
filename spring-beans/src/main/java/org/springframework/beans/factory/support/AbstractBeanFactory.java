@@ -18,6 +18,7 @@ import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.BeanIsNotAFactoryException;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.CannotLoadBeanClassException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -2205,9 +2206,35 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
 	 */
 	protected boolean requiresDestruction(Object bean, RootBeanDefinition mbd) {
-		return (bean.getClass() != NullBean.class && (DisposableBeanAdapter.hasDestroyMethod(bean, mbd) ||
-				(hasDestructionAwareBeanPostProcessors() && DisposableBeanAdapter.hasApplicableProcessors(
-						bean, getBeanPostProcessorCache().destructionAware))));
+		return (
+				bean.getClass() != NullBean.class //如果 bean 是 null，肯定返回 false
+						&&
+
+						//前提：bean 不是 null
+						(
+								/**
+								 * 是否指定了 destory-method 方法
+								 * 或者 是否是 {@link DisposableBean} 或者{@link AutoCloseable} 的实现
+								 */
+								DisposableBeanAdapter.hasDestroyMethod(bean, mbd)
+										||
+										(
+												/**
+												 * 是否有{@link DestructionAwareBeanPostProcessor}类型的后处理器
+												 */
+												hasDestructionAwareBeanPostProcessors()
+
+														&&
+
+														/**
+														 * 通过后处理器框架决定是否进行 析构 回调
+														 * @see DestructionAwareBeanPostProcessor
+														 */
+														DisposableBeanAdapter.hasApplicableProcessors(bean, getBeanPostProcessorCache().destructionAware)
+
+										)
+						)
+		);
 	}
 
 	/**
@@ -2225,13 +2252,29 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
-		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+		if (!mbd.isPrototype() //原型模式肯定是不会注册的
+
+				&& requiresDestruction(bean, mbd)) {
+
 			if (mbd.isSingleton()) {
 				// Register a DisposableBean implementation that performs all destruction
 				// work for the given bean: DestructionAwareBeanPostProcessors,
 				// DisposableBean interface, custom destroy method.
-				registerDisposableBean(beanName, new DisposableBeanAdapter(
-						bean, beanName, mbd, getBeanPostProcessorCache().destructionAware, acc));
+				// 注册一个DisposableBean实现，该实现将执行给定bean的所有销毁工作：DestructionAwareBeanPostProcessors，DisposableBean接口，自定义destroy方法。
+
+				/**
+				 * 给当前单实例注册回调适配器，适配器内根据当前bean
+				 * 实例是继承接口还是通过自定义方法来决定调用拿个方法完成析构
+				 *
+				 * @see DisposableBeanAdapter#destroy()
+				 */
+				registerDisposableBean(
+						beanName,
+						/**
+						 * 适配器
+						 */
+						new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessorCache().destructionAware, acc)
+				);
 			} else {
 				// A bean with a custom scope...
 				Scope scope = this.scopes.get(mbd.getScope());

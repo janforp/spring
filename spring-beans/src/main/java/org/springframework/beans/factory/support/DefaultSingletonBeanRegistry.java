@@ -109,6 +109,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Disposable bean instances: bean name to disposable instance.
+	 *
+	 * 析构函数都注册到这里
+	 *
+	 * @see AbstractBeanFactory#registerDisposableBeanIfNecessary(java.lang.String, java.lang.Object, org.springframework.beans.factory.support.RootBeanDefinition)
 	 */
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
@@ -819,5 +823,4 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public final Object getSingletonMutex() {
 		return this.singletonObjects;
 	}
-
 }
