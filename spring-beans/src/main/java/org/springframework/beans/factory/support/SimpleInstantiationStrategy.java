@@ -45,7 +45,6 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 	private static final ThreadLocal<Method> currentlyInvokedFactoryMethod = new ThreadLocal<>();
 
-
 	/**
 	 * Return the factory method currently being invoked or {@code null} if none.
 	 * <p>Allows factory method implementations to determine whether the current
@@ -56,11 +55,11 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		return currentlyInvokedFactoryMethod.get();
 	}
 
-
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
 		if (!bd.hasMethodOverrides()) {
+			//默认构造方法
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
@@ -73,20 +72,23 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 						if (System.getSecurityManager() != null) {
 							constructorToUse = AccessController.doPrivileged(
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
-						}
-						else {
+						} else {
+							/**
+							 * @see Class#getDeclaredConstructor(java.lang.Class[]) 获取指定参数类型的构造器
+							 * @see Class#getDeclaredConstructors() 获取所有的构造器
+							 *
+							 * 此处获取指定无参数的构造器，就是默认构造方法
+							 */
 							constructorToUse = clazz.getDeclaredConstructor();
 						}
 						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
-					}
-					catch (Throwable ex) {
+					} catch (Throwable ex) {
 						throw new BeanInstantiationException(clazz, "No default constructor found", ex);
 					}
 				}
 			}
 			return BeanUtils.instantiateClass(constructorToUse);
-		}
-		else {
+		} else {
 			// Must generate CGLIB subclass.
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
@@ -115,8 +117,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				});
 			}
 			return BeanUtils.instantiateClass(ctor, args);
-		}
-		else {
+		} else {
 			//方法注入
 			return instantiateWithMethodInjection(bd, beanName, owner, ctor, args);
 		}
@@ -144,8 +145,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					ReflectionUtils.makeAccessible(factoryMethod);
 					return null;
 				});
-			}
-			else {
+			} else {
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
 
@@ -157,26 +157,21 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					result = new NullBean();
 				}
 				return result;
-			}
-			finally {
+			} finally {
 				if (priorInvokedFactoryMethod != null) {
 					currentlyInvokedFactoryMethod.set(priorInvokedFactoryMethod);
-				}
-				else {
+				} else {
 					currentlyInvokedFactoryMethod.remove();
 				}
 			}
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			throw new BeanInstantiationException(factoryMethod,
 					"Illegal arguments to factory method '" + factoryMethod.getName() + "'; " +
-					"args: " + StringUtils.arrayToCommaDelimitedString(args), ex);
-		}
-		catch (IllegalAccessException ex) {
+							"args: " + StringUtils.arrayToCommaDelimitedString(args), ex);
+		} catch (IllegalAccessException ex) {
 			throw new BeanInstantiationException(factoryMethod,
 					"Cannot access factory method '" + factoryMethod.getName() + "'; is it public?", ex);
-		}
-		catch (InvocationTargetException ex) {
+		} catch (InvocationTargetException ex) {
 			String msg = "Factory method '" + factoryMethod.getName() + "' threw exception";
 			if (bd.getFactoryBeanName() != null && owner instanceof ConfigurableBeanFactory &&
 					((ConfigurableBeanFactory) owner).isCurrentlyInCreation(bd.getFactoryBeanName())) {

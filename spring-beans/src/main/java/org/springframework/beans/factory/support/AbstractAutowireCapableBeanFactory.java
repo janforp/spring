@@ -117,6 +117,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Strategy for creating bean instances.
+	 *
+	 * @see SimpleInstantiationStrategy
+	 * @see CglibSubclassingInstantiationStrategy
 	 */
 	private InstantiationStrategy instantiationStrategy;
 
@@ -610,6 +613,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 但是如果是有参数的构造方法，则可能有其他问题了，假设 A a = new A(B b)
 			 * 此时B类型的bean还没有实例化，则此时需要去先实例化B，再假设 B b = new B(A a)
 			 * 此时就很尴尬了，出现了循环依赖
+			 *
+			 * 下面的方法：
+			 * 使用默认构造器或者有参数构造器实例化一个对象
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -620,7 +626,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			mbd.resolvedTargetType = beanType;
 		}
 
-		// Allow post-processors to modify the merged bean definition.
+		// Allow post-processors to modify the merged bean definition.:允许后处理器修改合并的bean定义。
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
@@ -1455,6 +1461,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Instantiate the given bean using its default constructor.
+	 * -- 使用其默认构造函数实例化给定的bean。
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
