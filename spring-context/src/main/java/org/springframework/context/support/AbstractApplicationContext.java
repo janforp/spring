@@ -670,7 +670,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareRefresh() {
 		// Switch to active.
-		this.startupDate = System.currentTimeMillis();
+		this.startupDate = System.currentTimeMillis();//容器启动时间
 		this.closed.set(false);
 		this.active.set(true);
 
@@ -682,11 +682,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
-		// Initialize any placeholder property sources in the context environment.
+		// Initialize any placeholder property sources in the context environment.:在上下文环境中初始化任何占位符属性源。
+
+		/**
+		 * 留给子类扩展
+		 */
 		initPropertySources();
 
-		// Validate that all properties marked as required are resolvable:
-		// see ConfigurablePropertyResolver#setRequiredProperties
+		/**
+		 * Validate that all properties marked as required are resolvable:
+		 * @see ConfigurablePropertyResolver#setRequiredProperties
+		 * 验证所有标记为必需的属性都是可解析的：请参见ConfigurablePropertyResolver＃setRequiredProperties
+		 *
+		 * 校验必须有的环境变量
+		 */
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
