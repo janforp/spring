@@ -2405,6 +2405,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		final List<DestructionAwareBeanPostProcessor> destructionAware = new ArrayList<>();
 
+		/**
+		 * @see AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors
+		 */
 		final List<MergedBeanDefinitionPostProcessor> mergedDefinition = new ArrayList<>();
 	}
 

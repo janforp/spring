@@ -134,6 +134,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied.
+	 *
+	 * 表示是否执行过 AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors 方法了
+	 *
+	 * @see AbstractAutowireCapableBeanFactory#doCreateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
+	 * @see AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Class, java.lang.String)
 	 */
 	boolean postProcessed = false;
 

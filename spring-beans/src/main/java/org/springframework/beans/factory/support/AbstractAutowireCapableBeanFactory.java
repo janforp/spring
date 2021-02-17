@@ -630,6 +630,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
+					/**
+					 *
+					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				} catch (Throwable ex) {
 					throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", ex);
@@ -641,20 +644,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		boolean earlySingletonExposure = (
-				mbd.isSingleton()
-						&& this.allowCircularReferences
-						&& isSingletonCurrentlyInCreation(beanName)
+				mbd.isSingleton() //单例
+						&& this.allowCircularReferences // 允许循环引用
+						&& isSingletonCurrentlyInCreation(beanName) // 当前 beanName 还在创建中!
 		);
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Eagerly caching bean '" + beanName +
-						"' to allow for resolving potential circular references");
+				logger.trace("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
 			}
-			//把早期对象封装成一个ObjectFactory塞入三级缓存
+			//TODO 把早期对象封装成一个ObjectFactory塞入三级缓存
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
-		// Initialize the bean instance.
+		// Initialize the bean instance.：初始化bean实例。
 		Object exposedObject = bean;
 		try {
 			//依赖注入
@@ -1019,7 +1021,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
-		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+		if (!mbd.isSynthetic() //用户实例
+				&& hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
@@ -1545,8 +1548,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
 		if (bw == null) {
 			if (mbd.hasPropertyValues()) {
-				throw new BeanCreationException(
-						mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
+				throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
 			} else {
 				// Skip property population phase for null instance.
 				return;
@@ -1567,14 +1569,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
-		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+		if (resolvedAutowireMode == AUTOWIRE_BY_NAME //byName
+				|| resolvedAutowireMode == AUTOWIRE_BY_TYPE) { //by_type
+
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
 			if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
+				/**
+				 * 根据name装配
+				 */
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
 			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+
+				/**
+				 * 根据type装配
+				 */
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
 			pvs = newPvs;
