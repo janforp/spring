@@ -53,10 +53,10 @@ abstract class AutowireUtils {
 
 	public static final Comparator<Executable> EXECUTABLE_COMPARATOR = (e1, e2) -> {
 
-		//先按照是否public排序
+		//先按照是否public排序，public在前
 		int result = Boolean.compare(Modifier.isPublic(e2.getModifiers()), Modifier.isPublic(e1.getModifiers()));
 
-		//再按照参数个数排序
+		//再按照参数个数排序，个数多在前
 		return result != 0 ? result : Integer.compare(e2.getParameterCount(), e1.getParameterCount());
 	};
 

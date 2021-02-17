@@ -233,7 +233,7 @@ class ConstructorResolver {
 				Constructor<?> uniqueCandidate = candidates[0];
 				if (uniqueCandidate.getParameterCount() == 0) {
 					//无参数构造器
-					synchronized (mbd.constructorArgumentLock) {
+					synchronized (mbd.constructorArgumentLock) { //设置缓存
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
 						mbd.constructorArgumentsResolved = true;
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;//哨兵
@@ -272,7 +272,7 @@ class ConstructorResolver {
 
 			/**
 			 * 给可供选用构造器数组排序，排序规则
-			 * public > nonPublic > 参数多的 > 参数少的
+			 * 从前往后：public > nonPublic > 参数多的 > 参数少的
 			 * @see AutowireUtils#EXECUTABLE_COMPARATOR
 			 */
 			AutowireUtils.sortConstructors(candidates);
@@ -282,7 +282,7 @@ class ConstructorResolver {
 			 * 答：
 			 * 这个值越低，说明当前构造器参数列表类型和构造器参数匹配度越高
 			 * 这个值越高，说明当前构造器参数列表类型和构造器参数匹配度越低
-			 * 我们希望该参数越低越好！
+			 * 我们希望该参数越低越好！其实就是差异化程度
 			 */
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 
@@ -822,7 +822,7 @@ class ConstructorResolver {
 	 */
 	private int resolveConstructorArguments(
 			String beanName, RootBeanDefinition mbd, BeanWrapper bw,
-			ConstructorArgumentValues cargs, //bean标签中配置的 constructor-arg 子标签的内容
+			ConstructorArgumentValues cargs, //bean标签中配置的 constructor-arg 子标签的内容，还没有解析，无法直接使用
 			ConstructorArgumentValues resolvedValues // 该方法会向这个参数中放入解析好之后的数据,也就是该方法在返回 minNrOfArgs 的同时还做了其他的事情，并没有遵守单一职责原则！！！！
 	) {
 
