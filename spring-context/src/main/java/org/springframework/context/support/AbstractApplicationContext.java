@@ -600,12 +600,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
-			// Prepare this context for refreshing.
+			/**
+			 * Prepare this context for refreshing.
+			 * 刷新容器，预准备工作
+			 *
+			 * 确定哪些必须有的配置存在
+			 */
 			prepareRefresh();
 
 			/**
 			 * !!!
-			 * Tell the subclass to refresh the internal bean factory.
+			 * Tell the subclass to refresh the internal bean factory.:告诉子类刷新内部bean工厂。
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -694,7 +699,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 * @see ConfigurablePropertyResolver#setRequiredProperties
 		 * 验证所有标记为必需的属性都是可解析的：请参见ConfigurablePropertyResolver＃setRequiredProperties
 		 *
-		 * 校验必须有的环境变量
+		 * 校验必须有的环境变量,如果没有，则抛出异常
 		 */
 		getEnvironment().validateRequiredProperties();
 

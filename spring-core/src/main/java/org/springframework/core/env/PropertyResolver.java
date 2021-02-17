@@ -3,6 +3,8 @@ package org.springframework.core.env;
 import org.springframework.lang.Nullable;
 
 /**
+ * 配置解析器
+ *
  * Interface for resolving properties against any underlying source.
  *
  * @author Chris Beams

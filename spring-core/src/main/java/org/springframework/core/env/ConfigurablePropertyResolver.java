@@ -87,6 +87,8 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 *
 	 * @throws MissingRequiredPropertiesException if any of the required
 	 * properties are not resolvable.
+	 * @see AbstractEnvironment#validateRequiredProperties() 具体实现
+	 * @see AbstractPropertyResolver#validateRequiredProperties() 实现
 	 */
 	void validateRequiredProperties() throws MissingRequiredPropertiesException;
 }
