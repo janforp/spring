@@ -36,6 +36,7 @@ import org.springframework.core.DecoratingClassLoader;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.core.log.LogMessage;
 import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.core.metrics.StartupStep;
@@ -1449,7 +1450,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param bw the BeanWrapper to initialize
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
-		//设置类型转换器
+		/**
+		 * 设置类型转换器
+		 * @see GenericConversionService
+		 */
 		bw.setConversionService(getConversionService());
 		//注册自定义的属性编辑器
 		registerCustomEditors(bw);

@@ -38,6 +38,7 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -142,6 +143,7 @@ class ConstructorResolver {
 		/**
 		 * 1.设置类型转换器
 		 * 2.注册自定义的属性编辑器
+		 * @see GenericConversionService
 		 */
 		this.beanFactory.initBeanWrapper(bw);
 
@@ -255,6 +257,10 @@ class ConstructorResolver {
 			} else {
 				//bean标签中配置的
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
+				/**
+				 * 后面会向该对象中塞入解析好的参数
+				 * @see ConstructorResolver#resolveConstructorArguments(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, org.springframework.beans.BeanWrapper, org.springframework.beans.factory.config.ConstructorArgumentValues, org.springframework.beans.factory.config.ConstructorArgumentValues)
+				 */
 				resolvedValues = new ConstructorArgumentValues();
 
 				//返回构造器参数个数，并且把转换后的参数放到 resolvedValues 中
@@ -290,9 +296,14 @@ class ConstructorResolver {
 				//当前遍历构造器参数个数
 				int parameterCount = candidate.getParameterCount();
 
-				if (constructorToUse != null //可以使用的构造器,之前循环筛选得到的
-						&& argsToUse != null //可以使用的参数,之前循环筛选得到的
-						&& argsToUse.length > parameterCount) //并且可以使用的参数大于当前构造器参数数量(因为构造器是按参数个数排序过的，前面循环处理的构造器的参数是更多的)
+				if (constructorToUse != null //已经有可以使用的构造器,该值是之前循环筛选得到的
+						&& argsToUse != null //已经有可以使用的参数,该值是之前循环筛选得到的
+
+						/**
+						 * 并且可以使用的参数大于当前构造器参数数量(因为构造器是按参数个数排序过的，前面循环处理的构造器的参数是更多的)
+						 * @see AutowireUtils#sortConstructors(java.lang.reflect.Constructor[])
+						 */
+						&& argsToUse.length > parameterCount)
 				//if中的几个参数都是在下面的循环体中确定的，所以在下一次循环开始的时候进行判断，如果已经满足条件，则不必继续循环了
 				{
 					// Already found greedy constructor that can be satisfied ->
@@ -1020,8 +1031,12 @@ class ConstructorResolver {
 	 * Template method for resolving the specified argument which is supposed to be autowired.
 	 */
 	@Nullable
-	protected Object resolveAutowiredArgument(MethodParameter param, String beanName,
-			@Nullable Set<String> autowiredBeanNames, TypeConverter typeConverter, boolean fallback) {
+	protected Object resolveAutowiredArgument(
+			MethodParameter param, //封装了构造方法
+			String beanName,
+			@Nullable Set<String> autowiredBeanNames,
+			TypeConverter typeConverter,
+			boolean fallback) {
 
 		Class<?> paramType = param.getParameterType();
 		if (InjectionPoint.class.isAssignableFrom(paramType)) {
@@ -1033,7 +1048,10 @@ class ConstructorResolver {
 		}
 		try {
 			return this.beanFactory.resolveDependency(
-					new DependencyDescriptor(param, true), beanName, autowiredBeanNames, typeConverter);
+					new DependencyDescriptor(param, true),
+					beanName,
+					autowiredBeanNames,
+					typeConverter);
 		} catch (NoUniqueBeanDefinitionException ex) {
 			throw ex;
 		} catch (NoSuchBeanDefinitionException ex) {
