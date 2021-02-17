@@ -141,6 +141,7 @@ class ConstructorResolver {
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		/**
+		 * 注册一些组件到BeanWrapperImpl
 		 * 1.设置类型转换器
 		 * 2.注册自定义的属性编辑器
 		 * @see GenericConversionService
@@ -163,8 +164,10 @@ class ConstructorResolver {
 			 * 表示构造器参数需要做转换的参数引用
 			 */
 
-			/** 如果不是第一次创建该类型的实例，先走缓存 start ****/
 			Object[] argsToResolve = null;
+
+			/** 如果不是第一次创建该类型的实例，先走缓存 start ****/
+
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 
@@ -441,6 +444,8 @@ class ConstructorResolver {
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
+
+		//执行到这里，constructorToUse，argsToUse 两个变量肯定有值了
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
 		//进行反射创建实例
@@ -996,6 +1001,7 @@ class ConstructorResolver {
 			if (argValue == autowiredArgumentMarker) {
 				argValue = resolveAutowiredArgument(methodParam, beanName, null, converter, true);
 			} else if (argValue instanceof BeanMetadataElement) {
+				//转换参数
 				argValue = valueResolver.resolveValueIfNecessary("constructor argument", argValue);
 			} else if (argValue instanceof String) {
 				argValue = this.beanFactory.evaluateBeanDefinitionString((String) argValue, mbd);
