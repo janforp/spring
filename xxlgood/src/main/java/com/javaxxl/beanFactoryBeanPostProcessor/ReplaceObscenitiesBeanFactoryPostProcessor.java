@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class ReplaceObscenitiesBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-	private Set<String> obscenities;
+	private final Set<String> obscenities;
 
 	public ReplaceObscenitiesBeanFactoryPostProcessor() {
 		this.obscenities = new HashSet<>();
