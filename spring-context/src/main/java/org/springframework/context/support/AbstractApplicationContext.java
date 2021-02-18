@@ -636,6 +636,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				/**
 				 * Invoke factory processors registered as beans in the context.:调用在上下文中注册为bean的工厂处理器。
 				 * @see BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
+				 * @see com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
