@@ -104,6 +104,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * Flag that indicates whether we're currently within destroySingletons.
 	 * -- 指示我们当前是否在destroySingletons中的标志。
+	 *
+	 * @see DefaultSingletonBeanRegistry#destroySingletons() 表示当前 bf 正在销毁
 	 */
 	private boolean singletonsCurrentlyInDestruction = false;
 
@@ -701,6 +703,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			this.singletonsCurrentlyInDestruction = true;
 		}
 
+		/**
+		 * 创建单实例的时候，会检查(在后处理器中实现)当前单实例类型是否实现了DisposableBean接口，如果实现了该接口，
+		 * 在容器销毁的时候，需要执行 bean.destroy()方法
+		 */
 		String[] disposableBeanNames;
 		synchronized (this.disposableBeans) {
 			disposableBeanNames = StringUtils.toStringArray(this.disposableBeans.keySet());
@@ -740,13 +746,20 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public void destroySingleton(String beanName) {
 		// Remove a registered singleton of the given name, if any.
+
+		/**
+		 * 移除三级缓存
+		 * 以及 registeredSingletons 里面对应 beanName 数据
+		 */
 		removeSingleton(beanName);
 
 		// Destroy the corresponding DisposableBean instance.
 		DisposableBean disposableBean;
 		synchronized (this.disposableBeans) {
+			//移除并且拿到引用
 			disposableBean = (DisposableBean) this.disposableBeans.remove(beanName);
 		}
+		//执行
 		destroyBean(beanName, disposableBean);
 	}
 
@@ -761,6 +774,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		// Trigger destruction of dependent beans first...
 		Set<String> dependencies;
 		synchronized (this.dependentBeanMap) {
+			/**
+			 * dependentBeanMap：保存的是依赖当前 bean 的其他 bean 信息
+			 */
 			// Within full synchronization in order to guarantee a disconnected Set
 			dependencies = this.dependentBeanMap.remove(beanName);
 		}
@@ -769,6 +785,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				logger.trace("Retrieved dependent beans for bean '" + beanName + "': " + dependencies);
 			}
 			for (String dependentBeanName : dependencies) {
+				/**
+				 * 因为依赖对象要被回收，所以依赖当前bean的对象也要回收
+				 */
 				destroySingleton(dependentBeanName);
 			}
 		}
@@ -776,6 +795,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		// Actually destroy the bean now...
 		if (bean != null) {
 			try {
+				//销毁当前bean
 				bean.destroy();
 			} catch (Throwable ex) {
 				if (logger.isWarnEnabled()) {
@@ -809,6 +829,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		}
 
 		// Remove destroyed bean's prepared dependency information.
+		/**
+		 * dependenciesForBeanMap 保存当前 bean 自己依赖的 beanName
+		 * 例子：a 依赖 w,x，那么 dependenciesForBeanMap 中就有key-value:
+		 * {a, : {w,x}}
+		 */
 		this.dependenciesForBeanMap.remove(beanName);
 	}
 

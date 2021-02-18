@@ -128,6 +128,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * here, supporting "#{...}" expressions in a Unified EL compatible style.
 	 *
 	 * @since 3.0
+	 * @see org.springframework.context.support.AbstractApplicationContext#shouldIgnoreSpel
 	 */
 	void setBeanExpressionResolver(@Nullable BeanExpressionResolver resolver);
 

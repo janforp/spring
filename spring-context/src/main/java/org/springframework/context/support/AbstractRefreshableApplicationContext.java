@@ -122,14 +122,19 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
 		if (hasBeanFactory()) {
+			//说明当前applicationContext内部有一个 BeanFactory 实例，此处需要将其完全释放掉，重置：销毁，关闭
 			destroyBeans();
+			//不是空，设置为空，因为后续要新建
 			closeBeanFactory();
 		}
 		try {
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
+
 			customizeBeanFactory(beanFactory);
+			//加载bd信息，这一步完成之后，所有的配置信息(bd)就注册到 bf 内了
 			loadBeanDefinitions(beanFactory);
+			//保留引用
 			this.beanFactory = beanFactory;
 		} catch (IOException ex) {
 			throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
@@ -149,6 +154,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	protected final void closeBeanFactory() {
 		DefaultListableBeanFactory beanFactory = this.beanFactory;
 		if (beanFactory != null) {
+			//不是空，设置为空
 			beanFactory.setSerializationId(null);
 			this.beanFactory = null;
 		}

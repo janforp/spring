@@ -132,6 +132,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * Resolution strategy for expressions in bean definition values.
+	 *
+	 * @see org.springframework.context.support.AbstractApplicationContext#shouldIgnoreSpel
 	 */
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;

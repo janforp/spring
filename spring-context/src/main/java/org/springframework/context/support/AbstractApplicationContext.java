@@ -162,7 +162,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * Boolean flag controlled by a {@code spring.spel.ignore} system property that instructs Spring to
-	 * ignore SpEL, i.e. to not initialize the SpEL infrastructure.
+	 * ignore SpEL, i.e. to not initialize the SpEL infrastructure(基础设施).
 	 * <p>The default is "false".
 	 */
 	private static final boolean shouldIgnoreSpel = SpringProperties.getFlag("spring.spel.ignore");
@@ -611,10 +611,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			/**
 			 * !!!
 			 * Tell the subclass to refresh the internal bean factory.:告诉子类刷新内部bean工厂。
+			 * 该方法执行完成之后，返回全新的 beanFactory 实例
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+			/**
+			 * Prepare the bean factory for use in this context.
+			 * 给刚才创建的 bf 做一些预处理
+			 */
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -735,13 +739,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		/**
+		 * @see AbstractRefreshableApplicationContext#refreshBeanFactory()
+		 */
 		refreshBeanFactory();
 		return getBeanFactory();
 	}
 
 	/**
+	 * 给刚才创建的 bf 做一些预处理
+	 *
 	 * Configure the factory's standard context characteristics,
 	 * such as the context's ClassLoader and post-processors.
+	 * -- 配置工厂的标准上下文特征，例如上下文的ClassLoader和后处理器。
 	 *
 	 * @param beanFactory the BeanFactory to configure
 	 */
@@ -749,6 +759,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Tell the internal bean factory to use the context's class loader etc.
 		beanFactory.setBeanClassLoader(getClassLoader());
 		if (!shouldIgnoreSpel) {
+			//需要 spel
 			beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		}
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
@@ -1178,6 +1189,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#destroySingletons()
 	 */
 	protected void destroyBeans() {
+		/***
+		 * 销毁原 BeanFactory 内部的单实例
+		 */
 		getBeanFactory().destroySingletons();
 	}
 
