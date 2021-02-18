@@ -757,11 +757,23 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+
+		/**
+		 * 给当前 bf 设置 类加载器，用于加载 bd 的 class 信息
+		 */
 		beanFactory.setBeanClassLoader(getClassLoader());
 		if (!shouldIgnoreSpel) {
-			//需要 spel
+			/**
+			 * 需要 spel
+			 * el 表达式
+			 * Spring EL 表达式，用法:
+			 * #{object.a} 解析成:object.getA()
+			 */
 			beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		}
+		/**
+		 * 属性编辑器
+		 */
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
