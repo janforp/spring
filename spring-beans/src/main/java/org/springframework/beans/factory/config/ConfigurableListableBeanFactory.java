@@ -50,6 +50,9 @@ public interface ConfigurableListableBeanFactory
 	void ignoreDependencyType(Class<?> type);
 
 	/**
+	 * 忽略下面的依赖/忽略指定类型的依赖：
+	 * 意思就是，如果bean内部有这些类型的字段的话，这些字段 不参与 依赖注入
+	 *
 	 * Ignore the given dependency interface for autowiring.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through

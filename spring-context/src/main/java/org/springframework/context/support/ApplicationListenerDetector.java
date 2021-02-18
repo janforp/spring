@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2017 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context.support;
 
 import java.util.Map;
@@ -51,14 +35,14 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 
 	private final transient Map<String, Boolean> singletonNames = new ConcurrentHashMap<>(256);
 
-
 	public ApplicationListenerDetector(AbstractApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
-
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		//先执行
+
 		if (ApplicationListener.class.isAssignableFrom(beanType)) {
 			this.singletonNames.put(beanName, beanDefinition.isSingleton());
 		}
@@ -71,16 +55,18 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		//后执行
+
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
+				//如果是单实例
 				// singleton bean (top-level or inner): register on the fly
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
-			}
-			else if (Boolean.FALSE.equals(flag)) {
+			} else if (Boolean.FALSE.equals(flag)) {
 				if (logger.isWarnEnabled() && !this.applicationContext.containsBean(beanName)) {
-					// inner bean with other scope - can't reliably process events
+					// inner bean with other scope - can't reliably process events：具有其他作用域的内部bean-无法可靠地处理事件
 					logger.warn("Inner bean '" + beanName + "' implements ApplicationListener interface " +
 							"but is not reachable for event multicasting by its containing ApplicationContext " +
 							"because it does not have singleton scope. Only top-level listener beans are allowed " +
@@ -99,8 +85,7 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 				ApplicationEventMulticaster multicaster = this.applicationContext.getApplicationEventMulticaster();
 				multicaster.removeApplicationListener((ApplicationListener<?>) bean);
 				multicaster.removeApplicationListenerBean(beanName);
-			}
-			catch (IllegalStateException ex) {
+			} catch (IllegalStateException ex) {
 				// ApplicationEventMulticaster not initialized yet - no need to remove a listener
 			}
 		}
@@ -110,7 +95,6 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	public boolean requiresDestruction(Object bean) {
 		return (bean instanceof ApplicationListener);
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -122,5 +106,4 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	public int hashCode() {
 		return ObjectUtils.nullSafeHashCode(this.applicationContext);
 	}
-
 }

@@ -64,10 +64,10 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 
 	private final ResourceLoader resourceLoader;
 
-
 	/**
 	 * Create a new ResourceEditorRegistrar for the given {@link ResourceLoader}
 	 * and {@link PropertyResolver}.
+	 *
 	 * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
 	 * to create editors for (usually an ApplicationContext)
 	 * @param propertyResolver the PropertyResolver (usually an Environment)
@@ -80,13 +80,15 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 		this.propertyResolver = propertyResolver;
 	}
 
-
 	/**
+	 * 此处添加一些内置的属性编辑器
+	 *
 	 * Populate the given {@code registry} with the following resource editors:
 	 * ResourceEditor, InputStreamEditor, InputSourceEditor, FileEditor, URLEditor,
 	 * URIEditor, ClassEditor, ClassArrayEditor.
 	 * <p>If this registrar has been configured with a {@link ResourcePatternResolver},
 	 * a ResourceArrayPropertyEditor will be registered as well.
+	 *
 	 * @see org.springframework.core.io.ResourceEditor
 	 * @see org.springframework.beans.propertyeditors.InputStreamEditor
 	 * @see org.springframework.beans.propertyeditors.InputSourceEditor
@@ -127,8 +129,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	private void doRegisterEditor(PropertyEditorRegistry registry, Class<?> requiredType, PropertyEditor editor) {
 		if (registry instanceof PropertyEditorRegistrySupport) {
 			((PropertyEditorRegistrySupport) registry).overrideDefaultEditor(requiredType, editor);
-		}
-		else {
+		} else {
 			registry.registerCustomEditor(requiredType, editor);
 		}
 	}

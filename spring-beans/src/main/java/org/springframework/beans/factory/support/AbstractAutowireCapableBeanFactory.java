@@ -149,6 +149,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<>();
 
 	/**
+	 * 忽略下面的依赖/忽略指定类型的依赖：
+	 * 意思就是，如果bean内部有这些类型的字段的话，这些字段 不参与 依赖注入
+	 *
+	 * @see org.springframework.context.support.AbstractApplicationContext#prepareBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory) 在这里添加了一些值
+	 *
 	 * Dependency interfaces to ignore on dependency check and autowire,
 	 * -- 依赖接口忽略依赖检查和自动装配，
 	 * as Set of Class objects. By default, only the BeanFactory interface is ignored.

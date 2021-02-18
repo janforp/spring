@@ -16,6 +16,7 @@
 
 package org.springframework.context.support;
 
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -269,6 +271,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * Statically specified listeners.
+	 *
+	 * @see ApplicationListenerDetector#postProcessAfterInitialization(java.lang.Object, java.lang.String) 此处添加监听器
 	 */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
@@ -578,6 +582,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
+		/**
+		 * @see ApplicationListenerDetector#postProcessAfterInitialization(java.lang.Object, java.lang.String)
+		 */
 		Assert.notNull(listener, "ApplicationListener must not be null");
 		if (this.applicationEventMulticaster != null) {
 			this.applicationEventMulticaster.addApplicationListener(listener);
@@ -772,12 +779,28 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		}
 		/**
-		 * 属性编辑器
+		 * 属性编辑器,beanWrapper 本身就是属性编辑器注册中心，属性编辑器作用于 beanWrapper 内部管理的真实 bean，
+		 * 当 bean 注入字段的时候，某个字段的类型在 beanWrapper 内有对应的属性编辑器，那么对应的字段值就由该属性编辑器代理写入
+		 * @see PropertyEditorSupport#setValue(java.lang.Object)
+		 *
+		 * @see com.javaxxl.propertyeditor.PropertyEditorMain 这是例子
+		 * @see CustomEditorConfigurer#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
+		 * @see ResourceEditorRegistrar#registerCustomEditors(org.springframework.beans.PropertyEditorRegistry)
 		 */
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		/**
+		 * 添加后处理器，该处理器作用：主要是向 bean 内注入一些框架级别的实例，比如：环境变量，容器(ApplicationContext)...
+		 * @see ApplicationContextAwareProcessor#postProcessBeforeInitialization(java.lang.Object, java.lang.String)
+		 * 执行时机：bean实例化之后，执行 init 方法之前执行
+		 */
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+
+		/**
+		 * 忽略下面的依赖/忽略指定类型的依赖：
+		 * 意思就是，如果bean内部有这些类型的字段的话，这些字段 不参与 依赖注入
+		 */
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -788,12 +811,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
+		/**
+		 * 注册一些依赖，意思就是，当你注入类型是下面的类型的时候
+		 * 就直接使用下面字段的实例
+		 */
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
-		// Register early post-processor for detecting inner beans as ApplicationListeners.
+		/**
+		 * Register early post-processor for detecting inner beans as ApplicationListeners.
+		 * 注册早期的后处理器以将内部bean检测为ApplicationListeners。
+		 * 添加后处理器，该后处理器将配置的监听者注册到 applicationContext 中
+		 */
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found.
