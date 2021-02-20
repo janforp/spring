@@ -1,30 +1,15 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context;
-
-import java.util.Locale;
 
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Strategy interface for resolving messages, with support for the parameterization
- * and internationalization of such messages.
+ * Strategy interface for resolving messages, with support for the parameterization and internationalization of such messages.
+ * -- 解析消息的策略接口，支持此类消息的参数化和国际化。
  *
  * <p>Spring provides two out-of-the-box implementations for production:
+ * -- Spring为生产提供了两种现成的实现：
  * <ul>
  * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}: built
  * on top of the standard {@link java.util.ResourceBundle}, sharing its limitations.
@@ -41,6 +26,7 @@ public interface MessageSource {
 
 	/**
 	 * Try to resolve the message. Return default message if no message was found.
+	 *
 	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
 	 * MessageSource users are encouraged to base message names on qualified class
 	 * or package names, avoiding potential conflicts and ensuring maximum clarity.
@@ -59,6 +45,7 @@ public interface MessageSource {
 
 	/**
 	 * Try to resolve the message. Treat as an error if the message can't be found.
+	 *
 	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
 	 * MessageSource users are encouraged to base message names on qualified class
 	 * or package names, avoiding potential conflicts and ensuring maximum clarity.
@@ -74,11 +61,14 @@ public interface MessageSource {
 	String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException;
 
 	/**
+	 * resolvable：可分辨的
+	 *
 	 * Try to resolve the message using all the attributes contained within the
 	 * {@code MessageSourceResolvable} argument that was passed in.
 	 * <p>NOTE: We must throw a {@code NoSuchMessageException} on this method
 	 * since at the time of calling this method we aren't able to determine if the
 	 * {@code defaultMessage} property of the resolvable is {@code null} or not.
+	 *
 	 * @param resolvable the value object storing attributes required to resolve a message
 	 * (may include a default message)
 	 * @param locale the locale in which to do the lookup
@@ -92,5 +82,4 @@ public interface MessageSource {
 	 * @see java.text.MessageFormat
 	 */
 	String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException;
-
 }

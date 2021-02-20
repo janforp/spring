@@ -331,7 +331,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 */
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		} else {
-			//CASE2:什么缓存中没有数据，我们应该自己创建
+			//CASE2:缓存中没有数据，我们应该自己创建
 
 			/**
 			 *  @see AbstractBeanFactory#prototypesCurrentlyInCreation

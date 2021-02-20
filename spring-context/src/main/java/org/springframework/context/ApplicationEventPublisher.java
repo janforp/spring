@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context;
 
 /**
@@ -23,12 +7,12 @@ package org.springframework.context;
  *
  * @author Juergen Hoeller
  * @author Stephane Nicoll
- * @since 1.1.1
  * @see ApplicationContext
  * @see ApplicationEventPublisherAware
  * @see org.springframework.context.ApplicationEvent
  * @see org.springframework.context.event.ApplicationEventMulticaster
  * @see org.springframework.context.event.EventPublicationInterceptor
+ * @since 1.1.1
  */
 @FunctionalInterface
 public interface ApplicationEventPublisher {
@@ -42,6 +26,7 @@ public interface ApplicationEventPublisher {
 	 * or even immediate execution at all. Event listeners are encouraged
 	 * to be as efficient as possible, individually using asynchronous
 	 * execution for longer-running and potentially blocking operations.
+	 *
 	 * @param event the event to publish
 	 * @see #publishEvent(Object)
 	 * @see org.springframework.context.event.ContextRefreshedEvent
@@ -61,11 +46,11 @@ public interface ApplicationEventPublisher {
 	 * or even immediate execution at all. Event listeners are encouraged
 	 * to be as efficient as possible, individually using asynchronous
 	 * execution for longer-running and potentially blocking operations.
+	 *
 	 * @param event the event to publish
-	 * @since 4.2
 	 * @see #publishEvent(ApplicationEvent)
 	 * @see PayloadApplicationEvent
+	 * @since 4.2
 	 */
 	void publishEvent(Object event);
-
 }
