@@ -71,7 +71,7 @@ public class OrderComparator implements Comparator<Object> {
 		}
 
 		/**
-		 * 二者都实现了，则排序
+		 * 二者都实现了，则排序，order小的在前面
 		 */
 		int i1 = getOrder(o1, sourceProvider);
 		int i2 = getOrder(o2, sourceProvider);

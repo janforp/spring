@@ -27,6 +27,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -635,12 +636,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				/**
 				 * Invoke factory processors registered as beans in the context.:调用在上下文中注册为bean的工厂处理器。
+				 *
+				 * 查找并执行
+				 * 主要执行了 bfpp 以及 bdrpp
+				 * @see BeanDefinitionRegistryPostProcessor 该接口中的新定义的方法在前面已经执行过了
+				 * @see BeanFactoryPostProcessor 该接口中定义的方法还没有执行
 				 * @see BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
 				 * @see com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+
+				//注册一些后处理器
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 

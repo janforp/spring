@@ -30,4 +30,5 @@ package org.springframework.core;
  */
 public interface PriorityOrdered extends Ordered {
 
+	//优先执行
 }
