@@ -119,6 +119,8 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	// Internal helpers
 
 	private void startBeans(boolean autoStartupOnly) {
+
+		//key :beanName,value:实例
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
 		Map<Integer, LifecycleGroup> phases = new TreeMap<>();
 
@@ -244,7 +246,10 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	// overridable hooks
 
 	/**
-	 * Retrieve all applicable Lifecycle beans: all singletons that have already been created,
+	 * Retrieve all applicable Lifecycle beans:
+	 * --检索所有适用的Lifecycle bean：
+	 *
+	 * all singletons that have already been created,
 	 * as well as all SmartLifecycle beans (even if they are marked as lazy-init).
 	 *
 	 * @return the Map of applicable beans, with bean names as keys and bean instances as values
@@ -257,9 +262,16 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			String beanNameToRegister = BeanFactoryUtils.transformedBeanName(beanName);
 			boolean isFactoryBean = beanFactory.isFactoryBean(beanNameToRegister);
 			String beanNameToCheck = (isFactoryBean ? BeanFactory.FACTORY_BEAN_PREFIX + beanName : beanName);
-			if ((beanFactory.containsSingleton(beanNameToRegister) &&
-					(!isFactoryBean || matchesBeanType(Lifecycle.class, beanNameToCheck, beanFactory))) ||
+			if ((
+					beanFactory.containsSingleton(beanNameToRegister)
+							&&
+							(!isFactoryBean || matchesBeanType(Lifecycle.class, beanNameToCheck, beanFactory))
+			)
+
+					||
+
 					matchesBeanType(SmartLifecycle.class, beanNameToCheck, beanFactory)) {
+
 				Object bean = beanFactory.getBean(beanNameToCheck);
 				if (bean != this && bean instanceof Lifecycle) {
 					beans.put(beanNameToRegister, (Lifecycle) bean);
@@ -304,10 +316,12 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 		private final List<LifecycleGroupMember> members = new ArrayList<>();
 
+		/**
+		 * @see LifecycleGroup#add(java.lang.String, org.springframework.context.Lifecycle) 只统计 {@link SmartLifecycle} 类型的
+		 */
 		private int smartMemberCount;
 
-		public LifecycleGroup(
-				int phase, long timeout, Map<String, ? extends Lifecycle> lifecycleBeans, boolean autoStartupOnly) {
+		public LifecycleGroup(int phase, long timeout, Map<String, ? extends Lifecycle> lifecycleBeans, boolean autoStartupOnly) {
 
 			this.phase = phase;
 			this.timeout = timeout;
