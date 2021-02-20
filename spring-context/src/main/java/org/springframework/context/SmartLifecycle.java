@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context;
 
 /**
@@ -60,9 +44,9 @@ package org.springframework.context;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see LifecycleProcessor
  * @see ConfigurableApplicationContext
+ * @since 3.0
  */
 public interface SmartLifecycle extends Lifecycle, Phased {
 
@@ -72,12 +56,12 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 * {@link Lifecycle} implementations, putting the typically auto-started
 	 * {@code SmartLifecycle} beans into a later startup phase and an earlier
 	 * shutdown phase.
-	 * @since 5.1
+	 *
 	 * @see #getPhase()
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor#getPhase(Lifecycle)
+	 * @since 5.1
 	 */
 	int DEFAULT_PHASE = Integer.MAX_VALUE;
-
 
 	/**
 	 * Returns {@code true} if this {@code Lifecycle} component should get
@@ -87,6 +71,7 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 * be started through an explicit {@link #start()} call instead, analogous
 	 * to a plain {@link Lifecycle} implementation.
 	 * <p>The default implementation returns {@code true}.
+	 *
 	 * @see #start()
 	 * @see #getPhase()
 	 * @see LifecycleProcessor#onRefresh()
@@ -110,6 +95,7 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 * triggers the given callback in the calling thread. Note that there is no
 	 * synchronization between the two, so custom implementations may at least
 	 * want to put the same steps within their common lifecycle monitor (if any).
+	 *
 	 * @see #stop()
 	 * @see #getPhase()
 	 */
@@ -123,6 +109,7 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 * <p>The default implementation returns {@link #DEFAULT_PHASE} in order to
 	 * let {@code stop()} callbacks execute after regular {@code Lifecycle}
 	 * implementations.
+	 *
 	 * @see #isAutoStartup()
 	 * @see #start()
 	 * @see #stop(Runnable)
@@ -132,5 +119,4 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	default int getPhase() {
 		return DEFAULT_PHASE;
 	}
-
 }
