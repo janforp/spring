@@ -1,5 +1,7 @@
 package org.springframework.context;
 
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
+
 import java.util.EventListener;
 import java.util.function.Consumer;
 
@@ -28,6 +30,7 @@ public interface ApplicationListener<E extends ApplicationEvent> extends EventLi
 	 * Handle an application event.
 	 *
 	 * @param event the event to respond to
+	 * @see SimpleApplicationEventMulticaster#doInvokeListener(org.springframework.context.ApplicationListener, org.springframework.context.ApplicationEvent)
 	 */
 	void onApplicationEvent(E event);
 

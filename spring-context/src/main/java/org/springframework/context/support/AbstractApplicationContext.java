@@ -13,6 +13,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -271,6 +272,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * ApplicationEvents published before the multicaster setup.
 	 * -- 在多播程序设置之前发布的ApplicationEvents。
+	 *
+	 * 早期事件
 	 */
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
@@ -663,6 +666,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				/**
 				 * Check for listener beans and register them.
 				 * 检查侦听器bean并注册它们。
+				 *
+				 * 注册通过配置bean的方式提供的监听器，这些监听器最终都注册到了传播器
+				 * @see SimpleApplicationEventMulticaster
 				 */
 				registerListeners();
 
@@ -1000,6 +1006,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void onRefresh() throws BeansException {
 		// For subclasses: do nothing by default.
+		//在此，可以硬编码提供一些组建，如：提供一些监听器
 	}
 
 	/**
@@ -1014,7 +1021,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 */
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			/**
+			 * 注册通过硬编码的方式提供的监听器
+			 *
 			 * @see AbstractApplicationEventMulticaster#defaultRetriever
+			 * @see AbstractApplicationContext#applicationEventMulticaster
 			 */
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
@@ -1028,6 +1038,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			/**
+			 * 注册用户通过 bean 的方式提供的监听器,xml或者注解都可以
+			 *
 			 * @see AbstractApplicationEventMulticaster#defaultRetriever
 			 */
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
@@ -1035,6 +1047,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Publish early application events now that we finally have a multicaster...
 		// 现在我们终于有了多播器，可以发布早期的应用程序事件。
+
+		/**
+		 * 早期事件
+		 */
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
@@ -1093,10 +1109,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// TODO ?
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes. -- 冻结配置了，如果此后再改配置就要抛出异常了
+		// Allow for caching all bean definition metadata, not expecting further changes.
+		// -- 冻结配置了，如果此后再改配置就要抛出异常了,主要是 Bd 信息
+		/**
+		 * @see DefaultListableBeanFactory#configurationFrozen
+		 */
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.--预初始化单实例bean了
+		// Instantiate all remaining (non-lazy-init) singletons.--预初始化非懒加载的单实例bean了
 		beanFactory.preInstantiateSingletons();
 	}
 

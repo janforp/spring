@@ -950,22 +950,38 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		for (String beanName : beanNames) {
 			//获取合并后的 bd
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+			if (!bd.isAbstract() //具体类
+					&& bd.isSingleton() //单例
+					&& !bd.isLazyInit()) {//非懒加载的
 				//具体类，单例，非懒加载的 bean
 
+				//就需要预先实例化，当前bd对应的bean可能是 fb或者普通bean
+
 				if (isFactoryBean(beanName)) {
+					/**
+					 * beanInstance instanceof FactoryBean
+					 * 如果是 fb,则需要初始化 fb 自己
+					 *
+					 * 下面这一行就是获取 fb 本身
+					 */
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
-					if (bean instanceof FactoryBean) {
+					if (bean instanceof FactoryBean) {//理论都会成立
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
-						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
+						if (System.getSecurityManager() != null
+
+								//如果是 SmartFactoryBean的话，则可能需要在此时把该fb内部管理的bean也初始化
+								&& factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
 									getAccessControlContext());
 						} else {
+							//如果是 SmartFactoryBean的话，则可能需要在此时把该fb内部管理的bean也初始化
+							//eager:渴望的
 							isEagerInit = (factory instanceof SmartFactoryBean && ((SmartFactoryBean<?>) factory).isEagerInit());
 						}
 						if (isEagerInit) {
+							//初始化该 fb 管理的 bean
 							getBean(beanName);
 						}
 					}
@@ -982,15 +998,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {
-				StartupStep smartInitialize = this.getApplicationStartup().start("spring.beans.smart-initialize")
-						.tag("beanName", beanName);
+
+				StartupStep smartInitialize = this.getApplicationStartup().start("spring.beans.smart-initialize").tag("beanName", beanName);
+
 				SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
+
 				if (System.getSecurityManager() != null) {
 					AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 						smartSingleton.afterSingletonsInstantiated();
 						return null;
 					}, getAccessControlContext());
 				} else {
+					//生命周期一部分
 					smartSingleton.afterSingletonsInstantiated();
 				}
 				smartInitialize.end();

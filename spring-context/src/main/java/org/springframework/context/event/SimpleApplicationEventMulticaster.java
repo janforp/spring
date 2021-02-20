@@ -80,6 +80,9 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 */
 	@Nullable
 	protected Executor getTaskExecutor() {
+		/**
+		 * @see com.javaxxl.publicevent.EventMain#main(java.lang.String[])
+		 */
 		return this.taskExecutor;
 	}
 
@@ -121,6 +124,9 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		/**
+		 * @see com.javaxxl.publicevent.EventMain#main(java.lang.String[])
+		 */
 		Executor executor = getTaskExecutor();
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
 			if (executor != null) {
