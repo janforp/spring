@@ -49,6 +49,9 @@ import java.util.concurrent.Executor;
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
+	/**
+	 * @see com.javaxxl.publicevent.EventMain#main(java.lang.String[])
+	 */
 	@Nullable
 	private Executor taskExecutor;
 
