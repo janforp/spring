@@ -356,9 +356,12 @@ final class PostProcessorRegistrationDelegate {
 		/**
 		 * @see AbstractBeanFactory#beanPostProcessors
 		 */
-		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
+		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() //beanFactory中已经硬编码注册的后处理器数量
+				+ 1 //下面一行添加的
+				+ postProcessorNames.length;//配置中的
 
 		/**
+		 * @see BeanPostProcessorChecker 检查创建bean实例的时候，后处理器是否已经全部注册完毕，如果没有，则提示
 		 * @see AbstractBeanFactory#beanPostProcessors 添加到该集合
 		 */
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
@@ -366,19 +369,19 @@ final class PostProcessorRegistrationDelegate {
 		// Separate between BeanPostProcessors that implement PriorityOrdered,Ordered, and the rest.
 		// 实现PriorityOrdered，Ordered的BeanPostProcessor与其余的分开。
 
-		//主
+		//存储实现主排序接口后处理器
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
 		/**
-		 * 内部
+		 * 存储 MergedBeanDefinitionPostProcessor 类型的后处理器
 		 * @see MergedBeanDefinitionPostProcessor 都是该类型的
 		 */
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
-		//次
+		//存储实现 Ordered 接口的后处理器
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		//无排序的
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 
-		//遍历所有的bpp的 beanName
+		//遍历所有的bpp的 beanName（一般都是配置的）
 		for (String ppName : postProcessorNames) {
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				//如果是 PriorityOrdered 的
@@ -436,8 +439,9 @@ final class PostProcessorRegistrationDelegate {
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
 		// Finally, re-register all internal BeanPostProcessors.
-		// 最后，重新注册所有内部BeanPostProcessor。注册了2次哦，因为两个接口类型，虽然最顶层的接口是一样的，但是方法是不一样的
+		// 最后，再次(为什么叫再次？因为前面他们都是以 bpp 的类型添加过了,此处是以 mbdpp 的类型注册)注册所有内部BeanPostProcessor。注册了2次哦，因为两个接口类型，虽然最顶层的接口是一样的，但是方法是不一样的
 		sortPostProcessors(internalPostProcessors, beanFactory);
+		//确保 MergedBeanDefinitionPostProcessor 类型的后处理器在列表末尾
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
@@ -558,14 +562,17 @@ final class PostProcessorRegistrationDelegate {
 		}
 
 		@Override
-		public Object postProcessAfterInitialization(Object bean, String beanName) {
+		public Object postProcessAfterInitialization(Object bean, String beanName) {//初始化之后调用的函数
 			if (
-					!(bean instanceof BeanPostProcessor) //当前bean不是 bpp
-							&& !isInfrastructureBean(beanName)  //当前beanName 不是基础设施bean
+					!(bean instanceof BeanPostProcessor) //当前bean不是 bpp(后处理器)，比如：用户编码的普通bean
+							&& !isInfrastructureBean(beanName)  //当前beanName 不是基础设施bean，不是spring框架自身的bean？比如：用户编码的普通bean
 
 							//当前 bpp 的 beanPostProcessorTargetCount 数量大于 beanFactory 中的 bpp 的数量
-							&& this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount
+							&& this.beanFactory.getBeanPostProcessorCount() //bf中已经注册的后处理器数量
+							< this.beanPostProcessorTargetCount // 整个后处理器总数,如果该条件满足，说明当前时刻后处理器还没有初始化完全
 			) {
+				//说明当前bf中注册成功的后处理器数量小于后处理器总数，则说明后处理器还没有初始化完全，打印日志
+
 				if (logger.isInfoEnabled()) {
 					//eligible:有资格的
 					logger.info("Bean '" + beanName + "' of type [" + bean.getClass().getName() +
