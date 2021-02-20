@@ -1,5 +1,8 @@
 package org.springframework.context;
 
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.context.support.AbstractApplicationContext;
+
 /**
  * Interface that encapsulates event publication functionality.
  *
@@ -31,6 +34,9 @@ public interface ApplicationEventPublisher {
 	 * @see #publishEvent(Object)
 	 * @see org.springframework.context.event.ContextRefreshedEvent
 	 * @see org.springframework.context.event.ContextClosedEvent
+	 * @see AbstractApplicationContext#publishEvent(org.springframework.context.ApplicationEvent) 发布函数
+	 * @see AbstractApplicationContext#publishEvent(java.lang.Object, org.springframework.core.ResolvableType) 逻辑
+	 * @see SimpleApplicationEventMulticaster#multicastEvent 事件发布逻辑
 	 */
 	default void publishEvent(ApplicationEvent event) {
 		publishEvent((Object) event);

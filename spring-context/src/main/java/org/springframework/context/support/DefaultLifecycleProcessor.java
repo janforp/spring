@@ -1,20 +1,18 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context.support;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContextException;
+import org.springframework.context.Lifecycle;
+import org.springframework.context.LifecycleProcessor;
+import org.springframework.context.Phased;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,21 +26,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContextException;
-import org.springframework.context.Lifecycle;
-import org.springframework.context.LifecycleProcessor;
-import org.springframework.context.Phased;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 /**
  * Default implementation of the {@link LifecycleProcessor} strategy.
@@ -61,7 +44,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	@Nullable
 	private volatile ConfigurableListableBeanFactory beanFactory;
-
 
 	/**
 	 * Specify the maximum time allotted in milliseconds for the shutdown of
@@ -86,7 +68,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		Assert.state(beanFactory != null, "No BeanFactory available");
 		return beanFactory;
 	}
-
 
 	// Lifecycle implementation
 
@@ -135,7 +116,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		return this.running;
 	}
 
-
 	// Internal helpers
 
 	private void startBeans(boolean autoStartupOnly) {
@@ -159,6 +139,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	/**
 	 * Start the specified bean as part of the given set of Lifecycle beans,
 	 * making sure that any beans that it depends on are started first.
+	 *
 	 * @param lifecycleBeans a Map with bean name as key and Lifecycle instance as value
 	 * @param beanName the name of the bean to start
 	 */
@@ -176,8 +157,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 				}
 				try {
 					bean.start();
-				}
-				catch (Throwable ex) {
+				} catch (Throwable ex) {
 					throw new ApplicationContextException("Failed to start bean '" + beanName + "'", ex);
 				}
 				if (logger.isDebugEnabled()) {
@@ -211,6 +191,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	/**
 	 * Stop the specified bean as part of the given set of Lifecycle beans,
 	 * making sure that any beans that depends on it are stopped first.
+	 *
 	 * @param lifecycleBeans a Map with bean name as key and Lifecycle instance as value
 	 * @param beanName the name of the bean to stop
 	 */
@@ -238,8 +219,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 								logger.debug("Bean '" + beanName + "' completed its stop procedure");
 							}
 						});
-					}
-					else {
+					} else {
 						if (logger.isTraceEnabled()) {
 							logger.trace("Stopping bean '" + beanName + "' of type [" +
 									bean.getClass().getName() + "]");
@@ -249,13 +229,11 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 							logger.debug("Successfully stopped bean '" + beanName + "'");
 						}
 					}
-				}
-				else if (bean instanceof SmartLifecycle) {
+				} else if (bean instanceof SmartLifecycle) {
 					// Don't wait for beans that aren't running...
 					latch.countDown();
 				}
-			}
-			catch (Throwable ex) {
+			} catch (Throwable ex) {
 				if (logger.isWarnEnabled()) {
 					logger.warn("Failed to stop bean '" + beanName + "'", ex);
 				}
@@ -263,12 +241,12 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		}
 	}
 
-
 	// overridable hooks
 
 	/**
 	 * Retrieve all applicable Lifecycle beans: all singletons that have already been created,
 	 * as well as all SmartLifecycle beans (even if they are marked as lazy-init).
+	 *
 	 * @return the Map of applicable beans, with bean names as keys and bean instances as values
 	 */
 	protected Map<String, Lifecycle> getLifecycleBeans() {
@@ -300,6 +278,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	 * Determine the lifecycle phase of the given bean.
 	 * <p>The default implementation checks for the {@link Phased} interface, using
 	 * a default of 0 otherwise. Can be overridden to apply other/further policies.
+	 *
 	 * @param bean the bean to introspect
 	 * @return the phase (an integer value)
 	 * @see Phased#getPhase()
@@ -308,7 +287,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	protected int getPhase(Lifecycle bean) {
 		return (bean instanceof Phased ? ((Phased) bean).getPhase() : 0);
 	}
-
 
 	/**
 	 * Helper class for maintaining a group of Lifecycle beans that should be started
@@ -371,8 +349,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			for (LifecycleGroupMember member : this.members) {
 				if (lifecycleBeanNames.contains(member.name)) {
 					doStop(this.lifecycleBeans, member.name, latch, countDownBeanNames);
-				}
-				else if (member.bean instanceof SmartLifecycle) {
+				} else if (member.bean instanceof SmartLifecycle) {
 					// Already removed: must have been a dependent bean from another phase
 					latch.countDown();
 				}
@@ -384,13 +361,11 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 							(countDownBeanNames.size() > 1 ? "s" : "") + " with phase value " +
 							this.phase + " within timeout of " + this.timeout + "ms: " + countDownBeanNames);
 				}
-			}
-			catch (InterruptedException ex) {
+			} catch (InterruptedException ex) {
 				Thread.currentThread().interrupt();
 			}
 		}
 	}
-
 
 	/**
 	 * Adapts the Comparable interface onto the lifecycle phase model.
@@ -413,5 +388,4 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			return Integer.compare(thisPhase, otherPhase);
 		}
 	}
-
 }
