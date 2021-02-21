@@ -132,7 +132,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// this behavior emulates a stack of delegates without actually necessitating one.
 		BeanDefinitionParserDelegate parent = this.delegate;
 
-		//方法最终返回一个 beans 标签解析器对象
+		/**
+		 * 方法最终返回一个 beans 标签解析器对象
+		 * @see org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
+		 */
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
 		if (this.delegate.isDefaultNamespace(root)) {

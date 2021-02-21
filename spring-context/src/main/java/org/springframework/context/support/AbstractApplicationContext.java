@@ -48,6 +48,7 @@ import org.springframework.core.SpringProperties;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.ConfigurablePropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -205,16 +206,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * System time in milliseconds when this context started.
+	 *
+	 * @see AbstractApplicationContext#prepareRefresh() 记录容器刷新/启动的时间戳
 	 */
 	private long startupDate;
 
 	/**
 	 * Flag that indicates whether this context is currently active.
+	 *
+	 * 当前容器是否活跃
 	 */
 	private final AtomicBoolean active = new AtomicBoolean();
 
 	/**
 	 * Flag that indicates whether this context has been closed already.
+	 *
+	 * 当前容器是否已经关闭
 	 */
 	private final AtomicBoolean closed = new AtomicBoolean();
 
@@ -266,6 +273,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * Local listeners registered before refresh.
+	 *
+	 * @see AbstractApplicationContext#prepareRefresh() 该方法会初始化该字段
 	 */
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
@@ -275,6 +284,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * -- 在多播程序设置之前发布的ApplicationEvents。
 	 *
 	 * 早期事件
+	 *
+	 * @see AbstractApplicationContext#prepareRefresh() 该方法初始化该字段
 	 */
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
@@ -602,7 +613,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * Prepare this context for refreshing.
 			 * 刷新容器，预准备工作
 			 *
-			 * 确定哪些必须有的配置存在
+			 * 确定那些必须有的配置存在
 			 */
 			prepareRefresh();
 
@@ -610,6 +621,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * !!!
 			 * Tell the subclass to refresh the internal bean factory.:告诉子类刷新内部bean工厂。
 			 * 该方法执行完成之后，返回全新的 beanFactory 实例
+			 *
+			 * obtain:获得
+			 * fresh:新鲜的
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -678,6 +692,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Last step: publish corresponding event.
 				/**
+				 * 主要是启动生命周期对象
 				 * @see AbstractApplicationContext#lifecycleProcessor 初始化了这个字段
 				 */
 				finishRefresh();
@@ -731,8 +746,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		/**
 		 * Validate that all properties marked as required are resolvable:
-		 * @see ConfigurablePropertyResolver#setRequiredProperties
 		 * 验证所有标记为必需的属性都是可解析的：请参见ConfigurablePropertyResolver＃setRequiredProperties
+		 *
+		 * @see ConfigurablePropertyResolver#setRequiredProperties(java.lang.String...)
+		 *
 		 *
 		 * 校验必须有的环境变量,如果没有，则抛出异常
 		 */
@@ -763,6 +780,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * obtain:获得
+	 * fresh:新鲜的
+	 *
 	 * Tell the subclass to refresh the internal bean factory.
 	 *
 	 * @return the fresh BeanFactory instance
@@ -1163,7 +1183,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 */
 		getLifecycleProcessor().onRefresh();
 
-		// Publish the final event.
+		/**
+		 *  Publish the final event.
+		 *  发布一个上下文刷新事件
+		 */
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
