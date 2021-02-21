@@ -1,28 +1,12 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.support;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extension of MethodOverride that represents an arbitrary
@@ -37,13 +21,16 @@ import org.springframework.util.ObjectUtils;
  */
 public class ReplaceOverride extends MethodOverride {
 
+	/**
+	 * 不能空
+	 */
 	private final String methodReplacerBeanName;
 
 	private final List<String> typeIdentifiers = new ArrayList<>();
 
-
 	/**
 	 * Construct a new ReplaceOverride.
+	 *
 	 * @param methodName the name of the method to override
 	 * @param methodReplacerBeanName the bean name of the MethodReplacer
 	 */
@@ -52,7 +39,6 @@ public class ReplaceOverride extends MethodOverride {
 		Assert.notNull(methodReplacerBeanName, "Method replacer bean name must not be null");
 		this.methodReplacerBeanName = methodReplacerBeanName;
 	}
-
 
 	/**
 	 * Return the name of the bean implementing MethodReplacer.
@@ -64,23 +50,24 @@ public class ReplaceOverride extends MethodOverride {
 	/**
 	 * Add a fragment of a class string, like "Exception"
 	 * or "java.lang.Exc", to identify a parameter type.
+	 *
 	 * @param identifier a substring of the fully qualified class name
 	 */
 	public void addTypeIdentifier(String identifier) {
 		this.typeIdentifiers.add(identifier);
 	}
 
-
 	@Override
 	public boolean matches(Method method) {
 		if (!method.getName().equals(getMethodName())) {
+			//名称如果不相同，则肯定不匹配
 			return false;
 		}
 		if (!isOverloaded()) {
-			// Not overloaded: don't worry about arg type matching...
+			// Not overloaded: don't worry about arg type matching...：不重载：不用担心arg类型匹配...
 			return true;
 		}
-		// If we get here, we need to insist on precise argument matching...
+		// If we get here, we need to insist on precise argument matching...：如果到达这里，我们需要坚持精确的参数匹配...
 		if (this.typeIdentifiers.size() != method.getParameterCount()) {
 			return false;
 		}
@@ -93,7 +80,6 @@ public class ReplaceOverride extends MethodOverride {
 		}
 		return true;
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -117,5 +103,4 @@ public class ReplaceOverride extends MethodOverride {
 	public String toString() {
 		return "Replace override for method '" + getMethodName() + "'";
 	}
-
 }

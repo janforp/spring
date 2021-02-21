@@ -20,6 +20,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class MethodOverrides {
 
+	/**
+	 * look-up或者 replace-method
+	 */
 	private final Set<MethodOverride> overrides = new CopyOnWriteArraySet<>();
 
 	/**

@@ -32,6 +32,8 @@ import java.security.AccessControlContext;
  * @see org.springframework.beans.factory.ListableBeanFactory
  * @see ConfigurableListableBeanFactory
  * @since 03.11.2003
+ *
+ * 可配置的
  */
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 

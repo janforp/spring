@@ -85,8 +85,15 @@ public class LookupOverride extends MethodOverride {
 		if (this.method != null) {
 			return method.equals(this.method);
 		} else {
-			return (method.getName().equals(getMethodName()) && (!isOverloaded() ||
-					Modifier.isAbstract(method.getModifiers()) || method.getParameterCount() == 0));
+			return (
+					method.getName().equals(getMethodName())
+							&&
+							(
+									!isOverloaded()
+											|| Modifier.isAbstract(method.getModifiers())
+											|| method.getParameterCount() == 0
+							)
+			);
 		}
 	}
 
@@ -109,5 +116,4 @@ public class LookupOverride extends MethodOverride {
 	public String toString() {
 		return "LookupOverride for method '" + getMethodName() + "'";
 	}
-
 }

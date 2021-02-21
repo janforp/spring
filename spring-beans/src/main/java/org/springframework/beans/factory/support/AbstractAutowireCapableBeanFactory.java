@@ -103,6 +103,8 @@ import java.util.function.Supplier;
  * @see DefaultListableBeanFactory
  * @see BeanDefinitionRegistry
  * @since 13.02.2004
+ *
+ * Capable：有能力的
  */
 @SuppressWarnings("all")
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
@@ -180,8 +182,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Cache of filtered PropertyDescriptors: bean Class to PropertyDescriptor array.
 	 */
-	private final ConcurrentMap<Class<?>, PropertyDescriptor[]> filteredPropertyDescriptorsCache =
-			new ConcurrentHashMap<>();
+	private final ConcurrentMap<Class<?>, PropertyDescriptor[]> filteredPropertyDescriptorsCache = new ConcurrentHashMap<>();
 
 	/**
 	 * Create a new AbstractAutowireCapableBeanFactory.
