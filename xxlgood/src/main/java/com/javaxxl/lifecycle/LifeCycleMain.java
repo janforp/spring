@@ -12,7 +12,7 @@ public class LifeCycleMain {
 
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring-test-life-cycle.xml");
-		context.start();
-		context.close();
+		//		context.start();
+		//		context.close();
 	}
 }

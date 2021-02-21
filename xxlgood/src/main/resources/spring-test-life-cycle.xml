@@ -4,5 +4,5 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean class="com.javaxxl.lifecycle.DemoOneLifeCycle"/>
-	<bean class="com.javaxxl.lifecycle.DemoTwoLifeCycle"/>
+	<bean class="com.javaxxl.lifecycle.SmartDemoTwoLifeCycle"/>
 </beans>

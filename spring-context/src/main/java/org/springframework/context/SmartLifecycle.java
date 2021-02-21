@@ -1,5 +1,7 @@
 package org.springframework.context;
 
+import org.springframework.context.support.AbstractApplicationContext;
+
 /**
  * An extension of the {@link Lifecycle} interface for those objects that require
  * to be started upon {@code ApplicationContext} refresh and/or shutdown in a
@@ -41,6 +43,8 @@ package org.springframework.context;
  * of the application context in any case. As a consequence, the bean definition
  * lazy-init flag has very limited actual effect on {@code SmartLifecycle} beans.
  *
+ * 容器启动的时候会自动执行
+ *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -67,6 +71,8 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 * Returns {@code true} if this {@code Lifecycle} component should get
 	 * started automatically by the container at the time that the containing
 	 * {@link ApplicationContext} gets refreshed.
+	 * -- 该方法返回true的时候表示容器在刷新的时候会启动该生命周期处理器 {@link AbstractApplicationContext#finishRefresh()} 该方法就会触发当前生命周期处理器的 start
+	 *
 	 * <p>A value of {@code false} indicates that the component is intended to
 	 * be started through an explicit {@link #start()} call instead, analogous
 	 * to a plain {@link Lifecycle} implementation.
@@ -101,6 +107,8 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 	 */
 	default void stop(Runnable callback) {
 		stop();
+
+		//可以实现异步关闭
 		callback.run();
 	}
 

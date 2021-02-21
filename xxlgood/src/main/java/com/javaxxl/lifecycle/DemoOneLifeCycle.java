@@ -15,13 +15,13 @@ public class DemoOneLifeCycle implements Lifecycle {
 	@Override
 	public void start() {
 		this.running = true;
-		System.out.println("************* demo one is start !");
+		System.out.println("************* LifeCycle one is start !");
 	}
 
 	@Override
 	public void stop() {
 		this.running = false;
-		System.out.println("************* demo one is stop !");
+		System.out.println("************* LifeCycle one is stop !");
 	}
 
 	@Override

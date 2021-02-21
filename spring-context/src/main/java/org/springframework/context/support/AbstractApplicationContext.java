@@ -32,6 +32,7 @@ import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.PayloadApplicationEvent;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.AbstractApplicationEventMulticaster;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
@@ -979,20 +980,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void initLifecycleProcessor() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(LIFECYCLE_PROCESSOR_BEAN_NAME)) {
-			//用户自定义的生命周期处理器 bean
+			//用户自定义了生命周期处理器 bean
 			this.lifecycleProcessor = beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Using LifecycleProcessor [" + this.lifecycleProcessor + "]");
 			}
 		} else {
-			//用户没有自定义，则所以默认的实现
+			//用户没有自定义，则使用默认的实现
 			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
 			defaultProcessor.setBeanFactory(beanFactory);
 			this.lifecycleProcessor = defaultProcessor;
+
+			//注册到bf的一级缓存中
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);
 			if (logger.isTraceEnabled()) {
-				logger.trace("No '" + LIFECYCLE_PROCESSOR_BEAN_NAME + "' bean, using " +
-						"[" + this.lifecycleProcessor.getClass().getSimpleName() + "]");
+				logger.trace("No '" + LIFECYCLE_PROCESSOR_BEAN_NAME + "' bean, using " + "[" + this.lifecycleProcessor.getClass().getSimpleName() + "]");
 			}
 		}
 	}
@@ -1143,6 +1145,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Initialize lifecycle processor for this context.
 		// 为此上下文初始化生命周期处理器:初始化生命周期处理器
+
 		/**
 		 * @see AbstractApplicationContext#lifecycleProcessor 初始化该字段
 		 * @see DefaultLifecycleProcessor 使用默认实现
@@ -1152,8 +1155,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Propagate refresh to lifecycle processor first.：首先将刷新传播到生命周期处理器。
 
 		/**
+		 * 获取到上面刚才创建的生命周期处理器
 		 * @see AbstractApplicationContext#lifecycleProcessor
 		 * @see DefaultLifecycleProcessor 使用默认实现
+		 *
+		 * @see SmartLifecycle#isAutoStartup()
 		 */
 		getLifecycleProcessor().onRefresh();
 
