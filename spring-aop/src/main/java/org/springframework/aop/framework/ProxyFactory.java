@@ -28,9 +28,10 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	 * Create a new ProxyFactory.
 	 * <p>Will proxy all interfaces that the given target implements.
 	 *
-	 * @param target the target object to be proxied
+	 * @param target the target object to be proxied 被代理对象
 	 */
 	public ProxyFactory(Object target) {
+		//将被代理对象封装成为 SingletonTargetSource 保存到父类字段中
 		setTarget(target);
 		setInterfaces(ClassUtils.getAllInterfaces(target));
 	}

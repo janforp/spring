@@ -107,6 +107,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	 * Set the given object as target.
 	 * Will create a SingletonTargetSource for the object.
 	 *
+	 * @param target 被代理对象
 	 * @see #setTargetSource
 	 * @see org.springframework.aop.target.SingletonTargetSource
 	 */
@@ -116,6 +117,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	@Override
 	public void setTargetSource(@Nullable TargetSource targetSource) {
+		/**
+		 * @see SingletonTargetSource 一般是该类型的实例
+		 */
 		this.targetSource = (targetSource != null ? targetSource : EMPTY_TARGET_SOURCE);
 	}
 
