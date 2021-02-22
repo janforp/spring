@@ -376,7 +376,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Cannot add introductions this way unless the advice implements IntroductionInfo.
+	 * Cannot add introductions this way
+	 * unless the advice implements IntroductionInfo.
+	 *
+	 * @param pos {@link AdvisedSupport#advisors} 的下标
+	 * @param advice aop联盟的增强
 	 */
 	@Override
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {

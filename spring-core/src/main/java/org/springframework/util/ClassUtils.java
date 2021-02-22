@@ -791,7 +791,11 @@ public abstract class ClassUtils {
 			//当前class是接口，并且该classLoader能够加载到或者访问到该类
 			return Collections.singleton(clazz);
 		}
+
+		//如果当前clazz不是一个接口
 		Set<Class<?>> interfaces = new LinkedHashSet<>();
+
+		//遍历的起点
 		Class<?> current = clazz;
 		while (current != null) {
 			Class<?>[] ifcs = current.getInterfaces();
@@ -800,6 +804,8 @@ public abstract class ClassUtils {
 					interfaces.add(ifc);
 				}
 			}
+
+			//下一个循环
 			current = current.getSuperclass();
 		}
 		return interfaces;

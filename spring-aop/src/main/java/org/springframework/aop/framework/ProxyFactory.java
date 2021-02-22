@@ -35,6 +35,8 @@ public class ProxyFactory extends ProxyCreatorSupport {
 		setTarget(target);
 
 		/**
+		 * 获取目标对象class的所有接口，保存到父类字段内
+		 *
 		 * @see AdvisedSupport#interfaces 添加到该集合中
 		 */
 		setInterfaces(
@@ -91,7 +93,8 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	 * @return the proxy object
 	 */
 	public Object getProxy() {
-		return createAopProxy().getProxy();
+		return createAopProxy()
+				.getProxy();
 	}
 
 	/**
