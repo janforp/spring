@@ -33,7 +33,16 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	public ProxyFactory(Object target) {
 		//将被代理对象封装成为 SingletonTargetSource 保存到父类字段中
 		setTarget(target);
-		setInterfaces(ClassUtils.getAllInterfaces(target));
+
+		/**
+		 * @see AdvisedSupport#interfaces 添加到该集合中
+		 */
+		setInterfaces(
+				/**
+				 * 获取该接口以及父类实现的所有接口列表
+				 */
+				ClassUtils.getAllInterfaces(target)
+		);
 	}
 
 	/**

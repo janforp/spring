@@ -788,6 +788,7 @@ public abstract class ClassUtils {
 
 		Assert.notNull(clazz, "Class must not be null");
 		if (clazz.isInterface() && isVisible(clazz, classLoader)) {
+			//当前class是接口，并且该classLoader能够加载到或者访问到该类
 			return Collections.singleton(clazz);
 		}
 		Set<Class<?>> interfaces = new LinkedHashSet<>();
