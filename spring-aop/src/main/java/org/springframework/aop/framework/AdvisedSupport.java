@@ -371,6 +371,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	@Override
 	public void addAdvice(Advice advice) throws AopConfigException {
+		//当前已经有的增强个数
 		int pos = this.advisors.size();
 		addAdvice(pos, advice);
 	}
@@ -385,15 +386,24 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	@Override
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
-		if (advice instanceof IntroductionInfo) {
+		if (advice instanceof IntroductionInfo/** 不考虑，引介增强，很少用 **/) {
 			// We don't need an IntroductionAdvisor for this kind of introduction:
 			// It's fully self-describing.
 			addAdvisor(pos, new DefaultIntroductionAdvisor(advice, (IntroductionInfo) advice));
-		} else if (advice instanceof DynamicIntroductionAdvice) {
+		} else if (advice instanceof DynamicIntroductionAdvice/** 不考虑，引介增强，很少用 **/) {
 			// We need an IntroductionAdvisor for this kind of introduction.
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		} else {
-			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
+
+			/**
+			 * 一般会进入该分支
+			 * Spring中Advice对应的接口就是 Advisor，Spring使用 Advisor 包装一个 AOP联盟的 Advice实例
+			 */
+			addAdvisor(
+					pos,
+					//Spring中Advice对应的接口就是 Advisor，Spring使用 Advisor 包装一个 AOP联盟的 Advice实例
+					new DefaultPointcutAdvisor(advice)
+			);
 		}
 	}
 
