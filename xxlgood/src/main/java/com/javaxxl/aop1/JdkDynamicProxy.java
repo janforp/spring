@@ -3,6 +3,7 @@ package com.javaxxl.aop1;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * JdkDynamicProxy
@@ -13,29 +14,46 @@ import java.lang.reflect.Proxy;
 public class JdkDynamicProxy implements InvocationHandler {
 
 	/**
-	 * 被代理对象
+	 * 被代理对象,调用该对象的任何方法都会被重定向到方法{@link JdkDynamicProxy#invoke(Object, Method, Object[])}
 	 */
 	private Object target;
 
-	public JdkDynamicProxy(Object target) {
+	/**
+	 * 拦截器列表，这些拦截器就是为了增强 被代理对象的
+	 */
+	private List<MyMethodInterceptor> interceptorList;
+
+	/**
+	 * 创建JdkDynamicProxy,用来创建代理对象,以及添加拦截器
+	 *
+	 * @param target 被代理对象
+	 * @param interceptorList 拦截器列表，这些拦截器就是为了增强 被代理对象的
+	 */
+	public JdkDynamicProxy(Object target, List<MyMethodInterceptor> interceptorList) {
 		this.target = target;
+		this.interceptorList = interceptorList;
 	}
 
 	/**
-	 * @param proxy 代理对象，代理了target.代理对象内部持有target对象
+	 * 调用被代理对象的任何方法都会被重定向到该方法
+	 *
+	 * @param proxy 代理对象
 	 * @param method 被代理对象的方法
-	 * @param args 对代理对象方法的入参数
-	 * @return 结果
+	 * @param args 被代理对象的方法的参数
+	 * @return 被代理对象的方法的返回值
 	 * @throws Throwable 异常
 	 */
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		//需求：打印动物吃饭开始时间跟结束时间
-
-		System.out.println("开始" + System.currentTimeMillis());
-		Object invoke = method.invoke(target, args);
-		System.out.println("结束" + System.currentTimeMillis());
-		return invoke;
+		if (!method.getName().contains("eat")) {
+			return method.invoke(target, args);
+		}
+		//封装被代理对象的方法
+		TargetMethod targetMethod = new TargetMethod(target, method, args);
+		//拦截器驱动
+		MyMethodInvocation invocation = new MyMethodInvocationImpl(targetMethod, interceptorList);
+		//先这些拦截器，再调用被代理对象的方法
+		return invocation.proceed();
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package com.javaxxl.aop1;
+package com.javaxxl.aop0;
 
 import java.lang.reflect.Proxy;
 

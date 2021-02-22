@@ -1,24 +1,8 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * Convenience superclass for configuration used in creating proxies,
@@ -30,20 +14,20 @@ import org.springframework.util.Assert;
  */
 public class ProxyConfig implements Serializable {
 
-	/** use serialVersionUID from Spring 1.2 for interoperability. */
+	/**
+	 * use serialVersionUID from Spring 1.2 for interoperability(互通性).
+	 */
 	private static final long serialVersionUID = -8409359707199703185L;
-
 
 	private boolean proxyTargetClass = false;
 
 	private boolean optimize = false;
 
-	boolean opaque = false;
+	boolean opaque/*不透明*/ = false;
 
 	boolean exposeProxy = false;
 
 	private boolean frozen = false;
-
 
 	/**
 	 * Set whether to proxy the target class directly, instead of just proxying
@@ -55,6 +39,7 @@ public class ProxyConfig implements Serializable {
 	 * <p>Note: Depending on the configuration of the concrete proxy factory,
 	 * the proxy-target-class behavior will also be applied if no interfaces
 	 * have been specified (and no interface autodetection is activated).
+	 *
 	 * @see org.springframework.aop.TargetSource#getTargetClass()
 	 */
 	public void setProxyTargetClass(boolean proxyTargetClass) {
@@ -146,9 +131,9 @@ public class ProxyConfig implements Serializable {
 		return this.frozen;
 	}
 
-
 	/**
 	 * Copy configuration from the other config object.
+	 *
 	 * @param other object to copy configuration from
 	 */
 	public void copyFrom(ProxyConfig other) {
@@ -170,5 +155,4 @@ public class ProxyConfig implements Serializable {
 		sb.append("frozen=").append(this.frozen);
 		return sb.toString();
 	}
-
 }

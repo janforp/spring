@@ -25,6 +25,6 @@ public class TestMain {
 		Animal animal = (Animal) proxy.getProxy();
 		animal.eat();
 
-		ProxyUtils.generateClassFile(animal.getClass(), proxy.getClass().getSimpleName());
+		//		ProxyUtils.generateClassFile(animal.getClass(), proxy.getClass().getSimpleName());
 	}
 }
