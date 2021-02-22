@@ -1,14 +1,20 @@
-package com.javaxxl.aop2;
+package com.javaxxl.aop3;
 
 import com.javaxxl.aop0.Animal;
 import com.javaxxl.aop0.Cat;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.MethodMatcher;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.lang.NonNull;
 
+import java.lang.reflect.Method;
+
 /**
- * 增强 {@link Animal} 所有方法
+ * 只增强 {@link Animal} 的 eat 方法
  *
  * @author zhucj
  * @since 20210225
@@ -23,11 +29,16 @@ public class Main {
 		//ProxyFactory 是 config + factory 的存在，持有aop操作所有的生产资料
 		ProxyFactory proxyFactory = new ProxyFactory(cat);
 
-		//3.添加方法拦截器
-		proxyFactory.addAdvice(new MethodInterceptor01());
-		proxyFactory.addAdvice(new MethodInterceptor02());
+		//3.添加方法拦截器以及指定切点
+		MyPointCut pointCut = new MyPointCut();
+		proxyFactory.addAdvisor(
+				new DefaultPointcutAdvisor(pointCut, new MethodInterceptor01())
+		);
+		proxyFactory.addAdvisor(
+				new DefaultPointcutAdvisor(pointCut, new MethodInterceptor02())
+		);
 
-		//4.获取代理对象
+		//4.获取代理对象~
 		Animal proxy = (Animal) proxyFactory.getProxy();
 
 		proxy.eat();
@@ -56,6 +67,34 @@ public class Main {
 			Object proceed = invocation.proceed();
 			System.out.println("拦截器2 结束");
 			return proceed;
+		}
+	}
+
+	private static class MyPointCut implements Pointcut {
+
+		@Override
+		public ClassFilter getClassFilter() {
+			return clazz -> true;
+		}
+
+		@Override
+		public MethodMatcher getMethodMatcher() {
+			return new MethodMatcher() {
+				@Override
+				public boolean matches(Method method, Class<?> targetClass) {
+					return method.getName().equals("eat");
+				}
+
+				@Override
+				public boolean isRuntime() {
+					return false;
+				}
+
+				@Override
+				public boolean matches(Method method, Class<?> targetClass, Object... args) {
+					return false;
+				}
+			};
 		}
 	}
 }
