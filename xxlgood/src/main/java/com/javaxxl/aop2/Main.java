@@ -31,6 +31,10 @@ public class Main {
 		Animal proxy = (Animal) proxyFactory.getProxy();
 
 		proxy.eat();
+
+		System.out.println("------------------");
+
+		proxy.go();
 	}
 
 	private static class MethodInterceptor01 implements MethodInterceptor {

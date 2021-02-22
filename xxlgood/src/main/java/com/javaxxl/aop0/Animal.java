@@ -9,4 +9,6 @@ package com.javaxxl.aop0;
 public interface Animal {
 
 	void eat();
+
+	void go();
 }
