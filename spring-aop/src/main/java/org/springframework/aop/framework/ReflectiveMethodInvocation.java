@@ -1,34 +1,17 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.framework;
+
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.core.BridgeMethodResolver;
+import org.springframework.lang.Nullable;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.springframework.aop.ProxyMethodInvocation;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.core.BridgeMethodResolver;
-import org.springframework.lang.Nullable;
 
 /**
  * Spring's implementation of the AOP Alliance
@@ -91,9 +74,9 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 */
 	private int currentInterceptorIndex = -1;
 
-
 	/**
 	 * Construct a new ReflectiveMethodInvocation with the given arguments.
+	 *
 	 * @param proxy the proxy object that the invocation was made on
 	 * @param target the target object to invoke
 	 * @param method the method to invoke
@@ -116,7 +99,6 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		this.arguments = AopProxyUtils.adaptArgumentsIfNecessary(method, arguments);
 		this.interceptorsAndDynamicMethodMatchers = interceptorsAndDynamicMethodMatchers;
 	}
-
 
 	@Override
 	public final Object getProxy() {
@@ -154,7 +136,6 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		this.arguments = arguments;
 	}
 
-
 	@Override
 	@Nullable
 	public Object proceed() throws Throwable {
@@ -173,14 +154,12 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
 			if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
 				return dm.interceptor.invoke(this);
-			}
-			else {
+			} else {
 				// Dynamic matching failed.
 				// Skip this interceptor and invoke the next in the chain.
 				return proceed();
 			}
-		}
-		else {
+		} else {
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
@@ -190,6 +169,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	/**
 	 * Invoke the joinpoint using reflection.
 	 * Subclasses can override this to use custom invocation.
+	 *
 	 * @return the return value of the joinpoint
 	 * @throws Throwable if invoking the joinpoint resulted in an exception
 	 */
@@ -198,13 +178,13 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		return AopUtils.invokeJoinpointUsingReflection(this.target, this.method, this.arguments);
 	}
 
-
 	/**
 	 * This implementation returns a shallow copy of this invocation object,
 	 * including an independent copy of the original arguments array.
 	 * <p>We want a shallow copy in this case: We want to use the same interceptor
 	 * chain and other object references, but we want an independent value for the
 	 * current interceptor index.
+	 *
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
@@ -223,6 +203,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * <p>We want a shallow copy in this case: We want to use the same interceptor
 	 * chain and other object references, but we want an independent value for the
 	 * current interceptor index.
+	 *
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
@@ -238,13 +219,11 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			ReflectiveMethodInvocation clone = (ReflectiveMethodInvocation) clone();
 			clone.arguments = arguments;
 			return clone;
-		}
-		catch (CloneNotSupportedException ex) {
+		} catch (CloneNotSupportedException ex) {
 			throw new IllegalStateException(
 					"Should be able to clone object of type [" + getClass() + "]: " + ex);
 		}
 	}
-
 
 	@Override
 	public void setUserAttribute(String key, @Nullable Object value) {
@@ -253,8 +232,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 				this.userAttributes = new HashMap<>();
 			}
 			this.userAttributes.put(key, value);
-		}
-		else {
+		} else {
 			if (this.userAttributes != null) {
 				this.userAttributes.remove(key);
 			}
@@ -271,6 +249,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * Return user attributes associated with this invocation.
 	 * This method provides an invocation-bound alternative to a ThreadLocal.
 	 * <p>This map is initialized lazily and is not used in the AOP framework itself.
+	 *
 	 * @return any user attributes associated with this invocation
 	 * (never {@code null})
 	 */
@@ -281,7 +260,6 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		return this.userAttributes;
 	}
 
-
 	@Override
 	public String toString() {
 		// Don't do toString on target, it may be proxied.
@@ -289,11 +267,9 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		sb.append(this.method).append("; ");
 		if (this.target == null) {
 			sb.append("target is null");
-		}
-		else {
+		} else {
 			sb.append("target is of class [").append(this.target.getClass().getName()).append(']');
 		}
 		return sb.toString();
 	}
-
 }
