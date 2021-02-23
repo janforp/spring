@@ -33,6 +33,8 @@ public interface MethodInterceptor extends Interceptor {
 	 * Implement this method to perform extra treatments before and
 	 * after the invocation. Polite implementations would certainly
 	 * like to invoke {@link Joinpoint#proceed()}.
+	 * -- 实现此方法以在调用之前和之后执行额外的处理。
+	 * -- 礼貌的实现当然希望调用{@link Joinpoint#proceed()}。
 	 *
 	 * @param invocation the method invocation joinpoint
 	 * @return the result of the call to {@link Joinpoint#proceed()};
