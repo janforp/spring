@@ -88,7 +88,16 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		if (!this.active) {
 			activate();
 		}
-		return getAopProxyFactory().createAopProxy(this);
+		return
+
+				/**
+				 * 获取一个代理工厂
+				 *
+				 * @see DefaultAopProxyFactory 代理工厂
+				 */
+				getAopProxyFactory()
+						//this:org.springframework.aop.framework.ProxyCreatorSupport
+						.createAopProxy(this);
 	}
 
 	/**

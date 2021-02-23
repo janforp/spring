@@ -39,16 +39,24 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 	 */
 	private static final boolean IN_NATIVE_IMAGE = (System.getProperty("org.graalvm.nativeimage.imagecode") != null);
 
+	/**
+	 * @param config the AOP configuration in the form of an
+	 * AdvisedSupport object
+	 * @return
+	 * @throws AopConfigException
+	 * @see org.springframework.aop.framework.ProxyCreatorSupport
+	 * @see ProxyFactory
+	 */
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
 		if (!IN_NATIVE_IMAGE
 				&&
 				(
-						config.isOptimize()
+						config.isOptimize()//暂且不管
 								||
-								config.isProxyTargetClass()
+								config.isProxyTargetClass()//如果该条件为 true,表示强制使用 cglib 动态代理
 								||
-								hasNoUserSuppliedProxyInterfaces(config)
+								hasNoUserSuppliedProxyInterfaces(config)//如果该条件为 true,说明被代理对象没有实现然后接口，无法使用jdk动态代理，只能使用cglib
 				)) {
 
 			Class<?> targetClass = config.getTargetClass();
@@ -56,25 +64,43 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 				throw new AopConfigException("TargetSource cannot determine target class: "
 						+ "Either an interface or a target is required for proxy creation.");
 			}
-			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
-				//如果被代理class是接口或者本身就是jdk的代理类，则使用jdk的动态代理
+			if (targetClass.isInterface() //一个接口
+
+					//或者该类型已经是一个被代理过的类型
+					|| Proxy.isProxyClass(targetClass)) {
+
+				//如果被代理class是接口或者该类型已经是一个被代理过的类型，则使用jdk的动态代理
 				return new JdkDynamicAopProxy(config);
 			}
 			//否则使用cglib代理
 			return new ObjenesisCglibAopProxy(config);
-		} else {
-			//使用jdk的动态代理
+		}
+
+		//使用jdk的动态代理
+		else {
+			/**
+			 * targetClass实现了接口的情况下，一般会走该分支！
+			 * 我们一般但是面向接口编程，所以我们只研究jdk动态代理
+			 */
 			return new JdkDynamicAopProxy(config);
 		}
 	}
 
 	/**
+	 * 如果该条件为 true,说明被代理对象没有实现然后接口，无法使用jdk动态代理，只能使用cglib
+	 *
 	 * Determine whether the supplied {@link AdvisedSupport} has only the
 	 * {@link org.springframework.aop.SpringProxy} interface specified
 	 * (or no proxy interfaces specified at all).
 	 */
 	private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
 		Class<?>[] ifcs = config.getProxiedInterfaces();
-		return (ifcs.length == 0 || (ifcs.length == 1 && SpringProxy.class.isAssignableFrom(ifcs[0])));
+		return (
+				//没有实现任何接口
+				ifcs.length == 0
+						||
+						//只实现一个接口，并且还是 SpringProxy 接口（内部接口）
+						(ifcs.length == 1 && SpringProxy.class.isAssignableFrom(ifcs[0]))
+		);
 	}
 }

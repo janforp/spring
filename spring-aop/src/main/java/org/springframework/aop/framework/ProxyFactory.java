@@ -93,8 +93,19 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	 * @return the proxy object
 	 */
 	public Object getProxy() {
-		return createAopProxy()
-				.getProxy();
+		return
+
+				/**
+				 * 返回一个 aop代理
+				 * @see AopProxy
+				 * @see JdkDynamicAopProxy 主流
+				 */
+				createAopProxy()
+
+						/**
+						 * 通过代理获取
+						 */
+						.getProxy();
 	}
 
 	/**

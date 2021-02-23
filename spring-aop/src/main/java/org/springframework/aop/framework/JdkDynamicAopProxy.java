@@ -69,18 +69,29 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 	/**
 	 * Config used to configure this proxy.
+	 *
+	 * @see ProxyFactory 一般为该类型
 	 */
 	private final AdvisedSupport advised;
 
+	/**
+	 * 代理类型实现的接口，数组包括被代理接口以及Spring追加接口
+	 *
+	 * @see AopProxyUtils#completeProxiedInterfaces(org.springframework.aop.framework.AdvisedSupport, boolean)
+	 */
 	private final Class<?>[] proxiedInterfaces;
 
 	/**
 	 * Is the {@link #equals} method defined on the proxied interfaces?
+	 *
+	 * @see JdkDynamicAopProxy#findDefinedEqualsAndHashCodeMethods(java.lang.Class[]) 查询当前所有需要代理的接口，看看是否有 equals 和 hashcode 方法，如果有，则打一个标记
 	 */
 	private boolean equalsDefined;
 
 	/**
 	 * Is the {@link #hashCode} method defined on the proxied interfaces?
+	 *
+	 * @see JdkDynamicAopProxy#findDefinedEqualsAndHashCodeMethods(java.lang.Class[]) 查询当前所有需要代理的接口，看看是否有 equals 和 hashcode 方法，如果有，则打一个标记
 	 */
 	private boolean hashCodeDefined;
 
@@ -90,6 +101,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	 * @param config the AOP configuration as AdvisedSupport object
 	 * @throws AopConfigException if the config is invalid. We try to throw an informative
 	 * exception in this case, rather than let a mysterious failure happen later.
+	 * @see DefaultAopProxyFactory#createAopProxy(org.springframework.aop.framework.AdvisedSupport) 此处会调用该方法
+	 * @see org.springframework.aop.framework.ProxyCreatorSupport 参数 config 一般就是该类型
 	 */
 	public JdkDynamicAopProxy(AdvisedSupport config) throws AopConfigException {
 		Assert.notNull(config, "AdvisedSupport must not be null");
@@ -97,7 +110,15 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			throw new AopConfigException("No advisors and no TargetSource specified");
 		}
 		this.advised = config;
+
+		/**
+		 * 获取需要代理的接口数组
+		 * 数组包括被代理接口以及Spring追加接口
+		 */
 		this.proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
+		/**
+		 * 查询当前所有需要代理的接口，看看是否有 equals 和 hashcode 方法，如果有，则打一个标记
+		 */
 		findDefinedEqualsAndHashCodeMethods(this.proxiedInterfaces);
 	}
 
@@ -111,14 +132,43 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		if (logger.isTraceEnabled()) {
 			logger.trace("Creating JDK dynamic proxy: " + this.advised.getTargetSource());
 		}
-		return Proxy.newProxyInstance(classLoader, this.proxiedInterfaces, this);
+
+		/**
+		 * 很熟悉了吧
+		 * 该方法最终会返回一个代理类对象
+		 * 代理类大概的样子：
+		 *
+		 * class $proxy12 extends Proxy implements A,B,C {
+		 *
+		 *     //代理方法
+		 *     void xx() {
+		 *     		//调用被代理对象方法
+		 *         super.h.invoke(x,xx);
+		 *     }
+		 * }
+		 *
+		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+		 */
+		return Proxy.newProxyInstance(
+				classLoader, //类加载器
+				this.proxiedInterfaces, //生成代理类需要实现的接口集合
+
+				/**
+				 * JdkDynamicAopProxy 其实就是 InvocationHandler
+				 * 该类实现了 {@link InvocationHandler} 接口
+				 * 该方法最终会返回一个代理类对象
+				 */
+				this
+		);
 	}
 
 	/**
-	 * Finds any {@link #equals} or {@link #hashCode} method that may be defined
-	 * on the supplied set of interfaces.
+	 * 查询当前所有需要代理的接口，看看是否有 equals 和 hashcode 方法，如果有，则打一个标记
 	 *
-	 * @param proxiedInterfaces the interfaces to introspect
+	 * Finds any {@link #equals} or {@link #hashCode} method that may be defined on the supplied set of interfaces.
+	 * -- 查找可能在提供的一组接口上定义的任何{@link #equals}或{@link #hashCode}方法。
+	 *
+	 * @param proxiedInterfaces the interfaces to introspect：数组包括被代理接口以及Spring追加接口
 	 */
 	private void findDefinedEqualsAndHashCodeMethods(Class<?>[] proxiedInterfaces) {
 		for (Class<?> proxiedInterface : proxiedInterfaces) {
@@ -141,6 +191,12 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	 * Implementation of {@code InvocationHandler.invoke}.
 	 * <p>Callers will see exactly the exception thrown by the target,
 	 * unless a hook method throws an exception.
+	 *
+	 * @param proxy 代理对象
+	 * @param method 被代理方法
+	 * @param args 被代理方法参数
+	 * @return 被代理方法返回
+	 * @throws Throwable 如果发生异常
 	 */
 	@Override
 	@Nullable

@@ -75,6 +75,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
 
 	/**
+	 * 被代理的接口列表
+	 *
 	 * Interfaces to be implemented by the proxy. Held in List to keep the order
 	 * of registration, to create JDK proxy with specified order of interfaces.
 	 */
@@ -224,6 +226,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	@Override
 	public boolean isInterfaceProxied(Class<?> intf) {
+		//检查参数接口是否被当前对象代理了
 		for (Class<?> proxyIntf : this.interfaces) {
 			if (intf.isAssignableFrom(proxyIntf)) {
 				return true;
