@@ -469,6 +469,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
+	 * 查找适合该方法的增强
+	 *
 	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
 	 * for the given method, based on this configuration.
 	 *

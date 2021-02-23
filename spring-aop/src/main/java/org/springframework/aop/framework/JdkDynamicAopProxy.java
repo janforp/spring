@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.RawTargetAccess;
 import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.adapter.DefaultAdvisorAdapterRegistry;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.DecoratingProxy;
 import org.springframework.lang.Nullable;
@@ -243,24 +244,39 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 			// Get as late as possible to minimize the time we "own" the target, in case it comes from a pool.
 			// TODO 如果目标来自一个池，则应尽可能晚些以最小化我们“拥有”目标的时间。
+			//拿到目标对象/被代理对象
 			target = targetSource.getTarget();
+			//目标对象的类
 			Class<?> targetClass = (target != null ? target.getClass() : null);
 
-			// Get the interception chain for this method.:获取此方法的拦截链。
+			/**
+			 * 其实，这里最关键的地方，查找适合该方法的增强(方法拦截器)
+			 * 查询匹配该方法的增强
+			 * Get the interception chain for this method.:获取此方法的拦截链。
+			 * @see DefaultAdvisorAdapterRegistry#getInterceptors(org.springframework.aop.Advisor)
+			 */
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 
 			// Check whether we have any advice. If we don't, we can fallback on direct
 			// reflective invocation of the target, and avoid creating a MethodInvocation.
 			if (chain.isEmpty()) {
+				/**
+				 * 如果匹配当前方法的拦截器为空，说明当前方法不需要被增强，直接调用目标对象的方法即可
+				 */
 				// We can skip creating a MethodInvocation: just invoke the target directly
 				// Note that the final invoker must be an InvokerInterceptor so we know it does
 				// nothing but a reflective operation on the target, and no hot swapping or fancy proxying.
 				Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
+
+				//直接调用目标对象的方法
 				retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
 			} else {
-				// We need to create a method invocation...
+				// We need to create a method invocation...:们需要创建一个方法调用...
 				MethodInvocation invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
-				// Proceed to the joinpoint through the interceptor chain.
+				// Proceed to the joinpoint through the interceptor chain.:通过拦截器链进入连接点。
+				/**
+				 * @see ReflectiveMethodInvocation#proceed()
+				 */
 				retVal = invocation.proceed();
 			}
 

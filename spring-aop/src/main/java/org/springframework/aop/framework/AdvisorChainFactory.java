@@ -14,6 +14,8 @@ import java.util.List;
 public interface AdvisorChainFactory {
 
 	/**
+	 * 查找适合该方法的增强
+	 *
 	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
 	 * for the given advisor chain configuration.
 	 *
