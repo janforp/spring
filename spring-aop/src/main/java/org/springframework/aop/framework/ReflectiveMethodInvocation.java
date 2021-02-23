@@ -44,6 +44,7 @@ import java.util.Map;
  */
 public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Cloneable {
 
+	//代理对象
 	protected final Object proxy;
 
 	@Nullable
@@ -89,8 +90,13 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * but would complicate the code. And it would work only for static pointcuts.
 	 */
 	protected ReflectiveMethodInvocation(
-			Object proxy, @Nullable Object target, Method method, @Nullable Object[] arguments,
-			@Nullable Class<?> targetClass, List<Object> interceptorsAndDynamicMethodMatchers) {
+			Object proxy, //代理对象
+			@Nullable Object target,//目标对象
+			Method method, //目标对象方法
+			@Nullable Object[] arguments, //目标对象方法参数
+			@Nullable Class<?> targetClass, //目标对象类型
+			List<Object> interceptorsAndDynamicMethodMatchers // 拦截器链表
+	) {
 
 		this.proxy = proxy;
 		this.target = target;
@@ -139,13 +145,19 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	@Override
 	@Nullable
 	public Object proceed() throws Throwable {
-		// We start with an index of -1 and increment early.:我们从索引-1开始并提前增加。
+		// We start with an index of -1 and increment early.:我们从索引-1开始并提前增加（意思就是在适用前增加一个）。
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+			//说明所有拦截器都执行完了，接下来该执行目标对象目标方法了，也就是调用连接点了
 			return invokeJoinpoint();
 		}
 
+		//递增下标，一个一个的获取拦截器
 		Object interceptorOrInterceptionAdvice = this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
+			/**
+			 * 需要做运行时检查/匹配
+			 * 也就是运行时匹配
+			 */
 			// Evaluate dynamic method matcher here: static part will already have
 			// been evaluated and found to match.
 			InterceptorAndDynamicMethodMatcher dm = (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
@@ -158,6 +170,10 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 				return proceed();
 			}
 		} else {
+			/**
+			 * 大部分情况我们会执行此处
+			 * @see com.javaxxl.aop3.Main.MethodInterceptor01
+			 */
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);

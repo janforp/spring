@@ -1,5 +1,7 @@
 package org.springframework.aop;
 
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
+
 import java.lang.reflect.Method;
 
 /**
@@ -87,6 +89,7 @@ public interface MethodMatcher {
 	 * 才代表这个切面需要做运行时匹配
 	 *
 	 * 可以做的根据参数判断是否需要增强该方法
+	 * @see ReflectiveMethodInvocation#proceed() 运行时匹配
 	 */
 	boolean matches(Method method, Class<?> targetClass, Object... args);
 
