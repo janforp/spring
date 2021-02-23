@@ -25,6 +25,12 @@ public class ProxyConfig implements Serializable {
 
 	boolean opaque/*不透明*/ = false;
 
+	/**
+	 * 表示是否需要把当前代理对象暴露到 Aop 上下文中
+	 * 暴露之后应用程序就能拿到
+	 *
+	 * @see AopContext
+	 */
 	boolean exposeProxy = false;
 
 	private boolean frozen = false;

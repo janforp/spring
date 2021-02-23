@@ -204,14 +204,19 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		Object oldProxy = null;
 		boolean setProxyContext = false;
 
+		//获取到创建 ProxyFactory 的时候提供的 target
 		TargetSource targetSource = this.advised.targetSource;
+
+		//真正的 target 引用
 		Object target = null;
 
 		try {
 			if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {
+				// 如果代理对象没有实现 equals 方法，并且当前调用方法是 equal 方法，则所以当前 JdkDynamicAopProxy 对象提供的 equal 方法
 				// The target does not implement the equals(Object) method itself.：目标本身不实现equals（Object）方法。
 				return equals(args[0]);
 			} else if (!this.hashCodeDefined && AopUtils.isHashCodeMethod(method)) {
+				// 如果代理对象没有实现 hashcode 方法，并且当前调用方法是 hashcode 方法，则所以当前 JdkDynamicAopProxy 对象提供的 hashcode 方法
 				// The target does not implement the hashCode() method itself.：目标本身不实现hashCode（）方法。
 				return hashCode();
 			} else if (method.getDeclaringClass() == DecoratingProxy.class) {
@@ -222,8 +227,14 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				return AopUtils.invokeJoinpointUsingReflection(this.advised, method, args);
 			}
 
+			//保存返回值
 			Object retVal;
 
+			/**
+			 * 表示是否需要把当前代理对象暴露到 Aop 上下文中
+			 * 暴露之后应用程序就能拿到
+			 * @see AopContext
+			 */
 			if (this.advised.exposeProxy) {
 				// Make invocation available if necessary.-- 如有必要，使调用可用。
 				oldProxy = AopContext.setCurrentProxy(proxy);
