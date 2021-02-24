@@ -16,12 +16,19 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class ProxyCreatorSupport extends AdvisedSupport {
 
+	/**
+	 * 用于创建 AopProxy
+	 *
+	 * @see DefaultAopProxyFactory 默认实现
+	 * @see AopProxy 分为 jdk 跟 cglib 2个实现
+	 */
 	private AopProxyFactory aopProxyFactory;
 
 	private final List<AdvisedSupportListener> listeners = new ArrayList<>();
 
 	/**
 	 * Set to true when the first AOP proxy has been created.
+	 * -- 创建第一个AOP代理后，设置为true。
 	 */
 	private boolean active = false;
 
@@ -94,9 +101,19 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 				 * 获取一个代理工厂
 				 *
 				 * @see DefaultAopProxyFactory 代理工厂
+				 * @see JdkDynamicAopProxy
+				 * @see ObjenesisCglibAopProxy
+				 * @see AopProxy 分为 jdk 跟 cglib 2个实现
 				 */
 				getAopProxyFactory()
-						//this:org.springframework.aop.framework.ProxyCreatorSupport
+
+						/**
+						 * 2个不同的实现
+						 *
+						 * @see AopProxy#getProxy()
+						 * @see JdkDynamicAopProxy#getProxy()
+						 * @see ObjenesisCglibAopProxy#getProxy()
+						 */
 						.createAopProxy(this);
 	}
 

@@ -248,6 +248,8 @@ public abstract class AopProxyUtils {
 			return new Object[0];
 		}
 		if (method.isVarArgs()) {
+			//如果该方法的参数是可变参数
+
 			if (method.getParameterCount() == arguments.length) {
 				Class<?>[] paramTypes = method.getParameterTypes();
 				int varargIndex = paramTypes.length - 1;

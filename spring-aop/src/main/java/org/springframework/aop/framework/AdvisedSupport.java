@@ -72,6 +72,9 @@ public class AdvisedSupport
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
 	/**
+	 * 缓存某个方法上的增强链表，当然当增强链表{@link AdvisedSupport#advisors}变化的时候，该缓存是要清除的
+	 * 被代理接口列表变化的时候也会清除该缓存
+	 *
 	 * Cache with Method as key and advisor chain List as value.
 	 */
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
@@ -112,7 +115,7 @@ public class AdvisedSupport
 	 * @param interfaces the proxied interfaces
 	 */
 	public AdvisedSupport(Class<?>... interfaces) {
-		this();
+		this();//为了初始化 methodCache
 		setInterfaces(interfaces);
 	}
 
@@ -493,6 +496,9 @@ public class AdvisedSupport
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
 		if (cached == null) {
+			/**
+			 * @see DefaultAdvisorChainFactory#getInterceptorsAndDynamicInterceptionAdvice(org.springframework.aop.framework.Advised, java.lang.reflect.Method, java.lang.Class) 实现
+			 */
 			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(this, method, targetClass);
 			this.methodCache.put(cacheKey, cached);
 		}

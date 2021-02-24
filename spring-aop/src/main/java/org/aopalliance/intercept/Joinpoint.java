@@ -1,5 +1,7 @@
 package org.aopalliance.intercept;
 
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
@@ -32,15 +34,19 @@ public interface Joinpoint {
 	 *
 	 * @return see the children interfaces' proceed definition
 	 * @throws Throwable if the joinpoint throws an exception
+	 * @see ReflectiveMethodInvocation#proceed() 实现
 	 */
 	@Nullable
 	Object proceed() throws Throwable;
 
 	/**
+	 * 返回被代理对象
+	 *
 	 * Return the object that holds the current joinpoint's static part.
 	 * <p>For instance, the target object for an invocation.
 	 *
 	 * @return the object (can be null if the accessible object is static)
+	 * @see ReflectiveMethodInvocation#getThis() 实现
 	 */
 	@Nullable
 	Object getThis();
@@ -49,6 +55,10 @@ public interface Joinpoint {
 	 * Return the static part of this joinpoint.
 	 * <p>The static part is an accessible object on which a chain of
 	 * interceptors are installed.
+	 *
+	 * 一般方法被代理方法
+	 *
+	 * @see ReflectiveMethodInvocation#getStaticPart() 实现
 	 */
 	@Nonnull
 	AccessibleObject getStaticPart();

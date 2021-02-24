@@ -22,6 +22,7 @@ import java.util.List;
  * A simple but definitive way of working out an advice chain for a Method,
  * given an {@link Advised} object. Always rebuilds each advice chain;
  * caching can be provided by subclasses.
+ * -- 给定一个{@link Advised}对象，一种为方法制定建议链的简单但确定的方法。始终重建每个建议链；缓存可以由子类提供。
  *
  * @author Juergen Hoeller
  * @author Rod Johnson

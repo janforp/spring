@@ -99,11 +99,17 @@ public class ProxyFactory extends ProxyCreatorSupport {
 				 * 返回一个 aop代理
 				 * @see AopProxy
 				 * @see JdkDynamicAopProxy 主流
+				 * @see ObjenesisCglibAopProxy cglib实现
 				 */
 				createAopProxy()
 
 						/**
 						 * 通过代理获取
+						 * 2个不同的实现
+						 *
+						 * @see AopProxy#getProxy()
+						 * @see JdkDynamicAopProxy#getProxy()
+						 * @see ObjenesisCglibAopProxy#getProxy()
 						 */
 						.getProxy();
 	}

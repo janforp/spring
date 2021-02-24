@@ -47,13 +47,17 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	//代理对象
 	protected final Object proxy;
 
+	//被代理对象
 	@Nullable
 	protected final Object target;
 
+	//被代理方法
 	protected final Method method;
 
+	//参数
 	protected Object[] arguments;
 
+	//被代理类型
 	@Nullable
 	private final Class<?> targetClass;
 
@@ -64,12 +68,16 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	private Map<String, Object> userAttributes;
 
 	/**
+	 * 拦截器增强列表
+	 *
 	 * List of MethodInterceptor and InterceptorAndDynamicMethodMatcher
 	 * that need dynamic checks.
 	 */
 	protected final List<?> interceptorsAndDynamicMethodMatchers;
 
 	/**
+	 * 当前执行到的拦截器下标
+	 *
 	 * Index from 0 of the current interceptor we're invoking.
 	 * -1 until we invoke: then the current interceptor.
 	 */
@@ -157,6 +165,8 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			/**
 			 * 需要做运行时检查/匹配
 			 * 也就是运行时匹配
+			 *
+			 * @see DefaultAdvisorChainFactory#getInterceptorsAndDynamicInterceptionAdvice 该方法中真正的组装拦截器链表
 			 */
 			// Evaluate dynamic method matcher here: static part will already have
 			// been evaluated and found to match.
@@ -173,6 +183,8 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			/**
 			 * 大部分情况我们会执行此处
 			 * @see com.javaxxl.aop3.Main.MethodInterceptor01
+			 *
+			 * invoke 中会继续调用 当前对象的 {@link ReflectiveMethodInvocation#proceed()}方法实现遍历拦截器的效果
 			 */
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
