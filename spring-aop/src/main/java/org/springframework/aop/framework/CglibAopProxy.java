@@ -89,6 +89,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 	/**
 	 * Keeps track of the Classes that we have validated for final methods.
+	 * 跟踪我们为最终方法验证的类。
 	 */
 	private static final Map<Class<?>, Boolean> validatedClasses = new WeakHashMap<>();
 

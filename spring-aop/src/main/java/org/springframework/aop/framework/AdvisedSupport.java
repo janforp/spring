@@ -41,7 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AopProxy
  */
-public class AdvisedSupport extends ProxyConfig implements Advised {
+public class AdvisedSupport
+		extends ProxyConfig /** 该类基本上把 {@link Advised} 接口的方法都实现了，他们在此进行组合 **/
+		implements Advised {
 
 	/**
 	 * use serialVersionUID from Spring 2.0 for interoperability.
@@ -77,14 +79,23 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	/**
 	 * 被代理的接口列表
 	 *
-	 * Interfaces to be implemented by the proxy. Held in List to keep the order
-	 * of registration, to create JDK proxy with specified order of interfaces.
+	 * Interfaces to be implemented by the proxy.
+	 * -- 代理要实现的接口
+	 *
+	 * Held in List to keep the order of registration, to create JDK proxy with specified order of interfaces.
+	 * -- 在List中保留以保持注册顺序，以指定的接口顺序创建JDK代理
+	 *
+	 * @see ProxyFactory#ProxyFactory(java.lang.Object)
 	 */
 	private List<Class<?>> interfaces = new ArrayList<>();
 
 	/**
 	 * List of Advisors. If an Advice is added, it will be wrapped
 	 * in an Advisor before being added to this List.
+	 *
+	 * 增强列表/拦截器列表
+	 *
+	 * @see AdvisedSupport#addAdvisor(org.springframework.aop.Advisor)
 	 */
 	private List<Advisor> advisors = new ArrayList<>();
 

@@ -26,7 +26,7 @@ public class DefaultPointcutAdvisor
 	/**
 	 * 切面位置
 	 *
-	 * 当前实例表示匹配所有
+	 * 当前实例表示匹配所有，哨兵模式
 	 */
 	private Pointcut pointcut = Pointcut.TRUE;
 
@@ -45,6 +45,7 @@ public class DefaultPointcutAdvisor
 	 * @param advice the Advice to use
 	 */
 	public DefaultPointcutAdvisor(Advice advice) {
+		//该增强匹配所有的方法
 		this(Pointcut.TRUE, advice);
 	}
 
@@ -55,6 +56,7 @@ public class DefaultPointcutAdvisor
 	 * @param advice the Advice to run when Pointcut matches
 	 */
 	public DefaultPointcutAdvisor(Pointcut pointcut, Advice advice) {
+		//该增强的切点
 		this.pointcut = pointcut;
 		setAdvice(advice);
 	}
@@ -66,7 +68,11 @@ public class DefaultPointcutAdvisor
 	 * @see #setAdvice
 	 */
 	public void setPointcut(@Nullable Pointcut pointcut) {
-		this.pointcut = (pointcut != null ? pointcut : Pointcut.TRUE);
+		this.pointcut = (
+				pointcut != null ?
+						pointcut
+						: Pointcut.TRUE
+		);
 	}
 
 	@Override

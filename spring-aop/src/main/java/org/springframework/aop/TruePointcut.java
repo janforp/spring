@@ -3,6 +3,8 @@ package org.springframework.aop;
 import java.io.Serializable;
 
 /**
+ * 哨兵模式
+ *
  * Canonical Pointcut instance that always matches.
  *
  * @author Rod Johnson

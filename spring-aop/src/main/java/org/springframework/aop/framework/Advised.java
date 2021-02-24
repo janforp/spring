@@ -6,14 +6,22 @@ import org.springframework.aop.TargetClassAware;
 import org.springframework.aop.TargetSource;
 
 /**
+ * 该接口的所有方法基本上都已经被 {@link ProxyConfig} 实现了，
+ * 他们之前采用了组合{@link org.springframework.aop.framework.AdvisedSupport}的方式联系到一起
+ *
  * advised:建议
  *
  * Interface to be implemented by classes that hold the configuration
- * of a factory of AOP proxies. This configuration includes the
- * Interceptors and other advice, Advisors, and the proxied interfaces.
+ * of a factory of AOP proxies. -- 由包含AOP代理工厂配置的类实现的接口
  *
- * <p>Any AOP proxy obtained from Spring can be cast to this interface to
+ * This configuration includes the
+ * Interceptors and other advice, Advisors, and the proxied interfaces.
+ * -- 此配置包括拦截器和其他建议，顾问以及代理接口。
+ *
+ * <p>
+ * Any AOP proxy obtained from Spring can be cast to this interface to
  * allow manipulation of its AOP advice.
+ * -- 从Spring获得的任何AOP代理都可以转换为该接口，以允许对其AOP建议进行操作。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -45,6 +53,8 @@ public interface Advised extends TargetClassAware {
 	/**
 	 * Determine whether the given interface is proxied.
 	 *
+	 * 给定的类型是否是被代理的接口
+	 *
 	 * @param intf the interface to check
 	 */
 	boolean isInterfaceProxied(Class<?> intf);
@@ -69,6 +79,8 @@ public interface Advised extends TargetClassAware {
 	 * to invoke a method on itself with advice applied. Otherwise, if an
 	 * advised object invokes a method on {@code this}, no advice will be applied.
 	 * <p>Default is {@code false}, for optimal performance.
+	 *
+	 * @see AopContext
 	 */
 	void setExposeProxy(boolean exposeProxy);
 

@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.target;
 
 import org.springframework.aop.TargetSource;
@@ -23,9 +7,13 @@ import org.springframework.util.ObjectUtils;
 import java.io.Serializable;
 
 /**
+ * Canonical：典范
+ *
  * Canonical {@code TargetSource} when there is no target
  * (or just the target class known), and behavior is supplied
  * by interfaces and advisors only.
+ *
+ * -- 在没有目标（或只有已知的目标类）且行为仅由接口和顾问程序提供的情况下，规范化{@code TargetSource}。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -152,5 +140,4 @@ public final class EmptyTargetSource implements TargetSource, Serializable {
 				(this.targetClass != null ? "target class [" + this.targetClass.getName() + "]" : "no target class") +
 				", " + (this.isStatic ? "static" : "dynamic");
 	}
-
 }

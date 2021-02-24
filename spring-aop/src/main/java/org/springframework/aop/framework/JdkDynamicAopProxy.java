@@ -31,8 +31,9 @@ import java.util.List;
  * configured by an {@link AdvisedSupport} class. This class is internal
  * to Spring's AOP framework and need not be used directly by client code.
  *
- * <p>Proxies created using this class will be thread-safe if the
- * underlying (target) class is thread-safe.
+ * <p>
+ * Proxies created using this class will be thread-safe if the
+ * underlying (target) class is thread-safe.-- 如果基础（目标）类是线程安全的，则使用此类创建的代理将是线程安全的。
  *
  * <p>Proxies are serializable so long as all Advisors (including Advices
  * and Pointcuts) and the TargetSource are serializable.
@@ -55,12 +56,22 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 
 	/*
-	 * NOTE: We could avoid the code duplication between this class and the CGLIB
-	 * proxies by refactoring "invoke" into a template method. However, this approach
-	 * adds at least 10% performance overhead versus a copy-paste solution, so we sacrifice
-	 * elegance for performance. (We have a good test suite to ensure that the different
-	 * proxies behave the same :-)
+	 * NOTE:
+	 * We could avoid the code duplication between this class and the CGLIB
+	 * proxies by refactoring "invoke" into a template method.
+	 *
+	 * -- 通过将“invoke”方法重构为模板方法，我们可以避免此类与CGLIB代理之间的代码重复问题。
+	 *
+	 * However, this approach adds at least 10% performance overhead versus a copy-paste solution, so we sacrifice
+	 * elegance for performance.
+	 * -- 但是，与复制粘贴解决方案相比，此方法至少增加了10％的性能开销，因此我们在性能上牺牲了优雅。
+	 *
+	 *
+	 * (We have a good test suite to ensure that the different proxies behave the same :-)
+	 * -- 我们有一个很好的测试套件，以确保不同的代理表现相同
+	 *
 	 * This way, we can also more easily take advantage of minor optimizations in each class.
+	 * -- 这样，我们还可以更轻松地利用每个类中的次要优化。
 	 */
 
 	/**

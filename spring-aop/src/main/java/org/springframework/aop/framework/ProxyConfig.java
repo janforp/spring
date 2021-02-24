@@ -7,6 +7,7 @@ import java.io.Serializable;
 /**
  * Convenience superclass for configuration used in creating proxies,
  * to ensure that all proxy creators have consistent properties.
+ * -- 用于创建代理的配置的便利超类，以确保所有代理创建者都具有一致的属性。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -54,21 +55,26 @@ public class ProxyConfig implements Serializable {
 
 	/**
 	 * Return whether to proxy the target class directly as well as any interfaces.
+	 * -- 返回是否直接代理目标类以及任何接口。
 	 */
 	public boolean isProxyTargetClass() {
 		return this.proxyTargetClass;
 	}
 
 	/**
-	 * Set whether proxies should perform aggressive optimizations.
+	 * Set whether proxies should perform aggressive optimizations.--设置代理是否应执行积极的优化。
 	 * The exact meaning of "aggressive optimizations" will differ
-	 * between proxies, but there is usually some tradeoff.
+	 * between proxies, but there is usually some tradeoff. -- 代理之间“积极优化”的确切含义会有所不同，但通常会有一些权衡。
 	 * Default is "false".
-	 * <p>For example, optimization will usually mean that advice changes won't
+	 *
+	 * <p>
+	 * For example, optimization will usually mean that advice changes won't
 	 * take effect after a proxy has been created. For this reason, optimization
 	 * is disabled by default. An optimize value of "true" may be ignored
 	 * if other settings preclude optimization: for example, if "exposeProxy"
 	 * is set to "true" and that's not compatible with the optimization.
+	 * --例如，优化通常将意味着 advice 更改在创建代理后不会生效。因此，默认情况下禁用优化。
+	 * 如果其他设置无法进行优化，则可以忽略优化值“ true”：例如，如果“ exposeProxy”设置为“ true”，并且与优化不兼容。
 	 */
 	public void setOptimize(boolean optimize) {
 		this.optimize = optimize;
@@ -83,9 +89,10 @@ public class ProxyConfig implements Serializable {
 
 	/**
 	 * Set whether proxies created by this configuration should be prevented
-	 * from being cast to {@link Advised} to query proxy status.
-	 * <p>Default is "false", meaning that any AOP proxy can be cast to
-	 * {@link Advised}.
+	 * from being cast to {@link Advised} to query proxy status. -- 设置是否应防止由此配置创建的代理被强制转换为{@link Advised}来查询代理状态。
+	 * <p>
+	 * Default is "false", meaning that any AOP proxy can be cast to
+	 * {@link Advised}.-- 默认值为“ false”，表示任何AOP代理都可以转换为{@link Advised}。
 	 */
 	public void setOpaque(boolean opaque) {
 		this.opaque = opaque;

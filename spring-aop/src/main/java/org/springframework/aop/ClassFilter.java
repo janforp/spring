@@ -30,6 +30,9 @@ public interface ClassFilter {
 	boolean matches(Class<?> clazz);
 
 	/**
+	 * 匹配所有类的ClassFilter的规范实例。
+	 * 类似哨兵模式,可以避免if...else 分支判断
+	 *
 	 * Canonical instance of a ClassFilter that matches all classes.
 	 */
 	ClassFilter TRUE = TrueClassFilter.INSTANCE;
