@@ -1,23 +1,4 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.config;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
@@ -28,6 +9,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for handling registration of AOP auto-proxy creators.
@@ -47,9 +31,9 @@ public abstract class AopConfigUtils {
 
 	/**
 	 * The bean name of the internally managed auto-proxy creator.
+	 * -- 内部管理的自动代理创建者的Bean名称。
 	 */
-	public static final String AUTO_PROXY_CREATOR_BEAN_NAME =
-			"org.springframework.aop.config.internalAutoProxyCreator";
+	public static final String AUTO_PROXY_CREATOR_BEAN_NAME = "org.springframework.aop.config.internalAutoProxyCreator";
 
 	/**
 	 * Stores the auto proxy creator classes in escalation order.
