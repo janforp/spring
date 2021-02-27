@@ -78,6 +78,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	/**
 	 * Convenience constant for subclasses: Return value for "do not proxy".
 	 *
+	 * -- 子类的便利常数：“不代理”的返回值。
+	 *
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
 	@Nullable
@@ -137,8 +139,20 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	 */
 	private final Map<Object, Object> earlyProxyReferences = new ConcurrentHashMap<>(16);
 
+	/**
+	 * this.proxyTypes.put(cacheKey, proxy.getClass());
+	 *
+	 * key: cacheKey 一般为 beanName
+	 * value: 代理对象的class
+	 */
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
 
+	/**
+	 * key:beanName
+	 * value:beanName对应实例是否需要增强
+	 *
+	 * @see AbstractAutoProxyCreator#wrapIfNecessary(java.lang.Object, java.lang.String, java.lang.Object)
+	 */
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<>(256);
 
 	/**
@@ -298,10 +312,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 
 			/**
 			 * 为了避免 重复 将某个 bean 生成代理对象 ...
+			 * 保证增强逻辑只走一遍
 			 */
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
 
-				//保证增强逻辑只走一遍
+				//AOP操作入口
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}
@@ -331,6 +346,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	}
 
 	/**
+	 * AOP操作入口
+	 * 1.获取增强列表
+	 * 2.创建代理对象
+	 *
 	 * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
 	 *
 	 * @param bean the raw bean instance
@@ -340,22 +359,39 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
+			//一般不会进来，因为咱们很少使用  TargetSourceCreate 去创建对象
 			return bean;
 		}
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+			//不需要增强
 			return bean;
 		}
-		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+		if (isInfrastructureClass(bean.getClass())//框架
+
+				//beanName 是 .ORIGINAL结尾就不增强
+				|| shouldSkip(bean.getClass(), beanName) /**跳过*/) {
+
+			//不需要增强
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+
+		/**
+		 * 获取增强
+		 */
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
+			//需要增强
+
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			Object proxy = createProxy(
-					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+
+			/**
+			 * 创建增强代理对象
+			 */
+			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
 		}
