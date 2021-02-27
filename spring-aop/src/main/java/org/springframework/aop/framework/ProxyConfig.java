@@ -20,6 +20,9 @@ public class ProxyConfig implements Serializable {
 	 */
 	private static final long serialVersionUID = -8409359707199703185L;
 
+	/**
+	 * 如果为true,则默认所有cglib，否则使用jdk
+	 */
 	private boolean proxyTargetClass = false;
 
 	private boolean optimize = false;
@@ -151,8 +154,17 @@ public class ProxyConfig implements Serializable {
 	 */
 	public void copyFrom(ProxyConfig other) {
 		Assert.notNull(other, "Other ProxyConfig object must not be null");
+
+		//如果为true,使用cglib，否则使用jdk
 		this.proxyTargetClass = other.proxyTargetClass;
 		this.optimize = other.optimize;
+
+		/**
+		 * 表示是否需要把当前代理对象暴露到 Aop 上下文中
+		 * 暴露之后应用程序就能拿到
+		 *
+		 * @see AopContext
+		 */
 		this.exposeProxy = other.exposeProxy;
 		this.frozen = other.frozen;
 		this.opaque = other.opaque;

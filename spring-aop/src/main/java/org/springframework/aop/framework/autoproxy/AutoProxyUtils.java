@@ -43,8 +43,7 @@ public abstract class AutoProxyUtils {
 	 *
 	 * @see #shouldProxyTargetClass
 	 */
-	public static final String PRESERVE_TARGET_CLASS_ATTRIBUTE =
-			Conventions.getQualifiedAttributeName(AutoProxyUtils.class, "preserveTargetClass");
+	public static final String PRESERVE_TARGET_CLASS_ATTRIBUTE = Conventions.getQualifiedAttributeName(AutoProxyUtils.class, "preserveTargetClass");
 
 	/**
 	 * Bean definition attribute that indicates the original target class of an
@@ -58,6 +57,8 @@ public abstract class AutoProxyUtils {
 			Conventions.getQualifiedAttributeName(AutoProxyUtils.class, "originalTargetClass");
 
 	/**
+	 * 标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> 的时候，判断是否需要自动把 proxyTargetClass 设置为 true
+	 *
 	 * Determine whether the given bean should be proxied with its target
 	 * class rather than its interfaces. Checks the
 	 * {@link #PRESERVE_TARGET_CLASS_ATTRIBUTE "preserveTargetClass" attribute}
@@ -70,8 +71,11 @@ public abstract class AutoProxyUtils {
 	public static boolean shouldProxyTargetClass(
 			ConfigurableListableBeanFactory beanFactory, @Nullable String beanName) {
 
+		//标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> 的时候，判断是否需要自动把 proxyTargetClass 设置为 true
 		if (beanName != null && beanFactory.containsBeanDefinition(beanName)) {
 			BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+
+			//属性 PRESERVE_TARGET_CLASS_ATTRIBUTE  = preserveTargetClass 是否为 true
 			return Boolean.TRUE.equals(bd.getAttribute(PRESERVE_TARGET_CLASS_ATTRIBUTE));
 		}
 		return false;

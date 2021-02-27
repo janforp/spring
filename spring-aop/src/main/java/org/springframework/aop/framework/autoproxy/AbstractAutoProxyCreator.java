@@ -7,6 +7,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AopInfrastructureBean;
+import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.ProxyProcessorSupport;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
@@ -516,10 +517,21 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.copyFrom(this);
 
+		/**
+		 * @see ProxyConfig#proxyTargetClass 如果为true,则默认所有cglib，否则使用jdk
+		 */
 		if (!proxyFactory.isProxyTargetClass()) {
+			//进入此处：说明标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> ，当然默认也是 false
+
+			//标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> 的时候，判断是否需要自动把 proxyTargetClass 设置为 true
 			if (shouldProxyTargetClass(beanClass, beanName)) {
+				// beanName 对应的 bd 属性 PRESERVE_TARGET_CLASS_ATTRIBUTE  = preserveTargetClass 是否为 true
+				//如果 true,使用cglib，否则使用 jdk
+
 				proxyFactory.setProxyTargetClass(true);
 			} else {
+
+				//评估
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
@@ -538,6 +550,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	}
 
 	/**
+	 * 标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> 的时候，判断是否需要自动把 proxyTargetClass 设置为 true
+	 *
+	 *
 	 * Determine whether the given bean should be proxied with its target class rather than its interfaces.
 	 * <p>Checks the {@link AutoProxyUtils#PRESERVE_TARGET_CLASS_ATTRIBUTE "preserveTargetClass" attribute}
 	 * of the corresponding bean definition.
@@ -548,8 +563,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	 * @see AutoProxyUtils#shouldProxyTargetClass
 	 */
 	protected boolean shouldProxyTargetClass(Class<?> beanClass, @Nullable String beanName) {
-		return (this.beanFactory instanceof ConfigurableListableBeanFactory &&
-				AutoProxyUtils.shouldProxyTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName));
+
+		//标签 <aop:aspectj-autoproxy  proxy-target-class = "false" /> 的时候，判断是否需要自动把 proxyTargetClass 设置为 true
+		return (
+				this.beanFactory instanceof ConfigurableListableBeanFactory
+						&&
+						AutoProxyUtils.shouldProxyTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName)
+		);
 	}
 
 	/**
