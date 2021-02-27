@@ -381,6 +381,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 		/**
 		 * 获取增强
 		 * 查找适合当前实例 class 的通知(增强)
+		 *
+		 * @see AbstractAdvisorAutoProxyCreator#getAdvicesAndAdvisorsForBean(java.lang.Class, java.lang.String, org.springframework.aop.TargetSource) 看该实现
 		 */
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 
