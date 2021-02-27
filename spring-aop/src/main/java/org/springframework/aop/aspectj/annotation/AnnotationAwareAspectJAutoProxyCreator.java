@@ -2,7 +2,9 @@ package org.springframework.aop.aspectj.annotation;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
+import org.springframework.aop.config.AopConfigUtils;
 import org.springframework.aop.config.AopNamespaceUtils;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.lang.Nullable;
@@ -29,7 +31,12 @@ import java.util.regex.Pattern;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.aspectj.annotation.AspectJAdvisorFactory
- * @see AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(org.springframework.beans.factory.xml.ParserContext, org.w3c.dom.Element)
+ * @see AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(org.springframework.beans.factory.xml.ParserContext, org.w3c.dom.Element) 该方法会把当前类注册到容器
+ * @see AopConfigUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object) 注册当前类的 bd
+ * @see /Users/janita/code/sourceCodeLearn/spring-framework-master/spring-aop/src/main/java/org/springframework/aop/aspectj/annotation/AnnotationAwareAspectJAutoProxyCreator的继承体系.png
+ * 通过查看该类的继承体系，发现该类是 {@link org.springframework.beans.factory.config.BeanPostProcessor} 的子类
+ *
+ * @see AbstractAutoProxyCreator#postProcessAfterInitialization(java.lang.Object, java.lang.String) aop介入点
  * @since 2.0
  */
 @SuppressWarnings("serial")

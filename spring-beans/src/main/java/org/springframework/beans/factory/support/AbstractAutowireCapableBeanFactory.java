@@ -718,18 +718,34 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
+
 			if (earlySingletonReference != null) {
+				//如果进来：说明当前 bean 实例 从 二级缓存 获取到了，说明产生循环依赖了，三级缓存 当前对象的 ObjectFactory.getObject()被调用过
+
 				if (exposedObject == bean) {
+					//如果进来：1.当前 "真实实例" 不需要被代理，2.当前 "实例" 已经被代理过了，是在 ObjectFactory.getObject() 方法调用的时候实现增强代理
+
 					exposedObject = earlySingletonReference;
-				} else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+				} else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName) /**是否有其他 bean 依赖当前 bean**/) {
+					//有其他 bean 依赖当前 bean
+
+					//获取依赖当前 bean 的其他 beanName
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
 					for (String dependentBean : dependentBeans) {
+
 						if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+							//如果进来：说明当前 bean 已经创建完成
 							actualDependentBeans.add(dependentBean);
 						}
 					}
 					if (!actualDependentBeans.isEmpty()) {
+
+						/**
+						 * 为什么有问题？
+						 * 因为咱们当前对象的AOP操作是在当前方法的 initializBean 这个方法完成的，
+						 * 在这之前，外部其他 bean 持有到当前的 "bean实例"但是尚未增强的
+						 */
 						throw new BeanCurrentlyInCreationException(beanName,
 								"Bean with name '" + beanName + "' has been injected into other beans [" +
 										StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +
