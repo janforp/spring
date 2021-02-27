@@ -16,13 +16,13 @@
 
 package org.springframework.aop.aspectj;
 
-import java.util.List;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 /**
  * Utility methods for working with AspectJ proxies.
@@ -40,6 +40,7 @@ public abstract class AspectJProxyUtils {
 	 * <p>This will expose the current Spring AOP invocation (necessary for some AspectJ pointcut
 	 * matching) and make available the current AspectJ JoinPoint. The call will have no effect
 	 * if there are no AspectJ advisors in the advisor chain.
+	 *
 	 * @param advisors the advisors available
 	 * @return {@code true} if an {@link ExposeInvocationInterceptor} was added to the list,
 	 * otherwise {@code false}
@@ -52,11 +53,19 @@ public abstract class AspectJProxyUtils {
 				// Be careful not to get the Advice without a guard, as this might eagerly
 				// instantiate a non-singleton AspectJ aspect...
 				if (isAspectJAdvice(advisor)) {
+
+					//一般都会进来
 					foundAspectJAdvice = true;
 					break;
 				}
 			}
-			if (foundAspectJAdvice && !advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+
+			if (foundAspectJAdvice
+					&&
+
+					!advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+
+				//如果 advisors 列表中还没有 ExposeInvocationInterceptor.ADVISOR，则把它放到列表的第一个
 				advisors.add(0, ExposeInvocationInterceptor.ADVISOR);
 				return true;
 			}
@@ -66,13 +75,25 @@ public abstract class AspectJProxyUtils {
 
 	/**
 	 * Determine whether the given Advisor contains an AspectJ advice.
+	 *
 	 * @param advisor the Advisor to check
 	 */
 	private static boolean isAspectJAdvice(Advisor advisor) {
-		return (advisor instanceof InstantiationModelAwarePointcutAdvisor ||
-				advisor.getAdvice() instanceof AbstractAspectJAdvice ||
-				(advisor instanceof PointcutAdvisor &&
-						((PointcutAdvisor) advisor).getPointcut() instanceof AspectJExpressionPointcut));
+
+		//一般都会返回 true
+		return (
+
+				//如果是 InstantiationModelAwarePointcutAdvisor 实例 则 返回 true
+				advisor instanceof InstantiationModelAwarePointcutAdvisor
+						||
+
+						//如果是 advisor封装的 advice 是 AbstractAspectJAdvice 实例 则 返回 true
+						advisor.getAdvice() instanceof AbstractAspectJAdvice
+						||
+
+						//如果 advisor 是 PointcutAdvisor 实例，并且 advisor的 切面是 AspectJExpressionPointcut 的切面，则返回 true
+						(advisor instanceof PointcutAdvisor && ((PointcutAdvisor) advisor).getPointcut() instanceof AspectJExpressionPointcut)
+		);
 	}
 
 	static boolean isVariableName(@Nullable String name) {

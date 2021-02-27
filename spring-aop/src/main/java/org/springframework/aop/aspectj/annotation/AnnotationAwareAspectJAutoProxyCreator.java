@@ -4,6 +4,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.springframework.aop.config.AopConfigUtils;
 import org.springframework.aop.config.AopNamespaceUtils;
+import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator;
 import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -35,7 +36,6 @@ import java.util.regex.Pattern;
  * @see AopConfigUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object) 注册当前类的 bd
  * @see /Users/janita/code/sourceCodeLearn/spring-framework-master/spring-aop/src/main/java/org/springframework/aop/aspectj/annotation/AnnotationAwareAspectJAutoProxyCreator的继承体系.png
  * 通过查看该类的继承体系，发现该类是 {@link org.springframework.beans.factory.config.BeanPostProcessor} 的子类
- *
  * @see AbstractAutoProxyCreator#postProcessAfterInitialization(java.lang.Object, java.lang.String) aop介入点
  * @since 2.0
  */
@@ -45,9 +45,15 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	@Nullable
 	private List<Pattern> includePatterns;
 
+	/**
+	 * @see ReflectiveAspectJAdvisorFactory 该类型实例
+	 */
 	@Nullable
 	private AspectJAdvisorFactory aspectJAdvisorFactory;
 
+	/**
+	 * @see BeanFactoryAspectJAdvisorsBuilderAdapter 适配器
+	 */
 	@Nullable
 	private BeanFactoryAspectJAdvisorsBuilder aspectJAdvisorsBuilder;
 
@@ -67,22 +73,39 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
 	}
 
+	/**
+	 * @see AbstractAdvisorAutoProxyCreator#setBeanFactory(org.springframework.beans.factory.BeanFactory) 由该方法调用当前方法
+	 */
 	@Override
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		super.initBeanFactory(beanFactory);
 		if (this.aspectJAdvisorFactory == null) {
 			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory);
 		}
-		this.aspectJAdvisorsBuilder =
-				new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
+
+		/**
+		 * 适配器模式，目的是为了使用当前对象的 org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator.isEligibleAspectBean 方法
+		 * @see AnnotationAwareAspectJAutoProxyCreator#isEligibleAspectBean(java.lang.String)
+		 */
+		this.aspectJAdvisorsBuilder = new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
 	}
 
+	/**
+	 * @see AbstractAdvisorAutoProxyCreator#findEligibleAdvisors(java.lang.Class, java.lang.String) 调用者
+	 */
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
-		// Add all the Spring advisors found according to superclass rules.
+		// Add all the Spring advisors found according to superclass rules.：添加根据超类规则找到的所有Spring 增强。
+
+		//查询出来实现 Advisor 类型 然后注册到容器内的 bd，然后获取对象的实例列表
 		List<Advisor> advisors = super.findCandidateAdvisors();
-		// Build Advisors for all AspectJ aspects in the bean factory.
+
+		// Build Advisors for all AspectJ aspects in the bean factory.:Bean工厂中所有AspectJ方面的构建顾问。
 		if (this.aspectJAdvisorsBuilder != null) {
+			/**
+			 * @see BeanFactoryAspectJAdvisorsBuilderAdapter 适配器
+			 * @see BeanFactoryAspectJAdvisorsBuilder#buildAspectJAdvisors() 由 @Aspect 注解提供的增强，由当前方法构建
+			 */
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}
 		return advisors;
@@ -127,14 +150,13 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	 */
 	private class BeanFactoryAspectJAdvisorsBuilderAdapter extends BeanFactoryAspectJAdvisorsBuilder {
 
-		public BeanFactoryAspectJAdvisorsBuilderAdapter(
-				ListableBeanFactory beanFactory, AspectJAdvisorFactory advisorFactory) {
-
+		public BeanFactoryAspectJAdvisorsBuilderAdapter(ListableBeanFactory beanFactory, AspectJAdvisorFactory advisorFactory) {
 			super(beanFactory, advisorFactory);
 		}
 
 		@Override
 		protected boolean isEligibleBean(String beanName) {
+			//适配的方法
 			return AnnotationAwareAspectJAutoProxyCreator.this.isEligibleAspectBean(beanName);
 		}
 	}

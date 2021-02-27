@@ -2,6 +2,9 @@ package org.springframework.aop.framework.autoproxy;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
+import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
+import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
+import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -35,15 +38,21 @@ import java.util.List;
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator {
 
+	/**
+	 * @see 因为当前类实现类 {@link org.springframework.beans.factory.BeanFactoryAware}接口，所以会调用该方法初始化字段
+	 * @see AbstractAdvisorAutoProxyCreator#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+	 */
 	@Nullable
 	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
+		/**
+		 * @see 因为当前类实现类 {@link org.springframework.beans.factory.BeanFactoryAware}接口，所以会调用该方法初始化字段
+		 */
 		super.setBeanFactory(beanFactory);
 		if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
-			throw new IllegalArgumentException(
-					"AdvisorAutoProxyCreator requires a ConfigurableListableBeanFactory: " + beanFactory);
+			throw new IllegalArgumentException("AdvisorAutoProxyCreator requires a ConfigurableListableBeanFactory: " + beanFactory);
 		}
 		initBeanFactory((ConfigurableListableBeanFactory) beanFactory);
 	}
@@ -62,8 +71,12 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		//Eligible：有资格的
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
+
+			//没有匹配的增强，返回哨兵
 			return DO_NOT_PROXY;
 		}
+
+		//转换为数组返回
 		return advisors.toArray();
 	}
 
@@ -81,13 +94,23 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 
-		//Candidate ：候选
+		/**
+		 * Candidate ：候选
+		 * 当前方法啥有没传：获取当前项目中所有可以使用的 Advisor
+		 *
+		 * @see AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors() 看这个实现
+		 */
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 
 		//返回所有能够匹配的增强
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 
-		//模版方法
+		/**
+		 * 模版方法
+		 *
+		 * @see AspectJAwareAdvisorAutoProxyCreator#extendAdvisors(java.util.List) 看该实现，这一步会在 eligibleAdvisors 列表的头部添加一个静态实例
+		 * {@link ExposeInvocationInterceptor#ADVISOR} 细节后面说
+		 */
 		extendAdvisors(eligibleAdvisors);
 
 		if (!eligibleAdvisors.isEmpty()) {
@@ -105,7 +128,11 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findCandidateAdvisors() {
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
 
-		//Retrieval:取回，获取
+		/**
+		 * Retrieval:取回，获取
+		 *
+		 * 查询通过 bean 配置的方法 提供的 增强
+		 */
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}
 
