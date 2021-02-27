@@ -85,7 +85,7 @@ public abstract class AopNamespaceUtils {
 		 * <aop:aspectj-autoproxy  proxy-target-class = "true" />
 		 * <aop:aspectj-autoproxy expose-proxy="true"/>
 		 *
-		 * 处理2个属性
+		 * 处理2个属性，并且设置到 bd
 		 */
 		useClassProxyingIfNecessary(parserContext.getRegistry()/**spring 容器*/, sourceElement /** aop 标签*/);
 
