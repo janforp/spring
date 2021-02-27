@@ -224,7 +224,7 @@ public abstract class AopUtils {
 
 		Assert.notNull(pc, "Pointcut must not be null");
 		if (!pc.getClassFilter().matches(targetClass)) {
-			//类都匹配不上，就别看方法匹配器类
+			//类都匹配不上，就别看方法匹配器了
 			return false;
 		}
 
@@ -245,19 +245,42 @@ public abstract class AopUtils {
 			introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
 		}
 
+		//保存目标对象class以及目标对象的父类，父父类的父类.....的接口,包括自身实现的接口
 		Set<Class<?>> classes = new LinkedHashSet<>();
+
 		if (!Proxy.isProxyClass(targetClass)) {
-			//如果目标类型不是spring代理类型，则获取用户类型添加到classes
-			classes.add(ClassUtils.getUserClass(targetClass));
+			//如果目标类型不是jdk代理类型，则获取用户类型添加到classes
+
+			//则可能是cglib代理类，则 ClassUtils.getUserClass(targetClass) 方法就能保证获取到用户创建的类型
+			//如果 targetClass 是 cglib 代理类，则返回用户类型，如果 targetClass 不是 cglib 代理类，则自己返回原始类型
+			classes.add(
+
+					//保证 classes 中一定有原始对象的 class
+					ClassUtils.getUserClass(targetClass)
+			);
 		}
 
 		//获取目标类的所有接口
-		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
+		classes.addAll(
 
-		//遍历所有类型：包括目标类型以及它的所有接口
+				/**
+				 * 如果上面的 if (!Proxy.isProxyClass(targetClass)){}没有进入，则 targetClass
+				 * 可能是jdk代理类，那么也不要慌，这里的操作也能保证 classes 中一定有原始对象的 class
+				 *
+				 * 因为假设， targetClass 是 jdk 代理类，则 targetClass 肯定实现了原始接口，此处
+				 * 拿到 targetClass 所有实现的接口，肯定包括原始类了
+				 */
+				ClassUtils.getAllInterfacesForClassAsSet(targetClass)
+		);
+
+		/**
+		 * 遍历所有类型：目标对象class以及目标对象的父类，父父类的父类.....的接口,包括自身实现的接口
+		 *
+		 * 只要能够这些classes 中的任何一个 方法，则整体返回 true，循环结束
+		 */
 		for (Class<?> clazz : classes) {
 
-			//拿到当前类型所有的方法
+			//拿到当前类型 clazz 所有的方法
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 
 			for (Method method : methods) {
@@ -315,9 +338,15 @@ public abstract class AopUtils {
 			//引介增强，类匹配
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		} else if (advisor instanceof PointcutAdvisor) {
+			/**
+			 * 绝大部分是这个情况，因为我们创建的 advisor 类型 都是 org.springframework.aop.aspectj.annotation.InstantiationModelAwarePointcutAdvisorImpl
+			 * @see org.springframework.aop.aspectj.annotation.InstantiationModelAwarePointcutAdvisorImpl
+			 */
 
 			//切面增强
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+
+			//判断当前切点是否匹配当前class
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		} else {
 
@@ -341,11 +370,14 @@ public abstract class AopUtils {
 			Class<?> clazz) {//被增强的类型
 
 		if (candidateAdvisors.isEmpty()) {
+			//没有增强
 			return candidateAdvisors;
 		}
 
-		//eligible:有资格的
+		//eligible:有资格的，存匹配的增强
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
+
+		//第一次遍历
 		for (Advisor candidate : candidateAdvisors) {
 
 			//引介增强，不考虑
@@ -357,7 +389,7 @@ public abstract class AopUtils {
 		//是否有引介增强
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 
-		//在此遍历所有候选增强
+		//第二次遍历所有候选增强
 		for (Advisor candidate : candidateAdvisors) {
 			if (candidate instanceof IntroductionAdvisor) {
 				//上面已经处理过了
@@ -366,6 +398,8 @@ public abstract class AopUtils {
 			}
 
 			//下面处理非 引介增强
+
+			//是否匹配
 			if (canApply(candidate, clazz, hasIntroductions)) {
 
 				eligibleAdvisors.add(candidate);

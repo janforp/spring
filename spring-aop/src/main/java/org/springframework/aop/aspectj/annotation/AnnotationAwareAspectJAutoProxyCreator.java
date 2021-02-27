@@ -103,6 +103,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		// Build Advisors for all AspectJ aspects in the bean factory.:Bean工厂中所有AspectJ方面的构建顾问。
 		if (this.aspectJAdvisorsBuilder != null) {
 			/**
+			 * 提取有@Aspect注解类中的每个有 @Before/@After等注解的方法，然后封装成 Advisor
 			 * @see BeanFactoryAspectJAdvisorsBuilderAdapter 适配器
 			 * @see BeanFactoryAspectJAdvisorsBuilder#buildAspectJAdvisors() 由 @Aspect 注解提供的增强，由当前方法构建
 			 */

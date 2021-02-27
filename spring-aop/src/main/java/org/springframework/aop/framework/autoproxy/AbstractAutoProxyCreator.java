@@ -397,7 +397,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 			 * 根据查询到的通知
 			 * 创建增强代理对象
 			 */
-			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+			Object proxy = createProxy(
+					bean.getClass(),//目标对象类型
+					beanName, //beanName
+					specificInterceptors,//满足目标对象类型以及任何一个方法的拦截器或者增强或者advisor
+					new SingletonTargetSource(bean));//封装了一个目标对象实例
 
 			//保存代理对象类型
 			this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -499,8 +503,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 */
-	protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
-			@Nullable Object[] specificInterceptors, TargetSource targetSource) {
+	protected Object createProxy(
+			Class<?> beanClass,//目标对象类型
+			@Nullable String beanName,//beanName
+			@Nullable Object[] specificInterceptors,//满足目标对象类型以及任何一个方法的拦截器或者增强或者advisor
+			TargetSource targetSource) {//封装了一个目标对象实例
 
 		if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);

@@ -60,7 +60,7 @@ public abstract class AspectJProxyUtils {
 				}
 			}
 
-			if (foundAspectJAdvice
+			if (foundAspectJAdvice//一般true
 					&&
 
 					!advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
