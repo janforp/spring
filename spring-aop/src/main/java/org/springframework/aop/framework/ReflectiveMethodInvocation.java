@@ -185,6 +185,8 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			 * @see com.javaxxl.aop3.Main.MethodInterceptor01
 			 *
 			 * invoke 中会继续调用 当前对象的 {@link ReflectiveMethodInvocation#proceed()}方法实现遍历拦截器的效果
+			 *
+			 * 传递执行
 			 */
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.

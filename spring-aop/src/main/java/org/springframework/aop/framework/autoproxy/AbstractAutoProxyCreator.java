@@ -11,6 +11,7 @@ import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.ProxyProcessorSupport;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
+import org.springframework.aop.framework.adapter.DefaultAdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.beans.BeansException;
@@ -112,9 +113,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 
 	/**
 	 * Default is no common interceptors.
+	 *
+	 * 公共 方法拦截器，Spring 提供给使用者的扩展点，默认是没有的
 	 */
 	private String[] interceptorNames = new String[0];
 
+	/**
+	 * 公共 方法拦截器是否在最前面执行
+	 */
 	private boolean applyCommonInterceptorsFirst = true;
 
 	@Nullable
@@ -502,7 +508,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	 * @param targetSource the TargetSource for the proxy,
 	 * already pre-configured to access the bean
 	 * @return the AOP proxy for the bean
-	 * @see #buildAdvisors
+	 * @see #buildAdvisors 为好大哥(ProxyFactory)创建advisors数组，理论上这些specificInterceptors就是 Advisor 类型的，但是该方法作为一个功能较全的方法，需要考虑兼容性
 	 */
 	protected Object createProxy(
 			Class<?> beanClass,//目标对象类型
@@ -531,18 +537,31 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 				proxyFactory.setProxyTargetClass(true);
 			} else {
 
-				//评估
+				//根据beanClass(目标类)，判断是否可以使用 jdk 动态代理
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
 
+		//为好大哥(ProxyFactory)创建advisors数组，理论上这些specificInterceptors就是 Advisor 类型的，但是该方法作为一个功能较全的方法，需要考虑兼容性
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+
+		//提供给 ProxyFactory advisors 信息
 		proxyFactory.addAdvisors(advisors);
+
+		//提供给 ProxyFactory 目标对象
 		proxyFactory.setTargetSource(targetSource);
+
+		//扩展点
 		customizeProxyFactory(proxyFactory);
 
 		proxyFactory.setFrozen(this.freezeProxy);
+
+		/**
+		 * @see AbstractAdvisorAutoProxyCreator#advisorsPreFiltered() 使用该实现
+		 */
 		if (advisorsPreFiltered()) {
+
+			//如果preFiltered为 true:表示传递给 ProxyFactory 的这些 Advisor 信息做过基础匹配(ClassFilter匹配)
 			proxyFactory.setPreFiltered(true);
 		}
 
@@ -588,25 +607,51 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	}
 
 	/**
+	 * 为好大哥(ProxyFactory)创建advisors数组，理论上这些specificInterceptors就是 Advisor 类型的，但是该方法作为一个功能较全的方法，需要考虑兼容性
+	 *
 	 * Determine the advisors for the given bean, including the specific interceptors
 	 * as well as the common interceptor, all adapted to the Advisor interface.
 	 *
 	 * @param beanName the name of the bean
-	 * @param specificInterceptors the set of interceptors that is
+	 * @param specificInterceptors the set of interceptors that is 匹配当前 beanName 类型的增强!!!
 	 * specific to this bean (may be empty, but not null)
 	 * @return the list of Advisors for the given bean
+	 * @see AbstractAutoProxyCreator#createProxy(java.lang.Class, java.lang.String, java.lang.Object[], org.springframework.aop.TargetSource) 创建代理
 	 */
-	protected Advisor[] buildAdvisors(@Nullable String beanName, @Nullable Object[] specificInterceptors) {
-		// Handle prototypes correctly...
+	protected Advisor[] buildAdvisors(@Nullable String beanName,
+			@Nullable Object[] specificInterceptors) {//理论上这些specificInterceptors就是 Advisor 类型的，但是该方法作为一个功能较全的方法，需要考虑兼容性
+
+		// Handle prototypes correctly... : 正确处理原型...
+
+		/**
+		 * 公共 方法拦截器，Spring 提供给使用者的扩展点，默认是没有的
+		 * 如果要使用该扩展点的步骤：
+		 * 1.实现自己的 advice 或者 MethodInterceptor 实例，并且注入容器
+		 * 2.设置 {@link AbstractAutoProxyCreator#interceptorNames} 为第一步的时候注入的 beanName 数组
+		 *
+		 * @see AbstractAutoProxyCreator#interceptorNames
+		 */
 		Advisor[] commonInterceptors = resolveInterceptorNames();
 
+		//存储全部的方法拦截器
 		List<Object> allInterceptors = new ArrayList<>();
+
 		if (specificInterceptors != null) {
+			//匹配当前 beanName 类型的增强 不为空
+
+			//把 匹配当前 beanName 类型的增强 添加到 allInterceptors
 			allInterceptors.addAll(Arrays.asList(specificInterceptors));
+
 			if (commonInterceptors.length > 0) {
+				//如果 公共 方法拦截器也有配置
+
+				//公共 方法拦截器是否在最前面执行
 				if (this.applyCommonInterceptorsFirst) {
+					//添加到列表头部
 					allInterceptors.addAll(0, Arrays.asList(commonInterceptors));
 				} else {
+
+					//添加到列表尾部
 					allInterceptors.addAll(Arrays.asList(commonInterceptors));
 				}
 			}
@@ -618,8 +663,15 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 					" common interceptors and " + nrOfSpecificInterceptors + " specific interceptors");
 		}
 
+		//allInterceptors.size() 为所有增强的数量
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
+
 		for (int i = 0; i < allInterceptors.size(); i++) {
+
+			/**
+			 * 封装
+			 * @see DefaultAdvisorAdapterRegistry#wrap(java.lang.Object)
+			 */
 			advisors[i] = this.advisorAdapterRegistry.wrap(allInterceptors.get(i));
 		}
 		return advisors;
@@ -628,12 +680,19 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport imp
 	/**
 	 * Resolves the specified interceptor names to Advisor objects.
 	 *
+	 * 公共 方法拦截器，Spring 提供给使用者的扩展点，默认是没有的
+	 * 如果要使用该扩展点的步骤：
+	 * 1.实现自己的 advice 或者 MethodInterceptor 实例，并且注入容器
+	 * 2.设置 {@link AbstractAutoProxyCreator#interceptorNames} 为第一步的时候注入的 beanName 数组
+	 *
+	 * @see AbstractAutoProxyCreator#interceptorNames
 	 * @see #setInterceptorNames
 	 */
 	private Advisor[] resolveInterceptorNames() {
 		BeanFactory bf = this.beanFactory;
 		ConfigurableBeanFactory cbf = (bf instanceof ConfigurableBeanFactory ? (ConfigurableBeanFactory) bf : null);
 		List<Advisor> advisors = new ArrayList<>();
+
 		for (String beanName : this.interceptorNames) {
 			if (cbf == null || !cbf.isCurrentlyInCreation(beanName)) {
 				Assert.state(bf != null, "BeanFactory required for resolving interceptor names");

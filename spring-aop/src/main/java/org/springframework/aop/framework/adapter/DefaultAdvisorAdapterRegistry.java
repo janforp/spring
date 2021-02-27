@@ -3,6 +3,7 @@ package org.springframework.aop.framework.adapter;
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.Advisor;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 
 import java.io.Serializable;
@@ -39,6 +40,9 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		registerAdvisorAdapter(new ThrowsAdviceAdapter());
 	}
 
+	/**
+	 * @see AbstractAutoProxyCreator#buildAdvisors(java.lang.String, java.lang.Object[])
+	 */
 	@Override
 	public Advisor wrap(Object adviceObject) throws UnknownAdviceTypeException {
 		if (adviceObject instanceof Advisor) {

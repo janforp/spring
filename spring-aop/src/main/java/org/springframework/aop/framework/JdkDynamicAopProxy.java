@@ -127,7 +127,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		 * 获取需要代理的接口数组
 		 * 数组包括被代理接口以及Spring追加接口
 		 */
-		this.proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
+		this.proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised /**ProxyFactory**/, true);
 		/**
 		 * 查询当前所有需要代理的接口，看看是否有 equals 和 hashcode 方法，如果有，则打一个标记
 		 */
@@ -155,9 +155,14 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		 *     //代理方法
 		 *     void xx() {
 		 *     		//调用被代理对象方法
-		 *         super.h.invoke(x,xx);
+		 *         super.h.invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 *     }
 		 * }
+		 *
+		 * @see Proxy 所有jdk代理类都继承该类
+		 * @see InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+		 *
+		 * @see Proxy#h invokeHandler 实例
 		 *
 		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */

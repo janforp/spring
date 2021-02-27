@@ -62,7 +62,9 @@ public class AdvisedSupport
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 
 	/**
-	 * Whether the Advisors are already filtered for the specific target class.
+	 * Whether the Advisors are already filtered for the specific target class.:顾问程序是否已针对特定目标类进行过滤。
+	 *
+	 * 如果为 true:表示传递给 ProxyFactory 的这些 Advisor 信息做过基础匹配(ClassFilter匹配)
 	 */
 	private boolean preFiltered = false;
 

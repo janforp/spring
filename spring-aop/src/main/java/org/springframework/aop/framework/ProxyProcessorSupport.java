@@ -119,7 +119,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 							//接口确实定义了方法
 							ifc.getMethods().length > 0) {
 
-				//找到合适的，可以使用 jdk 代理的接口
+				//找到合适的接口，可以使用 jdk 代理的接口
 
 				hasReasonableProxyInterface = true;
 				break;
@@ -127,10 +127,13 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 		}
 		if (hasReasonableProxyInterface) {
 			// Must allow for introductions; can't just set interfaces to the target's interfaces only.
+			////找到合适的接口，可以使用 jdk 代理的接口
 			for (Class<?> ifc : targetInterfaces) {
+				//提供这些接口给 ProxyFactory
 				proxyFactory.addInterface(ifc);
 			}
 		} else {
+			//只能使用继承，使用 cglib
 			proxyFactory.setProxyTargetClass(true);
 		}
 	}
