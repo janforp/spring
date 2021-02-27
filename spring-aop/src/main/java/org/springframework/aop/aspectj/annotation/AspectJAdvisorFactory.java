@@ -59,6 +59,8 @@ public interface AspectJAdvisorFactory {
 	/**
 	 * Build a Spring AOP Advisor for the given AspectJ advice method.
 	 *
+	 * 把每个/当前增强方法封装传一个 Advisor 对象
+	 *
 	 * @param candidateAdviceMethod the candidate advice method
 	 * @param aspectInstanceFactory the aspect instance factory
 	 * @param declarationOrder the declaration order within the aspect
@@ -66,6 +68,7 @@ public interface AspectJAdvisorFactory {
 	 * @return {@code null} if the method is not an AspectJ advice method
 	 * or if it is a pointcut that will be used by other advice but will not
 	 * create a Spring advice in its own right
+	 * @see com.javaxxl.aop4aspect.AspectConfig 比如当前 @Aspect 对应的类就会提取出3个 Advisor 对象
 	 */
 	@Nullable
 	Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,

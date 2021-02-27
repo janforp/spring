@@ -71,6 +71,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 		List<String> aspectNames = this.aspectBeanNames;
 
 		if (aspectNames == null) {
+			//第一次来，缓存中没有 advisor 信息，需要一个一个的提取出来
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
 				if (aspectNames == null) {
@@ -115,8 +116,11 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 								/**
 								 * @see ReflectiveAspectJAdvisorFactory#getAdvisors(MetadataAwareAspectInstanceFactory) TODO
+								 * 这个方法返回指定添加类 @Aspect 注解的 class 相关的 Advisor 信息
 								 */
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+
+								//缓存机制
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
 								} else {
@@ -137,11 +141,15 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							}
 						}
 					}
+
+					//缓存
 					this.aspectBeanNames = aspectNames;
 					return advisors;
 				}
 			}
 		}
+
+		//缓存有数据
 
 		if (aspectNames.isEmpty()) {
 			return Collections.emptyList();

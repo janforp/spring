@@ -196,19 +196,48 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			annotationTypeMap.put(AfterThrowing.class, AspectJAnnotationType.AtAfterThrowing);
 		}
 
+		/**
+		 * 封装的真实的 aspect 注解:Around,After....
+		 */
 		private final A annotation;
 
+		/**
+		 * 其实就是具体的类型:将具体的注解转换为对应的枚举
+		 *
+		 * @see AspectJAnnotation#annotationTypeMap
+		 */
 		private final AspectJAnnotationType annotationType;
 
+		/**
+		 * 切点表达式
+		 *
+		 * 如：@Before(value = "test()")，@Around(value = "execution(* com.javaxxl..*.*Target(..))")等的test()，execution(* com.javaxxl..*.*Target(..))
+		 */
 		private final String pointcutExpression;
 
+		/**
+		 * 注解的 argNames 属性的值
+		 *
+		 * @see Before#argNames()
+		 *
+		 * 动态(运行时)匹配才有值
+		 */
 		private final String argumentNames;
 
 		public AspectJAnnotation(A annotation) {
 			this.annotation = annotation;
+
+			//确定类型:将具体的注解转换为对应的枚举
 			this.annotationType = determineAnnotationType(annotation);
 			try {
+				//切点表达式
 				this.pointcutExpression = resolveExpression(annotation);
+
+				/**
+				 * 提取注解的 argNames 属性的值
+				 * @see Before#argNames()
+				 * 动态(运行时)匹配才有值
+				 */
 				Object argNames = AnnotationUtils.getValue(annotation, "argNames");
 				this.argumentNames = (argNames instanceof String ? (String) argNames : "");
 			} catch (Exception ex) {
@@ -224,7 +253,15 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			throw new IllegalStateException("Unknown annotation type: " + annotation);
 		}
 
+		/**
+		 * 获取切点表达式
+		 *
+		 * @param annotation 具体的注解，如：@Before(value = "test()")，@Around(value = "execution(* com.javaxxl..*.*Target(..))")等
+		 * @return 表达式
+		 */
 		private String resolveExpression(A annotation) {
+
+			//pointcut/value2个属性
 			for (String attributeName : EXPRESSION_ATTRIBUTES) {
 				Object val = AnnotationUtils.getValue(annotation, attributeName);
 				if (val instanceof String) {
