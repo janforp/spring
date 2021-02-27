@@ -1,28 +1,4 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.aspectj.annotation;
-
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import org.aopalliance.aop.Advice;
 import org.aspectj.lang.annotation.After;
@@ -32,7 +8,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.DeclareParents;
 import org.aspectj.lang.annotation.Pointcut;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.aspectj.AbstractAspectJAdvice;
@@ -55,6 +30,14 @@ import org.springframework.util.ReflectionUtils.MethodFilter;
 import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.InstanceComparator;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * Factory that can create Spring AOP Advisors given AspectJ classes from
  * classes honoring AspectJ's annotation syntax, using reflection to invoke the
@@ -72,8 +55,7 @@ import org.springframework.util.comparator.InstanceComparator;
 public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFactory implements Serializable {
 
 	// Exclude @Pointcut methods
-	private static final MethodFilter adviceMethodFilter = ReflectionUtils.USER_DECLARED_METHODS
-			.and(method -> (AnnotationUtils.getAnnotation(method, Pointcut.class) == null));
+	private static final MethodFilter adviceMethodFilter = ReflectionUtils.USER_DECLARED_METHODS.and(method -> (AnnotationUtils.getAnnotation(method, Pointcut.class) == null));
 
 	private static final Comparator<Method> adviceMethodComparator;
 
@@ -94,10 +76,8 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		adviceMethodComparator = adviceKindComparator.thenComparing(methodNameComparator);
 	}
 
-
 	@Nullable
 	private final BeanFactory beanFactory;
-
 
 	/**
 	 * Create a new {@code ReflectiveAspectJAdvisorFactory}.
@@ -110,15 +90,15 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	 * Create a new {@code ReflectiveAspectJAdvisorFactory}, propagating the given
 	 * {@link BeanFactory} to the created {@link AspectJExpressionPointcut} instances,
 	 * for bean pointcut handling as well as consistent {@link ClassLoader} resolution.
+	 *
 	 * @param beanFactory the BeanFactory to propagate (may be {@code null}}
-	 * @since 4.3.6
 	 * @see AspectJExpressionPointcut#setBeanFactory
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getBeanClassLoader()
+	 * @since 4.3.6
 	 */
 	public ReflectiveAspectJAdvisorFactory(@Nullable BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
@@ -177,6 +157,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	 * Build a {@link org.springframework.aop.aspectj.DeclareParentsAdvisor}
 	 * for the given introduction field.
 	 * <p>Resulting Advisors will need to be evaluated for targets.
+	 *
 	 * @param introductionField the field to introspect
 	 * @return the Advisor instance, or {@code null} if not an Advisor
 	 */
@@ -195,7 +176,6 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		return new DeclareParentsAdvisor(
 				introductionField.getType(), declareParents.value(), declareParents.defaultImpl());
 	}
-
 
 	@Override
 	@Nullable
@@ -230,7 +210,6 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 		return ajexp;
 	}
-
 
 	@Override
 	@Nullable
@@ -311,7 +290,6 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		return springAdvice;
 	}
 
-
 	/**
 	 * Synthetic advisor that instantiates the aspect.
 	 * Triggered by per-clause pointcut on non-singleton aspect.
@@ -325,5 +303,4 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 					(method, args, target) -> aif.getAspectInstance());
 		}
 	}
-
 }

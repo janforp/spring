@@ -16,6 +16,8 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Simple utility class for working with the reflection API and handling
@@ -48,16 +48,15 @@ public abstract class ReflectionUtils {
 	/**
 	 * Pre-built MethodFilter that matches all non-bridge non-synthetic methods
 	 * which are not declared on {@code java.lang.Object}.
+	 *
 	 * @since 3.0.5
 	 */
-	public static final MethodFilter USER_DECLARED_METHODS =
-			(method -> !method.isBridge() && !method.isSynthetic());
+	public static final MethodFilter USER_DECLARED_METHODS = (method -> !method.isBridge() && !method.isSynthetic());
 
 	/**
 	 * Pre-built FieldFilter that matches all non-static, non-final fields.
 	 */
-	public static final FieldFilter COPYABLE_FIELDS =
-			(field -> !(Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())));
+	public static final FieldFilter COPYABLE_FIELDS = (field -> !(Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())));
 
 
 	/**

@@ -65,7 +65,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	 *
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
 	 * @see #isEligibleBean
-	 * @see AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors()
+	 * @see AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors() 该方法调用当前方法
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
 		List<String> aspectNames = this.aspectBeanNames;
@@ -74,26 +74,48 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
 				if (aspectNames == null) {
+
+					//保存查询结果 @Aspect
 					List<Advisor> advisors = new ArrayList<>();
+
+					//添加  @Aspect  的 BEAnName
 					aspectNames = new ArrayList<>();
-					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
-							this.beanFactory, Object.class, true, false);
+
+					//获取 beanFactory 中全部 beanName
+					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(this.beanFactory, Object.class, true, false);
 					for (String beanName : beanNames) {
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
+
 						// We must be careful not to instantiate beans eagerly as in this case they
 						// would be cached by the Spring container but would not have been weaved.
 						Class<?> beanType = this.beanFactory.getType(beanName, false);
 						if (beanType == null) {
+							//当前 bean 标签是 abstract = true 的适合，或者 是 parent
 							continue;
 						}
+
+						/**
+						 * @see ReflectiveAspectJAdvisorFactory 该类型实例
+						 * @see AbstractAspectJAdvisorFactory#isAspect(java.lang.Class)
+						 */
 						if (this.advisorFactory.isAspect(beanType)) {
+							// 表示当前类型以及父类..有 @Aspect 注解
+
 							aspectNames.add(beanName);
+
+							//Aspect 元数据
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
-								MetadataAwareAspectInstanceFactory factory =
-										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+								//正常情况下，都是 SINGLETON
+
+								//使用工厂模式管理 Aspect 元数据 关联 的 真实的 @Aspect 注解的 实例对象
+								MetadataAwareAspectInstanceFactory factory = new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+
+								/**
+								 * @see ReflectiveAspectJAdvisorFactory#getAdvisors(MetadataAwareAspectInstanceFactory) TODO
+								 */
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
@@ -101,14 +123,15 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 									this.aspectFactoryCache.put(beanName, factory);
 								}
 								advisors.addAll(classAdvisors);
-							} else {
+							}
+
+							//不考虑，属于 aspect 高级用法
+							else {
 								// Per target or per this.
 								if (this.beanFactory.isSingleton(beanName)) {
-									throw new IllegalArgumentException("Bean with name '" + beanName +
-											"' is a singleton, but aspect instantiation model is not singleton");
+									throw new IllegalArgumentException("Bean with name '" + beanName + "' is a singleton, but aspect instantiation model is not singleton");
 								}
-								MetadataAwareAspectInstanceFactory factory =
-										new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
+								MetadataAwareAspectInstanceFactory factory = new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
 								this.aspectFactoryCache.put(beanName, factory);
 								advisors.addAll(this.advisorFactory.getAdvisors(factory));
 							}

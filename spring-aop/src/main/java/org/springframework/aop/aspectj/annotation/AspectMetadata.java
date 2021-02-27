@@ -1,35 +1,18 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.aspectj.annotation;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.AjType;
 import org.aspectj.lang.reflect.AjTypeSystem;
 import org.aspectj.lang.reflect.PerClauseKind;
-
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.aspectj.TypePatternClassFilter;
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.aop.support.ComposablePointcut;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 /**
  * Metadata for an AspectJ aspect class, with an additional Spring AOP pointcut
@@ -40,8 +23,8 @@ import org.springframework.aop.support.ComposablePointcut;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @since 2.0
  * @see org.springframework.aop.aspectj.AspectJExpressionPointcut
+ * @since 2.0
  */
 @SuppressWarnings("serial")
 public class AspectMetadata implements Serializable {
@@ -72,10 +55,10 @@ public class AspectMetadata implements Serializable {
 	 */
 	private final Pointcut perClausePointcut;
 
-
 	/**
 	 * Create a new AspectMetadata instance for the given aspect class.
-	 * @param aspectClass the aspect class
+	 *
+	 * @param aspectClass the aspect class 有@Aspect注解的类
 	 * @param aspectName the name of the aspect
 	 */
 	public AspectMetadata(Class<?> aspectClass, String aspectName) {
@@ -95,6 +78,7 @@ public class AspectMetadata implements Serializable {
 			throw new IllegalArgumentException("Class '" + aspectClass.getName() + "' is not an @AspectJ aspect");
 		}
 		if (ajType.getDeclarePrecedence().length > 0) {
+			//Spring AOP目前不支持DeclarePrecedence
 			throw new IllegalArgumentException("DeclarePrecedence not presently supported in Spring AOP");
 		}
 		this.aspectClass = ajType.getJavaClass();
@@ -102,6 +86,7 @@ public class AspectMetadata implements Serializable {
 
 		switch (this.ajType.getPerClause().getKind()) {
 			case SINGLETON:
+				// 一般是这个
 				this.perClausePointcut = Pointcut.TRUE;
 				return;
 			case PERTARGET:
@@ -131,7 +116,6 @@ public class AspectMetadata implements Serializable {
 		int endIndex = str.length() - 1;
 		return str.substring(beginIndex, endIndex);
 	}
-
 
 	/**
 	 * Return AspectJ reflection information.
@@ -185,10 +169,8 @@ public class AspectMetadata implements Serializable {
 		return (isPerThisOrPerTarget() || isPerTypeWithin());
 	}
 
-
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
 		inputStream.defaultReadObject();
 		this.ajType = AjTypeSystem.getAjType(this.aspectClass);
 	}
-
 }

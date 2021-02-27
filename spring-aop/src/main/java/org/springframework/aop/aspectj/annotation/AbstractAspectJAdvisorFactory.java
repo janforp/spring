@@ -16,15 +16,6 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.annotation.After;
@@ -37,11 +28,19 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.AjType;
 import org.aspectj.lang.reflect.AjTypeSystem;
 import org.aspectj.lang.reflect.PerClauseKind;
-
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.Nullable;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Abstract base class for factories that can create Spring AOP Advisors
@@ -60,14 +59,14 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	private static final String AJC_MAGIC = "ajc$";
 
 	private static final Class<?>[] ASPECTJ_ANNOTATION_CLASSES = new Class<?>[] {
-			Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class};
+			Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class };
 
-
-	/** Logger available to subclasses. */
+	/**
+	 * Logger available to subclasses.
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	protected final ParameterNameDiscoverer parameterNameDiscoverer = new AspectJAnnotationParameterNameDiscoverer();
-
 
 	/**
 	 * We consider something to be an AspectJ aspect suitable for use by the Spring AOP system
@@ -77,7 +76,14 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	 */
 	@Override
 	public boolean isAspect(Class<?> clazz) {
-		return (hasAspectAnnotation(clazz) && !compiledByAjc(clazz));
+		return (
+
+				//有 @Aspect 注解
+				hasAspectAnnotation(clazz)
+						&&
+						//TODO ？
+						!compiledByAjc(clazz)
+		);
 	}
 
 	private boolean hasAspectAnnotation(Class<?> clazz) {
@@ -85,14 +91,19 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	}
 
 	/**
-	 * We need to detect this as "code-style" AspectJ aspects should not be
-	 * interpreted by Spring AOP.
+	 * We need to detect this as "code-style" AspectJ aspects should not be interpreted by Spring AOP.
+	 * -- 我们需要将其检测为Spring AOP不应解释的“代码样式” AspectJ方面。
 	 */
 	private boolean compiledByAjc(Class<?> clazz) {
 		// The AJTypeSystem goes to great lengths to provide a uniform appearance between code-style and
 		// annotation-style aspects. Therefore there is no 'clean' way to tell them apart. Here we rely on
 		// an implementation detail of the AspectJ compiler.
+
+		// -- AJTypeSystem竭尽全力在代码样式和注释样式之间提供统一的外观。因此，没有“干净的”方式将它们区分开。在这里，我们依靠AspectJ编译器的实现细节。
+
 		for (Field field : clazz.getDeclaredFields()) {
+
+			//TODO : private static final String AJC_MAGIC = "ajc$";
 			if (field.getName().startsWith(AJC_MAGIC)) {
 				return true;
 			}
@@ -144,31 +155,35 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		A result = AnnotationUtils.findAnnotation(method, toLookFor);
 		if (result != null) {
 			return new AspectJAnnotation<>(result);
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
 
-
 	/**
 	 * Enum for AspectJ annotation types.
+	 *
 	 * @see AspectJAnnotation#getAnnotationType()
 	 */
 	protected enum AspectJAnnotationType {
 
-		AtPointcut, AtAround, AtBefore, AtAfter, AtAfterReturning, AtAfterThrowing
+		AtPointcut,
+		AtAround,
+		AtBefore,
+		AtAfter,
+		AtAfterReturning,
+		AtAfterThrowing
 	}
-
 
 	/**
 	 * Class modelling an AspectJ annotation, exposing its type enumeration and
 	 * pointcut String.
+	 *
 	 * @param <A> the annotation type
 	 */
 	protected static class AspectJAnnotation<A extends Annotation> {
 
-		private static final String[] EXPRESSION_ATTRIBUTES = new String[] {"pointcut", "value"};
+		private static final String[] EXPRESSION_ATTRIBUTES = new String[] { "pointcut", "value" };
 
 		private static Map<Class<?>, AspectJAnnotationType> annotationTypeMap = new HashMap<>(8);
 
@@ -196,8 +211,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 				this.pointcutExpression = resolveExpression(annotation);
 				Object argNames = AnnotationUtils.getValue(annotation, "argNames");
 				this.argumentNames = (argNames instanceof String ? (String) argNames : "");
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				throw new IllegalArgumentException(annotation + " is not a valid AspectJ annotation", ex);
 			}
 		}
@@ -245,7 +259,6 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		}
 	}
 
-
 	/**
 	 * ParameterNameDiscoverer implementation that analyzes the arg names
 	 * specified at the AspectJ annotation level.
@@ -269,8 +282,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 					names[i] = nameTokens.nextToken();
 				}
 				return names;
-			}
-			else {
+			} else {
 				return null;
 			}
 		}
