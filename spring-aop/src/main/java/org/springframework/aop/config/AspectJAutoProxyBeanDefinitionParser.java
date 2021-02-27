@@ -13,19 +13,7 @@ import org.w3c.dom.NodeList;
 /**
  * 自定义标签 ：<aop:aspectj-autoproxy/> 的解析器
  *
- * <?xml version="1.0" encoding="UTF-8"?>
- * <beans xmlns="http://www.springframework.org/schema/beans"
- * xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
- * xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
- *
- * <!--	开启Aop-->
- * <aop:aspectj-autoproxy/>
- *
- * <bean class="com.javaxxl.aop4aspect.AspectConfig" id="aspectConfig"/>
- *
- * <bean class="com.javaxxl.aop4aspect.TargetInterfaceTestImpl" id="targetInterfaceTest"/>
- * </beans>
- *
+ * <aop:aspectj-autoproxy/> 处理自定义标签
  *
  * {@link BeanDefinitionParser} for the {@code aspectj-autoproxy} tag,
  * enabling the automatic application of @AspectJ-style aspects found in
@@ -40,14 +28,17 @@ import org.w3c.dom.NodeList;
 class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**
-	 * @param element 标签
-	 * @param parserContext 封装解析过程当前状态的对象，内部持有 readContext,readContext持有registry也就是咋们的BeanFactory
+	 * @param element 标签:<aop:aspectj-autoproxy/> 处理自定义标签
+	 * @param parserContext 封装解析过程当前状态的对象，内部持有 readContext,
+	 * readContext持有registry也就是咋们的BeanFactory
 	 */
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		/**
 		 * @see AopConfigUtils
+		 *
+		 * 方法名称：如有必要，注册Aspect J注释自动代理创建器
 		 */
 		AopNamespaceUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext, element);
 		extendBeanDefinition(element, parserContext);

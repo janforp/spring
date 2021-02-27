@@ -4,7 +4,11 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
 	<!--	开启Aop-->
-	<aop:aspectj-autoproxy/>
+	<aop:aspectj-autoproxy expose-proxy=""/>
+
+	<!--	<aop:aspectj-autoproxy expose-proxy="true"/>-->
+
+	<!--	<aop:aspectj-autoproxy  proxy-target-class = "true" />-->
 
 	<bean class="com.javaxxl.aop4aspect.AspectConfig" id="aspectConfig"/>
 
