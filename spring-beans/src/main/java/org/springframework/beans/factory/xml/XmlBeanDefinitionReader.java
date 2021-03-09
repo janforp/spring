@@ -553,6 +553,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		 * dom reader
 		 * 创建一个 BeanDefinitionDocumentReader ，一个 BeanDefinitionDocumentReader 只能处理一个 document 对象！！！
 		 * 每个 document 对象都会创建一个 BeanDefinitionDocumentReader 对象去处理自己
+		 * @see DefaultBeanDefinitionDocumentReader 一般是该类型的实例
 		 */
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
 		int countBefore = getRegistry().//该方法会返回beanFactory实例

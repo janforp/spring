@@ -595,6 +595,8 @@ public class BeanDefinitionParserDelegate {
 			 */
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 
+			//***********************下面的是解析bean标签里面的子标签，上面的是解析bean标签的属性
+
 			/**
 			 * 设置描述信息到 bd 中
 			 * description 子标签
@@ -1111,7 +1113,7 @@ public class BeanDefinitionParserDelegate {
 					try {
 						//给解析起对象设置状态，表示正在解析 constructor 参数
 						this.parseState.push(new ConstructorArgumentEntry(index));
-						//解析 constructor-arg 标签完成，返回解析完成后的封装的对象
+						//解析 constructor-arg 标签完成，返回解析完成后的封装的对象,如果是 value 跟 ref 返回的对象是不一样的
 						Object value = parsePropertyValue(ele, bd, null);
 						ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 						if (StringUtils.hasLength(typeAttr)) {
@@ -1128,6 +1130,11 @@ public class BeanDefinitionParserDelegate {
 							//索引1的构造函数-arg条目不明确
 							error("Ambiguous constructor-arg entries for index " + index, ele);
 						} else {
+							//<bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+							//		<constructor-arg index="0" value="1"/>
+							//		<constructor-arg index="1" value="小刘"/>
+							//	</bean>
+							// 这样的配置，<constructor-arg index="0" value="1"/> 就会进入该方法
 							bd.getConstructorArgumentValues().addIndexedArgumentValue(index, valueHolder);
 						}
 					} finally {
@@ -1137,7 +1144,7 @@ public class BeanDefinitionParserDelegate {
 			} catch (NumberFormatException ex) {
 				error("Attribute 'index' of tag 'constructor-arg' must be an integer", ele);
 			}
-		} else {
+		} else { // <constructor-arg name="teacher" ref="teacher"/> 会走该分支
 			try {
 				this.parseState.push(new ConstructorArgumentEntry());
 				Object value = parsePropertyValue(ele, bd, null);
@@ -1246,7 +1253,7 @@ public class BeanDefinitionParserDelegate {
 
 		// Should only have one child element: ref, value, list, etc.
 		NodeList nl = ele.getChildNodes();
-		Element subElement = null;
+		Element subElement = null;//如果subElement为null，说明没有子标签
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT) && !nodeNameEquals(node, META_ELEMENT)) {

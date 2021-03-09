@@ -248,7 +248,12 @@ public abstract class AbstractBeanDefinition
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
 	/**
-	 * init-method 属性
+	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+	 * <constructor-arg index="0" value="1"/>
+	 * <constructor-arg index="1" value="小刘"/>
+	 * </bean>
+	 *
+	 * 该字段存储的就是 start
 	 */
 	@Nullable
 	private String initMethodName;

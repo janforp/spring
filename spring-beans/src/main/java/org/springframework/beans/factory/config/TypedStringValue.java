@@ -9,6 +9,8 @@ import org.springframework.util.ObjectUtils;
 /**
  * <property name="id" value="1"/> 封装这样的属性注入
  *
+ * <constructor-arg index="0" value="1"/> 也会被封装为这样的对象
+ *
  *
  * Holder for a typed String value. Can be added to bean definitions
  * in order to explicitly specify a target type for a String value,
@@ -24,6 +26,9 @@ import org.springframework.util.ObjectUtils;
  */
 public class TypedStringValue implements BeanMetadataElement {
 
+	/**
+	 * 如果为<constructor-arg index="0" value="1"/>，则该字段为 1
+	 */
 	@Nullable
 	private String value;
 

@@ -1,7 +1,5 @@
 package com.javaxxl.bpp;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * Student
  *
@@ -14,15 +12,15 @@ public class Student {
 
 	private String name;
 
-	@Autowired
 	private Teacher teacher;
 
 	public Student() {
 	}
 
-	public Student(int id, String name) {
+	public Student(int id, String name, Teacher teacher) {
 		this.id = id;
 		this.name = name;
+		this.teacher = teacher;
 	}
 
 	public void start() {

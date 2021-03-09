@@ -28,6 +28,11 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class PropertyValue extends BeanMetadataAttributeAccessor implements Serializable {
 
+	/**
+	 * <property name="id" value="1"/>
+	 * <property name="name" value="小刘"/>
+	 * <property name="subject" value="脱发小刘"/>
+	 */
 	private final String name;
 
 	@Nullable
@@ -203,5 +208,4 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	public String toString() {
 		return "bean property '" + this.name + "'";
 	}
-
 }

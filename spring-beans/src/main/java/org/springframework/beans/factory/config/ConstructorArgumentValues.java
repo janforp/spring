@@ -29,6 +29,13 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * 指定了 index  的
+	 * <!--	注释-->
+	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+	 * ----<constructor-arg index="0" value="1"/>
+	 * ----<constructor-arg index="1" value="小刘"/>
+	 * </bean>
+	 *
+	 * 这样的类型的构造器注入就会把值存入在这个map
 	 */
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
@@ -39,6 +46,12 @@ public class ConstructorArgumentValues {
 
 	/**
 	 * Create a new empty ConstructorArgumentValues object.
+	 *
+	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+	 * --- 		<constructor-arg name="teacher" ref="teacher"/>
+	 * </bean>
+	 *
+	 * 如果为 <constructor-arg name="teacher" ref="teacher"/> 这样的配置
 	 */
 	public ConstructorArgumentValues() {
 	}
@@ -440,13 +453,18 @@ public class ConstructorArgumentValues {
 	 */
 	public static class ValueHolder implements BeanMetadataElement {
 
+		/**
+		 * 解析 constructor-arg 标签完成，返回解析完成后的封装的对象,如果是 value 跟 ref 返回的对象是不一样的
+		 * <constructor-arg index="0" value="1"/> 这样的 value 则该对象的类型为{@link TypedStringValue}
+		 * <constructor-arg index="0" ref="beanName"/> 这样的 ref 则该对象的类型为 {@link RuntimeBeanReference}
+		 */
 		@Nullable
 		private Object value;
 
-		@Nullable
+		@Nullable//java 类型,如果 <constructor-arg index="0" type="int" value="1"/>，则为 int
 		private String type;
 
-		@Nullable
+		@Nullable //如果 		<constructor-arg name="teacher" ref="teacher"/> 则为 teacher
 		private String name;
 
 		/**

@@ -20,8 +20,8 @@ com/javaxxl/replacemethod/TestChangeMethod.java
  com.javaxxl.replacemethod.TestChangeMethod
 com/javaxxl/User.java
  com.javaxxl.User
-com/javaxxl/bpp/Student.java
- com.javaxxl.bpp.Student
+com/javaxxl/classutils/Main.java
+ com.javaxxl.classutils.Main
 com/javaxxl/lookup/GetBeanTest.java
  com.javaxxl.lookup.GetBeanTest
 com/javaxxl/circular/B.java
@@ -89,6 +89,17 @@ com/javaxxl/aop2/Main.java
  com.javaxxl.aop2.Main$1
  com.javaxxl.aop2.Main$MethodInterceptor01
  com.javaxxl.aop2.Main$MethodInterceptor02
+com/javaxxl/aop3/Main.java
+ com.javaxxl.aop3.Main
+ com.javaxxl.aop3.Main$1
+ com.javaxxl.aop3.Main$MethodInterceptor01
+ com.javaxxl.aop3.Main$MethodInterceptor02
+ com.javaxxl.aop3.Main$MyPointCut
+ com.javaxxl.aop3.Main$MyPointCut$1
+com/javaxxl/publicevent/EatEventListener.java
+ com.javaxxl.publicevent.EatEventListener
+com/javaxxl/bpp/Student.java
+ com.javaxxl.bpp.Student
 com/javaxxl/publicevent/EventMain.java
  com.javaxxl.publicevent.EventMain
 com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
@@ -103,8 +114,6 @@ com/javaxxl/propertyeditor/PropertyEditorMain.java
  com.javaxxl.propertyeditor.PropertyEditorMain
 com/javaxxl/BeanFactoryTest.java
  com.javaxxl.BeanFactoryTest
-com/javaxxl/classutils/Main.java
- com.javaxxl.classutils.Main
 com/javaxxl/replacemethod/MethodReplacerTest.java
  com.javaxxl.replacemethod.MethodReplacerTest
 com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
@@ -115,18 +124,9 @@ com/javaxxl/lifecycle/LifeCycleMain.java
  com.javaxxl.lifecycle.LifeCycleMain
 com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
  com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
-com/javaxxl/publicevent/EatEventListener.java
- com.javaxxl.publicevent.EatEventListener
 com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/javaxxl/bpp/BppMain.java
  com.javaxxl.bpp.BppMain
 com/javaxxl/Main.java
  com.javaxxl.Main
-com/javaxxl/aop3/Main.java
- com.javaxxl.aop3.Main
- com.javaxxl.aop3.Main$1
- com.javaxxl.aop3.Main$MethodInterceptor01
- com.javaxxl.aop3.Main$MethodInterceptor02
- com.javaxxl.aop3.Main$MyPointCut
- com.javaxxl.aop3.Main$MyPointCut$1

@@ -1,6 +1,6 @@
 package com.shengsiyuan.spring.lecture;
 
-import com.javaxxl.UserService;
+import com.javaxxl.bpp.Student;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -26,17 +26,21 @@ public class SpringClient {
 	 * 8.通过 BeanDefinitionParserDelegate 对象在解析 XML 文件时，又使用了模版方法设计模式（pre,process,post）
 	 * 9.当所有 Bean 标签元素都解析完毕后，开始定义一个 BeanDefinition 对象，该对象是一个非常重要的对象，里面容纳了一个 Bean 相关的所有属性
 	 * 10.BeanDefinition 对象创建完成后，Spring 又会创建一个 BeanDefinitionHolder 对象来持有这个 BeanDefinition 对象
-	 * 11.BeanDefinitionHolder 对象主要包含3 部分内容，beanName,alais,bd
+	 * 11.BeanDefinitionHolder 对象主要包含3 部分内容，beanName,alias,bd
 	 * 12.工厂将解析出来的 Bean 信息存放在一个 并发Map 中，该Map的 beanName 唯一，值为 bd 对象
 	 * 13.调用 Bean  解析完毕触发动作，从而触发相应的监听器的方法执行（观察者模式）
 	 */
 	public static void main(String[] args) {
-		Resource resource = new ClassPathResource("spring-test.xml");
+		Resource resource = new ClassPathResource("spring-construct-property.xml");
 		DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
+		//load 配置文件, 解析配置文件中的 <bean> 标签成 bd，然后
+		// 注册到工厂
 		reader.loadBeanDefinitions(resource);
 
-		UserService service = (UserService) factory.getBean("userService");
+		//上面是解析配置文件，并且解析配置文件，生成 BeanDefinition 并且注册到工厂中
+
+		Student service = (Student) factory.getBean("student");
 		System.out.println(service);
 	}
 }
