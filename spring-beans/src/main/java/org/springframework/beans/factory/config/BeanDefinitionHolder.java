@@ -28,8 +28,14 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
 	 */
 	private final BeanDefinition beanDefinition;
 
+	/**
+	 * 注册到factory的时候使用
+	 */
 	private final String beanName;
 
+	/**
+	 * 会注册到factory
+	 */
 	@Nullable
 	private final String[] aliases;
 

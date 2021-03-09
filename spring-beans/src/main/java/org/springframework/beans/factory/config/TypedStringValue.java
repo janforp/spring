@@ -7,6 +7,9 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * <property name="id" value="1"/> 封装这样的属性注入
+ *
+ *
  * Holder for a typed String value. Can be added to bean definitions
  * in order to explicitly specify a target type for a String value,
  * for example for collection elements.

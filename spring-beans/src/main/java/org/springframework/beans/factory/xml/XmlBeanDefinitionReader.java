@@ -10,6 +10,7 @@ import org.springframework.beans.factory.parsing.ReaderEventListener;
 import org.springframework.beans.factory.parsing.SourceExtractor;
 import org.springframework.beans.factory.support.AbstractBeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.io.DescriptiveResource;
@@ -568,7 +569,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				 * @see XmlReaderContext#XmlReaderContext(org.springframework.core.io.Resource, org.springframework.beans.factory.parsing.ProblemReporter, org.springframework.beans.factory.parsing.ReaderEventListener, org.springframework.beans.factory.parsing.SourceExtractor, org.springframework.beans.factory.xml.XmlBeanDefinitionReader, org.springframework.beans.factory.xml.NamespaceHandlerResolver)
 				 */
 				createReaderContext(resource));
-
+		/**
+		 * 获取本次resource注册的bd数量
+		 * @see DefaultListableBeanFactory#beanDefinitionMap 的数量就是当前工厂中所有的 bd 数量
+		 */
 		return getRegistry().getBeanDefinitionCount()//解析 当前 doc 之后的注册 bd
 
 				- countBefore;

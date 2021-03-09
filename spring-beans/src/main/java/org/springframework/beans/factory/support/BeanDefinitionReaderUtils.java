@@ -20,6 +20,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.core.SimpleAliasRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -50,8 +51,8 @@ public abstract class BeanDefinitionReaderUtils {
 	 * </bean>
 	 *
 	 * 则参数：
-	 * Create a new GenericBeanDefinition for the given parent name and class name,
-	 * eagerly loading the bean class if a ClassLoader has been specified.
+	 * Create a new GenericBeanDefinition for the given parent name and class name, eagerly loading the bean class if a ClassLoader has been specified.
+	 * 为给定的父名称和类名称创建一个新的GenericBeanDefinition，如果已指定ClassLoader，则急于加载Bean类。(beanClass)
 	 *
 	 * @param parentName the name of the parent bean, if any 为null
 	 * @param className the name of the bean class, if any 为 com.javaxxl.ComponentA
@@ -67,10 +68,23 @@ public abstract class BeanDefinitionReaderUtils {
 		bd.setParentName(parentName);
 		if (className != null) {
 			if (classLoader != null) {
+				//如果有类加载器，则通过方式加载class到jvm
 				//通过反射的方式设置  beanClass 字段
-				bd.setBeanClass(ClassUtils.forName(className, classLoader));
+				bd.setBeanClass(
+
+						/**
+						 * 获取 className 对应的 Class 对象
+						 * @see AbstractBeanDefinition#hasBeanClass()
+						 * @see AbstractBeanDefinition#beanClass 为 Class 对象
+						 */
+						ClassUtils.forName(className, classLoader)
+				);
 			} else {
-				//否则保留 bean 的class属性值
+
+				/**
+				 * 如果没有类加载器，则保留 bean 的class属性值
+				 * @see AbstractBeanDefinition#beanClass 为字符串
+				 */
 				bd.setBeanClassName(className);
 			}
 		}
@@ -122,8 +136,7 @@ public abstract class BeanDefinitionReaderUtils {
 			}
 		}
 		if (!StringUtils.hasText(generatedBeanName)) {
-			throw new BeanDefinitionStoreException("Unnamed bean definition specifies neither " +
-					"'class' nor 'parent' nor 'factory-bean' - can't generate bean name");
+			throw new BeanDefinitionStoreException("Unnamed bean definition specifies neither 'class' nor 'parent' nor 'factory-bean' - can't generate bean name");
 		}
 
 		if (isInnerBean) {
@@ -132,6 +145,7 @@ public abstract class BeanDefinitionReaderUtils {
 		}
 
 		// Top-level bean: use plain class name with unique suffix if necessary.
+		//顶级bean：必要时使用带有唯一后缀的普通类名。
 		return uniqueBeanName(generatedBeanName, registry);
 	}
 
@@ -149,9 +163,10 @@ public abstract class BeanDefinitionReaderUtils {
 		String id = beanName;
 		int counter = -1;
 
-		// Increase counter until the id is unique.
+		// Increase counter until the id is unique.一个 # 号
 		String prefix = beanName + GENERATED_BEAN_NAME_SEPARATOR;
 		while (counter == -1 || registry.containsBeanDefinition(id)) {
+			//保证唯一性
 			counter++;
 			id = prefix + counter;
 		}
@@ -161,20 +176,35 @@ public abstract class BeanDefinitionReaderUtils {
 	/**
 	 * Register the given bean definition with the given bean factory.
 	 *
+	 * --在给定的bean工厂中注册给定的bean定义。
+	 *
 	 * @param definitionHolder the bean definition including name and aliases 解析xml标签得到的 bdHolder
 	 * @param registry the bean factory to register with 注册中心
 	 * @throws BeanDefinitionStoreException if registration failed
 	 */
-	public static void registerBeanDefinition(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry) throws BeanDefinitionStoreException {
+	public static void registerBeanDefinition(
+			BeanDefinitionHolder definitionHolder,//bd，完成的<bean>标签
+			BeanDefinitionRegistry registry)//工厂
+
+			throws BeanDefinitionStoreException {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
+
+		/**
+		 * 注册bd到registry
+		 * @see DefaultListableBeanFactory#registerBeanDefinition(java.lang.String, org.springframework.beans.factory.config.BeanDefinition)
+		 * @see DefaultListableBeanFactory#beanDefinitionMap 其实就保存到这里了
+		 */
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
-		// Register aliases for bean name, if any.
+		// Register aliases for bean name, if any.：注册bean名称的别名（如果有）。
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
 			for (String alias : aliases) {
+				/**
+				 * @see SimpleAliasRegistry#registerAlias(java.lang.String, java.lang.String)
+				 */
 				registry.registerAlias(beanName, alias);
 			}
 		}

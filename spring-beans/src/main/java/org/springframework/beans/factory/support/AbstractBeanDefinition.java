@@ -5,6 +5,9 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.Resource;
@@ -147,13 +150,17 @@ public abstract class AbstractBeanDefinition
 	public static final String INFER_METHOD = "(inferred)";
 
 	/**
-	 * TODO 这个 beanClass 可能是String className 也可能是 Class<?> beanClass
+	 * TODO 这个 beanClass 可能是String className 也可能是 Class<?> beanClass 后面通过 instanceof 去判断
 	 *
 	 * @see BeanDefinitionReaderUtils#createBeanDefinition(java.lang.String, java.lang.String, java.lang.ClassLoader)
+	 * @see AbstractBeanDefinition#hasBeanClass()
 	 */
 	@Nullable
 	private volatile Object beanClass;
 
+	/**
+	 * scope = ""/"singleton"
+	 */
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
 
@@ -191,6 +198,9 @@ public abstract class AbstractBeanDefinition
 	 */
 	private boolean primary = false;
 
+	/**
+	 * @see BeanDefinitionParserDelegate#parseQualifierElement(org.w3c.dom.Element, org.springframework.beans.factory.support.AbstractBeanDefinition)
+	 */
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
 	@Nullable
@@ -222,6 +232,13 @@ public abstract class AbstractBeanDefinition
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+	/**
+	 * <property name="id" value="1"/> 标签解析之后会存入这里
+	 *
+	 * @see BeanDefinitionParserDelegate#parsePropertyElement(org.w3c.dom.Element, org.springframework.beans.factory.config.BeanDefinition)
+	 * @see RuntimeBeanReference 如果 <property name="id" ref="beanName"/>
+	 * @see TypedStringValue 如果 <property name="id" value="1"/>
+	 */
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
@@ -260,6 +277,9 @@ public abstract class AbstractBeanDefinition
 	@Nullable
 	private String description;
 
+	/**
+	 * classPath资源
+	 */
 	@Nullable
 	private Resource resource;
 
@@ -456,12 +476,15 @@ public abstract class AbstractBeanDefinition
 
 	/**
 	 * Return the current bean class name of this bean definition.
+	 *
+	 * @see BeanDefinitionReaderUtils#createBeanDefinition(java.lang.String, java.lang.String, java.lang.ClassLoader) 在该方法中会给 beanClass 字段赋值
 	 */
 	@Override
 	@Nullable
 	public String getBeanClassName() {
 		Object beanClassObject = this.beanClass;
 		if (beanClassObject instanceof Class) {
+			//
 			return ((Class<?>) beanClassObject).getName();
 		} else {
 			return (String) beanClassObject;
@@ -546,7 +569,9 @@ public abstract class AbstractBeanDefinition
 
 	/**
 	 * Set the name of the target scope for the bean.
-	 * <p>The default is singleton status, although this is only applied once
+	 * <p>The default is singleton status -- 默认为单身状态
+	 *
+	 * , although this is only applied once
 	 * a bean definition becomes active in the containing factory. A bean
 	 * definition may eventually inherit its scope from a parent bean definition.
 	 * For this reason, the default scope name is an empty string (i.e., {@code ""}),

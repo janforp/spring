@@ -6,6 +6,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.lang.Nullable;
@@ -89,6 +90,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		 * 	<bean id="componentA" class="com.javaxxl.ComponentA"/>
 		 * 	<bean id="componentB" class="com.javaxxl.ComponentB"/>
 		 * </beans>
+		 *
+		 * 底层真正完成元素的解析，并且注册到工厂
+		 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到map
 		 */
 		doRegisterBeanDefinitions(doc.getDocumentElement());
 	}
@@ -184,6 +188,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		preProcessXml(root);
 		/**
 		 * 真正逻辑
+		 * 底层真正完成元素的解析，并且注册到工厂
+		 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到map
 		 */
 		parseBeanDefinitions(root, this.delegate);
 		/**
@@ -216,8 +222,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Parse the elements at the root level in the document: "import", "alias", "bean".
 	 * -- 在文档的根级别上解析元素：“ import”，“ alias”，“ bean”。
 	 *
+	 * 底层真正完成元素的解析，并且注册到工厂
+	 *
 	 * @param root the DOM root element of the document
 	 * @param delegate 解析该 dom 是委托给该对象进行的
+	 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到map
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 
@@ -271,7 +280,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * 真正完成元素的解析
+	 * 真正完成元素的解析，并且注册到工厂
+	 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到map
 	 *
 	 * @param ele <bean></bean>,<alais></alais>,<import></import>等根元素
 	 * @param delegate 委托对象
@@ -394,7 +404,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	/**
 	 * Process the given bean element, parsing the bean definition
+	 * -- 第一步：处理给定的bean元素，解析bean定义
+	 *
 	 * and registering it with the registry.
+	 * -- 第二步：把bd注册到registry
 	 *
 	 * @param ele <bean id="componentB" class="com.javaxxl.ComponentB"/>
 	 */
@@ -402,8 +415,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		//通过该方法就把一个<bean>标签解析成一个 bd
 
 		/**
-		 * 解析 bean 标签,<bean> 标签中所有的属性，配置都已经解析出来，并已经放到 {@link BeanDefinitionHolder#beanDefinition} 中了
-		 * 解析完成之后返回一个 bdHolder，主要保存了别名信息
+		 * 解析 bean 标签,<bean> 标签中所有的属性，配置都已经解析出来，
+		 * 并已经放到 {@link BeanDefinitionHolder#beanDefinition} 中了
+		 * 解析完成之后返回一个 bdHolder，主要保存了别名信息以及bd以及别名
+		 *
+		 * 一个BeanDefinitionHolder 其实就维护了一个 <bean></bean>的完整定义
 		 */
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
@@ -415,14 +431,21 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				/**
 				 * Register the final decorated instance.注册bd
 				 * 将 bd 注册到容器中 注册中心实例：DefaultListableBeanFactory
+				 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到这个map中
 				 */
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+				BeanDefinitionReaderUtils.registerBeanDefinition(
+
+						bdHolder,
+
+						//注册表，其实就是工厂
+						getReaderContext().getRegistry());
+
 				//上面代码执行之后，bd已经注册到register中了
 			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
-			// Send registration event.发送bd注册完成的事件
+			// Send registration event.触发bd注册完成的事件，观察者模式
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}

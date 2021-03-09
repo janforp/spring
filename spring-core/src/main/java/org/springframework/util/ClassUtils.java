@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.util;
 
 import org.springframework.lang.Nullable;
@@ -246,8 +230,11 @@ public abstract class ClassUtils {
 	/**
 	 * Replacement for {@code Class.forName()} that also returns Class instances
 	 * for primitives (e.g. "int") and array class names (e.g. "String[]").
+	 * -- 替换为{@code Class.forName（）}，该函数还返回基元（例如“ int”）和数组类名称（例如“ String []”）的Class实例。
+	 *
 	 * Furthermore, it is also capable of resolving inner class names in Java source
 	 * style (e.g. "java.lang.Thread.State" instead of "java.lang.Thread$State").
+	 * -- 此外，它还能够解析Java源样式的内部类名称（例如，“ java.lang.Thread.State”而不是“ java.lang.Thread $ State”）。
 	 *
 	 * @param name the name of the Class
 	 * @param classLoader the class loader to use
@@ -257,8 +244,7 @@ public abstract class ClassUtils {
 	 * @throws LinkageError if the class file could not be loaded
 	 * @see Class#forName(String, boolean, ClassLoader)
 	 */
-	public static Class<?> forName(String name, @Nullable ClassLoader classLoader)
-			throws ClassNotFoundException, LinkageError {
+	public static Class<?> forName(String name, @Nullable ClassLoader classLoader) throws ClassNotFoundException, LinkageError {
 
 		Assert.notNull(name, "Name must not be null");
 

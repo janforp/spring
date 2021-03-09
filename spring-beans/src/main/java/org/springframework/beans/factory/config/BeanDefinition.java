@@ -342,9 +342,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * provides the frameworks as well as tools an indication of
 	 * the role and importance of a particular {@code BeanDefinition}.
 	 *
-	 * @see #ROLE_APPLICATION
-	 * @see #ROLE_SUPPORT
-	 * @see #ROLE_INFRASTRUCTURE
+	 * @see #ROLE_APPLICATION 0
+	 * @see #ROLE_SUPPORT 1
+	 * @see #ROLE_INFRASTRUCTURE 2
 	 */
 	int getRole();
 
