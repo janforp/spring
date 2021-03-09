@@ -1781,7 +1781,7 @@ public class BeanDefinitionParserDelegate {
 	 * Determine whether the given URI indicates the default namespace.
 	 */
 	public boolean isDefaultNamespace(@Nullable String namespaceUri) {
-		return !StringUtils.hasLength(namespaceUri)
+		return !StringUtils.hasLength(namespaceUri)//如果为空，则也是默认的
 
 				|| BEANS_NAMESPACE_URI.equals(namespaceUri);
 	}

@@ -64,7 +64,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	private XmlReaderContext readerContext;
 
 	/**
-	 * 代表
+	 * 委托
 	 */
 	@Nullable
 	private BeanDefinitionParserDelegate delegate;
@@ -77,7 +77,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
-		//将上下文 context 保存到 reader 字段中
+		//将上下文 context 保存到 readerContext 字段中
 		this.readerContext = readerContext;
 
 		/**
@@ -115,21 +115,26 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 *
 	 * @param root 如下
 	 * <beans xmlns="http://www.springframework.org/schema/beans"
-	 * xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 * xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	 * ***xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 * ***xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	 *
-	 * <bean id="componentA" class="com.javaxxl.ComponentA"/>
-	 * <bean id="componentB" class="com.javaxxl.ComponentB"/>
+	 * *****<bean id="componentA" class="com.javaxxl.ComponentA"/>
+	 * *****<bean id="componentB" class="com.javaxxl.ComponentB"/>
+	 *
 	 * </beans>
 	 */
 	@SuppressWarnings("deprecation")  // for Environment.acceptsProfiles(String...)
 	protected void doRegisterBeanDefinitions(Element root) {
-		// Any nested <beans> elements will cause recursion in this method. In
-		// order to propagate and preserve <beans> default-* attributes correctly,
+		// Any nested <beans> elements will cause recursion in this method.-- 任何嵌套的<beans>元素都将导致此方法中的递归
+		// In order to propagate and preserve <beans> default-* attributes correctly,
 		// keep track of the current (parent) delegate, which may be null. Create
 		// the new (child) delegate with a reference to the parent for fallback purposes,
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
+		// 为了正确传播和保留<beans> default- *属性，请跟踪当前（父）委托，该委托可以为null。创建一个新的（子）委托，
+		// 并带有对父参考的引用以进行回退，然后最终将this.delegate重设回其原始（父）参考。此行为模拟了一组委托，而实际上没有必要。
+
+		//委托
 		BeanDefinitionParserDelegate parent = this.delegate;
 
 		/**
@@ -144,6 +149,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			/**
 			 * 获取beans标签的profile属性
 			 * profile可能是：dev/prod/pre/test
+			 *
+			 * profile = "dev,test;prod"
 			 */
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
@@ -195,7 +202,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param parentDelegate
 	 * @return
 	 */
-	protected BeanDefinitionParserDelegate createDelegate(XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
+	protected BeanDefinitionParserDelegate createDelegate(
+			XmlReaderContext readerContext, //上下文
+			Element root, //beans标签
+			@Nullable BeanDefinitionParserDelegate parentDelegate)//上级
+	{
 		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);
 		delegate.initDefaults(root, parentDelegate);
 		return delegate;
@@ -206,6 +217,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * -- 在文档的根级别上解析元素：“ import”，“ alias”，“ bean”。
 	 *
 	 * @param root the DOM root element of the document
+	 * @param delegate 解析该 dom 是委托给该对象进行的
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 
@@ -219,6 +231,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			 * 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			 * 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 			 *
+			 * <!-- 根元素 -->
 			 * 	<bean id="componentA" class="com.javaxxl.ComponentA"/>
 			 * 	<bean id="componentB" class="com.javaxxl.ComponentB"/>
 			 *
@@ -234,11 +247,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 
-				//排除空格
+				//排除空格/comment（注释）
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
-						//说明子标签说明也是 spring 默认标签
+						//说明子标签说明也是 spring 默认标签,真正完成元素的解析
 						parseDefaultElement(ele, delegate);
 					} else {
 						//自定义标签
@@ -257,6 +270,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 	}
 
+	/**
+	 * 真正完成元素的解析
+	 *
+	 * @param ele <bean></bean>,<alais></alais>,<import></import>等根元素
+	 * @param delegate 委托对象
+	 */
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			//解析 import 标签
@@ -271,7 +290,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			//<bean id="componentB" class="com.javaxxl.ComponentB"/>
 			processBeanDefinition(ele, delegate);
 		} else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse -- 嵌套了一个 beans 标签
+			// recurse(递归) -- 嵌套了一个 beans 标签
 			//解析 beans 标签
 			doRegisterBeanDefinitions(ele);
 		}
