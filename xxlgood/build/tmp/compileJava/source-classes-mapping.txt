@@ -26,8 +26,8 @@ com/javaxxl/lookup/GetBeanTest.java
  com.javaxxl.lookup.GetBeanTest
 com/javaxxl/circular/B.java
  com.javaxxl.circular.B
-com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
- com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
+com/javaxxl/aop4aspect/AspectConfig.java
+ com.javaxxl.aop4aspect.AspectConfig
 com/javaxxl/UserServiceImpl.java
  com.javaxxl.UserServiceImpl
 com/javaxxl/bpp/Teacher.java
@@ -84,8 +84,6 @@ com/javaxxl/aop1/OneMethodInterceptor.java
  com.javaxxl.aop1.OneMethodInterceptor
 com/javaxxl/aop1/Main.java
  com.javaxxl.aop1.Main
-com/javaxxl/aop4aspect/AspectConfig.java
- com.javaxxl.aop4aspect.AspectConfig
 com/javaxxl/aop2/Main.java
  com.javaxxl.aop2.Main
  com.javaxxl.aop2.Main$1
@@ -97,6 +95,8 @@ com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProces
  com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/javaxxl/parent/BeanParentAttTest.java
  com.javaxxl.parent.BeanParentAttTest
+com/shengsiyuan/spring/lecture/SpringClient.java
+ com.shengsiyuan.spring.lecture.SpringClient
 com/javaxxl/lookup/LookUpTest.java
  com.javaxxl.lookup.LookUpTest
 com/javaxxl/propertyeditor/PropertyEditorMain.java
@@ -113,6 +113,8 @@ com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
  com.javaxxl.lifecycle.LifeCycleMain
+com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
+ com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
 com/javaxxl/publicevent/EatEventListener.java
  com.javaxxl.publicevent.EatEventListener
 com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java

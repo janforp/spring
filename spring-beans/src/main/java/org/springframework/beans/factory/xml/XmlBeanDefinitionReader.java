@@ -418,6 +418,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			 * 将 document 解析成 bd，最终返回新注册到beanFactory中的bean的数量
 			 *
 			 * TODO 注册 BeanDefinition 到???哪里呢？
+			 * @see DefaultListableBeanFactory#beanDefinitionMap 注册到这里
 			 */
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
