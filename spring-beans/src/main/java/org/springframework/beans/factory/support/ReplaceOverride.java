@@ -23,6 +23,7 @@ public class ReplaceOverride extends MethodOverride {
 
 	/**
 	 * 不能空
+	 * <replaced-method name="changeMe" replacer="testMethodReplacer"/> 中的 testMethodReplacer
 	 */
 	private final String methodReplacerBeanName;
 

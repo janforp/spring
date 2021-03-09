@@ -3,5 +3,5 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="userService" class="com.javaxxl.UserServiceImpl"/>
+	<bean id="userService" class="com.javaxxl.UserServiceImpl" name="service,service2,service3"/>
 </beans>

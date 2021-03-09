@@ -45,7 +45,19 @@ import java.util.function.Supplier;
  * @see ChildBeanDefinition
  */
 @SuppressWarnings("serial")
-public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor implements BeanDefinition, Cloneable {
+public abstract class AbstractBeanDefinition
+
+		/**
+		 * 继承该类型的目的是为了能够拿到 metadata
+		 *
+		 * @see org.springframework.core.AttributeAccessorSupport#attributes
+		 */
+		extends BeanMetadataAttributeAccessor
+
+		/**
+		 * 实现这2个接口的目的就比较明明显了
+		 */
+		implements BeanDefinition, Cloneable {
 
 	/**
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
@@ -134,6 +146,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public static final String INFER_METHOD = "(inferred)";
 
+	/**
+	 * TODO 这个 beanClass 可能是String className 也可能是 Class<?> beanClass
+	 *
+	 * @see BeanDefinitionReaderUtils#createBeanDefinition(java.lang.String, java.lang.String, java.lang.ClassLoader)
+	 */
 	@Nullable
 	private volatile Object beanClass;
 
@@ -148,19 +165,30 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * autowire="byName"
 	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start" autowire="byName">
-	 * 		<constructor-arg index="0" value="1"/>
-	 * 		<constructor-arg index="1" value="小刘"/>
-	 * 	</bean>
+	 * <constructor-arg index="0" value="1"/>
+	 * <constructor-arg index="1" value="小刘"/>
+	 * </bean>
 	 */
 	private int autowireMode = AUTOWIRE_NO;
 
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
+	/**
+	 * <bean class = "xxxxx" id = "xx" depends-on = "a,b,c"/>
+	 * 则该字段就是[a,b,c]
+	 */
 	@Nullable
 	private String[] dependsOn;
 
+	/**
+	 * <bean autowire-candidate  = "false"/>
+	 */
 	private boolean autowireCandidate = true;
 
+	/**
+	 * <bean class = "xxxxx" id = "xx" depends-on = "a,b,c" primary = "true"/>
+	 * 则该字段就是 true
+	 */
 	private boolean primary = false;
 
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
@@ -172,9 +200,22 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean lenientConstructorResolution = true;
 
+	/**
+	 * factory-bean 属性
+	 */
 	@Nullable
 	private String factoryBeanName;
 
+	/**
+	 * factory-method 属性
+	 *
+	 * 1.使用实例方法创建对象
+	 * <bean id = "personFactory" class = "xx.xx.xxx.PersonFactory"/>
+	 * <bean id = "person" factory-bean = "personFactory"  factory-method = "buildPerson"/>
+	 *
+	 * 2.使用静态工厂方法创建对象
+	 * <bean id = "person" class = "xx.xx.xxx.PersonFactory" factory-method = "staticBuildPerson"/>
+	 */
 	@Nullable
 	private String factoryMethodName;
 
@@ -184,11 +225,20 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+	/**
+	 * look-up或者 replace-method
+	 */
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
+	/**
+	 * init-method 属性
+	 */
 	@Nullable
 	private String initMethodName;
 
+	/**
+	 * destroy-method 属性
+	 */
 	@Nullable
 	private String destroyMethodName;
 
@@ -200,6 +250,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
+	/**
+	 * 设置描述信息到 bd 中
+	 * description 子标签
+	 * <bean id="componentA" name="a,aa, aaa" class="com.javaxxl.ComponentA">
+	 * <description>不可描述</description>
+	 * </bean>
+	 */
 	@Nullable
 	private String description;
 
@@ -383,7 +440,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	@Override
 	public void setBeanClassName(@Nullable String beanClassName) {
+		//TODO
 		this.beanClass = beanClassName;
+	}
+
+	/**
+	 * Specify the class for this bean.
+	 *
+	 * @see #setBeanClassName(String)
+	 */
+	public void setBeanClass(@Nullable Class<?> beanClass) {
+		//TODO 这个 beanClass 可能是String className 也可能是 Class<?> beanClass
+		this.beanClass = beanClass;
 	}
 
 	/**
@@ -398,15 +466,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		} else {
 			return (String) beanClassObject;
 		}
-	}
-
-	/**
-	 * Specify the class for this bean.
-	 *
-	 * @see #setBeanClassName(String)
-	 */
-	public void setBeanClass(@Nullable Class<?> beanClass) {
-		this.beanClass = beanClass;
 	}
 
 	/**

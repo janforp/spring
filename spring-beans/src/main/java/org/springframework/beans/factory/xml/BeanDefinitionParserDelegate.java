@@ -29,6 +29,7 @@ import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.support.MethodOverrides;
 import org.springframework.beans.factory.support.ReplaceOverride;
+import org.springframework.core.AttributeAccessorSupport;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -434,6 +435,7 @@ public class BeanDefinitionParserDelegate {
 		/**
 		 * 核心逻辑
 		 * 将 ele 标签解析成 bd
+		 * 下面的方法返回之后 bd 中已经有很多在配置文件中配置的属性了
 		 */
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 
@@ -565,7 +567,7 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
-			//返回一个 GenericBeanDefinition 对象，仅仅设置了 class 或者 className
+			//返回一个 GenericBeanDefinition 对象，仅仅设置了 class 或者 className 其实就是赋值了该字段：org.springframework.beans.factory.support.AbstractBeanDefinition.beanClass
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
 			//解析标签上的属性,比如：lazy-init,init-method,depends-on等，并且把属性值都塞入到 bd 中
@@ -662,7 +664,7 @@ public class BeanDefinitionParserDelegate {
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, //bean标签
 			String beanName,//beanName
 			@Nullable BeanDefinition containingBean, //一般为null
-			AbstractBeanDefinition bd) {//一个bd对象,该方法最终返回的就是这个对象
+			AbstractBeanDefinition bd) {//一个bd对象（GenericBeanDefinition）,该方法最终返回的就是这个对象
 
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			//bean 标签有 singleton 属性，已经废弃，直接给错误
@@ -816,9 +818,9 @@ public class BeanDefinitionParserDelegate {
 			Node node = nl.item(i);
 			if (isCandidateElement(node)
 
-					//该节点的名称是 meta
+					//该节点的名称是 meta:<meta key="meta_1" value="val_1"/>
 					&& nodeNameEquals(node, META_ELEMENT)) {
-				//说明这个节点是一个 meta 节点
+				//说明这个节点是一个 meta 节点:<meta key="meta_1" value="val_1"/>
 
 				Element metaElement = (Element) node;
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
@@ -827,7 +829,15 @@ public class BeanDefinitionParserDelegate {
 				//将meta信息封装成 BeanMetadataAttribute 对象
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
-				//其实就是放到了一个map中
+				/**
+				 * 其实就是放到了一个map中
+				 *  * Map with String keys and Object values.
+				 *  * 每个value就表示一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+				 *  * key:为 key="meta_1" 中的  meta_1
+				 *  * value:一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+				 *
+				 * @see AttributeAccessorSupport#attributes
+				 */
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
 		}
@@ -947,8 +957,20 @@ public class BeanDefinitionParserDelegate {
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (isCandidateElement(node) && nodeNameEquals(node, LOOKUP_METHOD_ELEMENT)) {
+				/**
+				 * 当前是一个 lookup-method 标签 : <lookup-method name="getBean" bean="teacher"/>
+				 *
+				 * <bean id="getBeanTest" class="com.javaxxl.lookup.GetBeanTest">
+				 * 		<lookup-method name="getBean" bean="teacher"/>
+				 * 	</bean>
+				 *
+				 * 	<bean id="teacher" class="com.javaxxl.lookup.Teacher"/>
+				 */
+
 				Element ele = (Element) node;
+				//<lookup-method name="getBean" bean="teacher"/>
 				String methodName = ele.getAttribute(NAME_ATTRIBUTE);
+				//<lookup-method name="getBean" bean="teacher"/>
 				String beanRef = ele.getAttribute(BEAN_ELEMENT);
 				LookupOverride override = new LookupOverride(methodName, beanRef);
 				override.setSource(extractSource(ele));
@@ -1029,6 +1051,8 @@ public class BeanDefinitionParserDelegate {
 		 * ---<constructor-arg index="0" value="7500000"/>
 		 * ---<constructor-arg index="1" value="42"/>
 		 * </bean>
+		 *
+		 * index = "0"
 		 */
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
 		/**
@@ -1036,12 +1060,16 @@ public class BeanDefinitionParserDelegate {
 		 * ---<constructor-arg type="int" value="7500000"/>
 		 * ---<constructor-arg type="java.lang.String" value="42"/>
 		 * </bean>
+		 *
+		 * type="int"
 		 */
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
 		/**
 		 * <bean id="exampleBean" class="examples.ExampleBean">
 		 * ---<constructor-arg name="name" value="张三"/>
 		 * </bean>
+		 *
+		 * name="name"
 		 */
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		if (StringUtils.hasLength(indexAttr)) {
@@ -1174,16 +1202,16 @@ public class BeanDefinitionParserDelegate {
 	@Nullable
 	public Object parsePropertyValue(Element ele, BeanDefinition bd, @Nullable String propertyName) {
 		String elementName = (propertyName != null ?
-				"<property> element for property '" + propertyName + "'" :
-				"<constructor-arg> element");
+				"<property> element for property '" + propertyName + "'" // <property> 标签
+				:
+				"<constructor-arg> element"); //<constructor-arg> 标签
 
 		// Should only have one child element: ref, value, list, etc.
 		NodeList nl = ele.getChildNodes();
 		Element subElement = null;
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
-			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT) &&
-					!nodeNameEquals(node, META_ELEMENT)) {
+			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT) && !nodeNameEquals(node, META_ELEMENT)) {
 				// Child element is what we're looking for.
 				if (subElement != null) {
 					error(elementName + " must not contain more than one sub-element", ele);
@@ -1198,6 +1226,7 @@ public class BeanDefinitionParserDelegate {
 		//有 value
 		boolean hasValueAttribute = ele.hasAttribute(VALUE_ATTRIBUTE);
 		if ((hasRefAttribute && hasValueAttribute)//同时有是不行的
+
 				||
 
 				//有ref或者value的一个，不能再有子标签
@@ -1670,7 +1699,7 @@ public class BeanDefinitionParserDelegate {
 
 		BeanDefinitionHolder finalDefinition = originalDef;
 
-		// Decorate based on custom attributes first.
+		// Decorate based on custom attributes first.:首先根据自定义属性进行装饰
 		NamedNodeMap attributes = ele.getAttributes();
 		for (int i = 0; i < attributes.getLength(); i++) {
 			Node node = attributes.item(i);

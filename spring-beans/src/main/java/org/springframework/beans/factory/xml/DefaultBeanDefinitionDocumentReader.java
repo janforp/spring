@@ -402,7 +402,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		//通过该方法就把一个<bean>标签解析成一个 bd
 
 		/**
-		 * 解析 bean 标签
+		 * 解析 bean 标签,<bean> 标签中所有的属性，配置都已经解析出来，并已经放到 {@link BeanDefinitionHolder#beanDefinition} 中了
 		 * 解析完成之后返回一个 bdHolder，主要保存了别名信息
 		 */
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
@@ -414,7 +414,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			try {
 				/**
 				 * Register the final decorated instance.注册bd
-				 * 将 bd 注册到容器中
+				 * 将 bd 注册到容器中 注册中心实例：DefaultListableBeanFactory
 				 */
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 				//上面代码执行之后，bd已经注册到register中了

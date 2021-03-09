@@ -1,29 +1,13 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.core;
+
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Support class for {@link AttributeAccessor AttributeAccessors}, providing
@@ -39,17 +23,21 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 
-	/** Map with String keys and Object values. */
+	/**
+	 * Map with String keys and Object values.
+	 * 每个value就表示一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+	 * key:为 key="meta_1" 中的  meta_1
+	 * value:一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+	 */
 	private final Map<String, Object> attributes = new LinkedHashMap<>();
-
 
 	@Override
 	public void setAttribute(String name, @Nullable Object value) {
 		Assert.notNull(name, "Name must not be null");
 		if (value != null) {
 			this.attributes.put(name, value);
-		}
-		else {
+		} else {
+			//如果 value 为空，则说明要移除该 name 对应的 value
 			removeAttribute(name);
 		}
 	}
@@ -90,9 +78,9 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 		return StringUtils.toStringArray(this.attributes.keySet());
 	}
 
-
 	/**
 	 * Copy the attributes from the supplied AttributeAccessor to this accessor.
+	 *
 	 * @param source the AttributeAccessor to copy from
 	 */
 	protected void copyAttributesFrom(AttributeAccessor source) {
@@ -102,7 +90,6 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 			setAttribute(attributeName, source.getAttribute(attributeName));
 		}
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -114,5 +101,4 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 	public int hashCode() {
 		return this.attributes.hashCode();
 	}
-
 }

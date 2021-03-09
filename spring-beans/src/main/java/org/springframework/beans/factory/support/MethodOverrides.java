@@ -21,6 +21,20 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class MethodOverrides {
 
 	/**
+	 * * 当前是一个 lookup-method 标签 : <lookup-method name="getBean" bean="teacher"/>
+	 * *
+	 * * <bean id="getBeanTest" class="com.javaxxl.lookup.GetBeanTest">
+	 * * 		<lookup-method name="getBean" bean="teacher"/>
+	 * * 	</bean>
+	 * *
+	 * * 	<bean id="teacher" class="com.javaxxl.lookup.Teacher"/>
+	 *
+	 * <bean id="testChangeMethod" class="com.javaxxl.replacemethod.TestChangeMethod">
+	 * <replaced-method name="changeMe" replacer="testMethodReplacer"/>
+	 * </bean>
+	 *
+	 * <bean id="testMethodReplacer" class="com.javaxxl.replacemethod.TestMethodReplacer"/>
+	 *
 	 * look-up或者 replace-method
 	 */
 	private final Set<MethodOverride> overrides = new CopyOnWriteArraySet<>();

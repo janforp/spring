@@ -13,6 +13,8 @@ import org.springframework.util.ObjectUtils;
  *
  * 中的每一个  meta 标签中的 key,value 属性值
  *
+ * 一个{@link BeanMetadataAttribute} 对象就封装了一个 <meta key="meta_1" value="val_1"/> 标签中的数据
+ *
  * Holder for a key-value style attribute that is part of a bean definition.
  * Keeps track of the definition source in addition to the key-value pair.
  *

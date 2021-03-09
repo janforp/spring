@@ -39,16 +39,27 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 	}
 
 	/**
+	 * * Map with String keys and Object values.
+	 * * 每个value就表示一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+	 * * key:为 key="meta_1" 中的  meta_1
+	 * * value:一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+	 *
 	 * Add the given BeanMetadataAttribute to this accessor's set of attributes.
 	 *
 	 * @param attribute the BeanMetadataAttribute object to register
 	 */
 	public void addMetadataAttribute(BeanMetadataAttribute attribute) {
+		//<meta key="meta_1" value="val_1"/>
 		super.setAttribute(attribute.getName(), attribute);
 	}
 
 	/**
 	 * Look up the given BeanMetadataAttribute in this accessor's set of attributes.
+	 *
+	 *  * Map with String keys and Object values.
+	 *  * 每个value就表示一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
+	 *  * key:为 key="meta_1" 中的  meta_1
+	 *  * value:一个 <meta key="meta_1" value="val_1"/> 对象的模型： {@link org.springframework.beans.BeanMetadataAttribute} BeanMetadataAttribute
 	 *
 	 * @param name the name of the attribute
 	 * @return the corresponding BeanMetadataAttribute object,

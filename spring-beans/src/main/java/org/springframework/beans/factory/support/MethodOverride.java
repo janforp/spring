@@ -23,6 +23,9 @@ public abstract class MethodOverride implements BeanMetadataElement {
 
 	/**
 	 * 不能空，配置的方法名称
+	 *
+	 * <lookup-method name="getBean" bean="teacher"/> 中的 getBean
+	 * <replaced-method name="changeMe" replacer="testMethodReplacer"/> 中的 changeMe
 	 */
 	private final String methodName;
 
