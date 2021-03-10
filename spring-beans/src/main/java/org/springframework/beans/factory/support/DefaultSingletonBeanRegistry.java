@@ -305,6 +305,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * Return the (raw) singleton object registered under the given name,
 	 * creating and registering a new one if none registered yet.
+	 * -- 返回以给定名称注册的（原始）单例对象，如果尚未注册，则创建并注册一个新对象。
 	 *
 	 * @param beanName the name of the bean
 	 * @param singletonFactory the ObjectFactory to lazily create the singleton
@@ -341,7 +342,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				 */
 				beforeSingletonCreation(beanName);
 
+				//创建成功失败的标识
 				boolean newSingleton = false;
+				//异常的处理
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
 					//容纳一些异常
@@ -480,7 +483,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void beforeSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) //该 beanName 是否可以不要检查
 
-				//把beanName 放到 singletonsCurrentlyInCreation(一个并发Map)
+				/**
+				 * 把beanName 放到 singletonsCurrentlyInCreation(一个并发Map)
+				 * 添加成功则不报错
+				 */
 				&& !this.singletonsCurrentlyInCreation.add(beanName)) {//该 beanName 是否正在创建中
 
 			//如果创建中，则抛出异常
