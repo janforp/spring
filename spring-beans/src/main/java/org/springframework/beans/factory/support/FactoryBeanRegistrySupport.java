@@ -33,6 +33,8 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * key:FactoryBean name
 	 * value:当前 FactoryBean 实例管理的对象
 	 *
+	 * 缓存每个 FactoryBean 中管理的对象
+	 *
 	 * @see FactoryBean#getObject()
 	 */
 	private final Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<>(16);

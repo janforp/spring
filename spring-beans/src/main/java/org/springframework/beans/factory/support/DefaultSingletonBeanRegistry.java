@@ -160,10 +160,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
-			this.singletonObjects.put(beanName, singletonObject);
-			this.singletonFactories.remove(beanName);
-			this.earlySingletonObjects.remove(beanName);
-			this.registeredSingletons.add(beanName);
+			this.singletonObjects.put(beanName, singletonObject);//添加到一级缓存
+			this.singletonFactories.remove(beanName);//从三级缓存移除
+			this.earlySingletonObjects.remove(beanName);//从二级缓存移除
+			this.registeredSingletons.add(beanName);//已经注册的beanName
 		}
 	}
 
@@ -205,7 +205,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	@Nullable
-	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+	protected Object getSingleton(
+			String beanName,
+
+			//是否允许拿到早期引用
+			boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
 		//从一级缓存中拿，第一次拿应该是Null
 		Object singletonObject = this.singletonObjects.get(beanName);
@@ -340,16 +344,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
+					//容纳一些异常
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
 					/**
 					 * singletonFactory 一般是传进来一个匿名内部类
 					 * @see AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
+					 * 其实调用上面的方法 createBean
 					 */
 					singletonObject = singletonFactory.getObject();
 
-					//新创建成功
+					//没有发生异常，则表示创建成功
 					newSingleton = true;
 				} catch (IllegalStateException ex) {
 					// Has the singleton object implicitly appeared in the meantime ->
@@ -372,7 +378,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					//添加到一级缓存，二级缓存更三级缓存都去掉
+					//添加到一级缓存，二级缓存，三级缓存都去掉
 					addSingleton(beanName, singletonObject);
 				}
 			}
@@ -469,6 +475,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * @param beanName the name of the singleton about to be created
 	 * @see #isSingletonCurrentlyInCreation
+	 * @see DefaultSingletonBeanRegistry#afterSingletonCreation(java.lang.String) 每个bean在创建之前跟之后都会进去然后再出来
 	 */
 	protected void beforeSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) //该 beanName 是否可以不要检查

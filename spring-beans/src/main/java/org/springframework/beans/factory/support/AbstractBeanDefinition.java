@@ -616,7 +616,10 @@ public abstract class AbstractBeanDefinition
 	 */
 	@Override
 	public boolean isSingleton() {
-		return SCOPE_SINGLETON.equals(this.scope) || SCOPE_DEFAULT.equals(this.scope);
+		return SCOPE_SINGLETON.equals(this.scope)
+
+				//没有配置的情况也是Singleton
+				|| SCOPE_DEFAULT.equals(this.scope);
 	}
 
 	/**

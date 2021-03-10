@@ -46,6 +46,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * Determines if the definition needs to be re-merged.
+	 * 确定是否需要重新合并定义。
+	 *
+	 * 如果合并后的bd信息缓存中，有当前 beanName 对象的 bd 信息，需要把当前 mbd 信息设置为过期数据
 	 */
 	volatile boolean stale;
 
@@ -68,6 +71,17 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * Package-visible field for caching if the bean is a factory bean.
+	 *
+	 * 当前bd是一个{@link org.springframework.beans.factory.FactoryBean} 类型的bean
+	 * https://www.jianshu.com/p/6f0a59623090
+	 * <bean id="tradeSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	 *
+	 * ---        <property name="dataSource" ref="trade" />
+	 * ---        <property name="mapperLocations" value="classpath*:mapper/trade/*Mapper.xml" />
+	 * ---        <property name="configLocation" value="classpath:mybatis-config.xml" />
+	 * ---        <property name="typeAliasesPackage" value="com.bytebeats.mybatis3.domain.trade" />
+	 *
+	 * </bean>
 	 */
 	@Nullable
 	volatile Boolean isFactoryBean;
@@ -532,5 +546,4 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	public String toString() {
 		return "Root bean: " + super.toString();
 	}
-
 }

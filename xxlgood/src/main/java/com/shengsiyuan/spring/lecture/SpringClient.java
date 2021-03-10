@@ -46,4 +46,12 @@ public class SpringClient {
 		Student service = (Student) factory.getBean("student");
 		System.out.println(service);
 	}
+
+	/**
+	 * 1.FactoryBean 注入
+	 * 2.FactoryBean 管理的 bean
+	 * 3.property注入的时候使用 ref
+	 * 4.各种配置bean的方式最终生成bd的beanName
+	 * 5.depends-on 的场景
+	 */
 }

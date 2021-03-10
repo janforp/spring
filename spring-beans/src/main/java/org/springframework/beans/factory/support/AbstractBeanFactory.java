@@ -289,10 +289,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		 * 1.别名：重定向出来真实 beanName
 		 * 2.&开头的name：说明你要获取一个FactoryBean类型的bean
 		 * 3.真实的BeanName
-		 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+		 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，
+		 * 那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
 		 * 这里就涉及两种对象，一种是FactoryBean接口实现类，一种是FactoryBean实现类内部管理的对象，
 		 * 如果要拿FactoryBean接口实现类，使用getBean的时候传的name要使用 & 开头
 		 * 如果要拿FactoryBean实现类内部管理的对象，直接传name即可，不需要 & 开头
+		 *
+		 * 	<bean class="com.javaxxl.bpp.Teacher" id="teacher"/> 最终该bd的beanName就是 teacher
 		 */
 		String beanName = transformedBeanName(name);
 
@@ -300,7 +303,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object beanInstance;
 
 		/**
-		 *  Eagerly check singleton cache for manually registered singletons.
+		 * Eagerly：热切地，急切的
+		 * Eagerly check singleton cache for manually registered singletons.
 		 *  -- 认真检查单例缓存是否有手动注册的单例
 		 *  首先试图到一级缓存拿
 		 *
@@ -330,7 +334,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 * 如果是 FactoryBean 实例，这个时候还需要进行处理，主要是看 name 是否带 & 开头
 			 * &开头，则说明要拿 FactoryBean 实例，否则为 FactoryBean 实例内部管理的bean
 			 */
-			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
+			beanInstance = getObjectForBeanInstance(sharedInstance,
+					name,//用户传进来的name,可能是别名，可能待&
+					beanName,//经过spring处理之后的beanName
+					null);
 		} else {
 			//CASE2:缓存中没有数据，我们应该自己创建
 
@@ -347,8 +354,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 *  7.spring转头再次去获取A，触发getBean(A.class)
 			 *  8.此时会执行到这里，因为此时 {@link AbstractBeanFactory#prototypesCurrentlyInCreation} 中已经有 A 了，所以 {@link AbstractBeanFactory#isPrototypeCurrentlyInCreation(java.lang.String)} 会返回 true
 			 *  9.进入下面的if代码块，最终抛出了异常，成功阻止了原型模式的循环依赖
+			 *
+			 *  ThreadLocal<Object> prototypesCurrentlyInCreation 其实就是在一个ThreadLocal中存储
+			 *
+			 * @see AbstractBeanFactory#beforePrototypeCreation(java.lang.String) 在这个方法会塞入原型类型的beanName
 			 */
-			if (isPrototypeCurrentlyInCreation(beanName)) {//ThreadLocal<Object> prototypesCurrentlyInCreation
+			if (isPrototypeCurrentlyInCreation(beanName)) {
 
 				/**
 				 * Fail if we're already creating this bean instance:
@@ -382,6 +393,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			/** 父子容器 ignore end **************/
 
 			if (!typeCheckOnly) {
+				//首次创建的时候 typeCheckOnly 为 false，就会进来
 				markBeanAsCreated(beanName);
 			}
 
@@ -423,6 +435,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				 */
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
+					//depends-on = "a,b,c",并且当前beanName = "d"
 					for (String dep : dependsOn) {
 						//判断循环依赖
 						if (isDependent(beanName, dep)) {
@@ -437,7 +450,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						 */
 						registerDependentBean(dep, beanName);
 						try {
-							//必须要实例化 dep
+							//必须要实例化 当前 bean 所依赖的 实例。此处发生递归
 							getBean(dep);
 						} catch (NoSuchBeanDefinitionException ex) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName, "'" + beanName + "' depends on missing bean '" + dep + "'", ex);
@@ -468,6 +481,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					 */
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							//真正实例化的地方
 							return createBean(beanName, mbd, args);
 						} catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
@@ -1423,7 +1437,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * 3.真实的BeanName
 	 *
 	 *
-	 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+	 * FactoryBean：如果某个bean的配置非常复杂，使用Spring管理不易，不够灵活，想使用编码的方式去构建它，
+	 * 那么你就可以提供一个构建该bean的工厂，这个工厂就是FactoryBean接口实现类，但是FactoryBean实例bean还是要使用Spring管理的，
+	 *
 	 * 这里就涉及两种对象，一种是FactoryBean接口实现类，一种是FactoryBean实现类内部管理的对象，
 	 * 如果要拿FactoryBean接口实现类，使用getBean的时候传的name要使用 & 开头
 	 * 如果要拿FactoryBean实现类内部管理的对象，直接传name即可，不需要 & 开头
@@ -1532,9 +1548,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
-		if (mbd != null && !mbd.stale) {
+		if (mbd != null //存在
+				//并且还没有过期
+
+				&& !mbd.stale) {
 			return mbd;
 		}
+
 		return getMergedBeanDefinition(
 
 				beanName,
@@ -1705,8 +1725,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Remove the merged bean definition for the specified bean,
-	 * recreating it on next access.
+	 * Remove the merged bean definition for the specified bean,recreating it on next access.
+	 * -- 删除指定bean的合并bean定义，在下次访问时重新创建。
 	 *
 	 * @param beanName the bean name to clear the merged definition for
 	 */
@@ -2014,15 +2034,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Mark the specified bean as already created (or about to be created).
-	 * <p>This allows the bean factory to optimize its caching for repeated
-	 * creation of the specified bean.
+	 * Mark the specified bean as already created (or about to be created).-- 将指定的bean标记为已经创建（或将要创建）。
+	 * <p>This allows the bean factory to optimize its caching for repeated creation of the specified bean. -- 这允许bean工厂优化其缓存以重复创建指定的bean。
 	 *
 	 * @param beanName the name of the bean
 	 */
 	protected void markBeanAsCreated(String beanName) {
 		if (!this.alreadyCreated.contains(beanName)) {
-			//alreadyCreated Set 中还没有该 beanName: Set<String> alreadyCreated
+			//Set<String> alreadyCreated 其实就是一个Set
 
 			synchronized (this.mergedBeanDefinitions) {
 				if (!this.alreadyCreated.contains(beanName)) {
@@ -2102,8 +2121,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			/**缓存中拿到的实例 {@link DefaultSingletonBeanRegistry#getSingleton(java.lang.String)}, 其实，你从IOC容器中拿到的对象，
 			 * 它可能是普通单实例，也可能是 FactoryBean 实例。如果是 FactoryBean 实例，这个时候还需要进行处理，
 			 * 主要是看 name 是否带 & 开头,&开头，则说明要拿 FactoryBean 实例，否则为 FactoryBean 实例内部管理的bean*/
-			String name,  //用户传入的未处理&的nam
-			String beanName, /** 处理 & 以及 alias 的 {@link AbstractBeanFactory#transformedBeanName(java.lang.String)}  ***/
+			String name,  //用户传入的未处理&的name
+			String beanName, /** 处理 & 以及 alias 之后 的 {@link AbstractBeanFactory#transformedBeanName(java.lang.String)}  ***/
 			@Nullable RootBeanDefinition mbd) { //合并过后的bd
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.-- 如果Bean不是工厂，则不要让调用代码尝试取消引用工厂。
@@ -2114,7 +2133,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				return beanInstance;
 			}
 			if (!(beanInstance instanceof FactoryBean)) {
-				//当前的 beanInstance 实例 不是 FactoryBean 实现，则抛出异常，因为你想要的就是一个 FactoryBean 实现，但是IOC中并没有
+				//当前的 beanInstance 实例 不是 FactoryBean 实现，
+				//
+				// 则抛出异常，因为你想要的就是一个 FactoryBean 实现，但是IOC中并没有
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
 			/**
