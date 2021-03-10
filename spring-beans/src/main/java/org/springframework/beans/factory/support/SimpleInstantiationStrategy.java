@@ -44,10 +44,14 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
 		if (!bd.hasMethodOverrides()) {
+			//一般是没有覆盖方法的
+
 			//默认构造方法
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
-				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;//首次实例化是没有缓存的，首次过后就会把构造方法缓存到对应的bd
+
+				//首次实例化是没有缓存的，首次过后就会把构造方法缓存到对应的bd，第二次创建的时候才有缓存
+				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {
 					final Class<?> clazz = bd.getBeanClass();
 					if (clazz.isInterface()) {
@@ -63,17 +67,28 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 							 *
 							 * 此处获取指定无参数的构造器，就是默认构造方法
 							 */
-							constructorToUse = clazz.getDeclaredConstructor();//拿到默认的构造方法
+
+							//拿到默认的构造方法
+							constructorToUse = clazz.getDeclaredConstructor();
 						}
-						bd.resolvedConstructorOrFactoryMethod = constructorToUse;//缓存到bd，方便后面直接使用
+
+						//缓存到bd，方便后面直接使用
+						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
 					} catch (Throwable ex) {
 						throw new BeanInstantiationException(clazz, "No default constructor found", ex);
 					}
 				}
 			}
+
+			//使用反射创建实例
 			return BeanUtils.instantiateClass(constructorToUse);
 		} else {
-			// Must generate CGLIB subclass.
+			/**
+			 * Must generate CGLIB subclass. ---- 必须生成CGLIB子类。
+			 *
+			 * 如果有 方法 覆盖的情况，则使用 cglib 生成代理对象！！！！
+			 * 但是aop默认是使用jdk动态代理！
+			 */
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
 	}
@@ -85,6 +100,8 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	 * Instantiation should use a no-arg constructor.
 	 */
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
+
+		//cglib 实现覆盖了该方法
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 
@@ -113,9 +130,9 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	 * the Method Injection specified in the given RootBeanDefinition.
 	 * Instantiation should use the given constructor and parameters.
 	 */
-	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName,
-			BeanFactory owner, @Nullable Constructor<?> ctor, Object... args) {
+	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner, @Nullable Constructor<?> ctor, Object... args) {
 
+		//cglib 实现覆盖了该方法
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 

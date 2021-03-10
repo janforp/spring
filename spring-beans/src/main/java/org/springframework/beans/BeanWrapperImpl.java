@@ -1,5 +1,6 @@
 package org.springframework.beans;
 
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.Property;
 import org.springframework.core.convert.TypeDescriptor;
@@ -84,6 +85,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 	 * Create a new BeanWrapperImpl for the given object.
 	 *
 	 * @param object the object wrapped by this BeanWrapper
+	 * @see AbstractAutowireCapableBeanFactory#instantiateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition) 实例化
 	 */
 	public BeanWrapperImpl(Object object) {
 		super(object);

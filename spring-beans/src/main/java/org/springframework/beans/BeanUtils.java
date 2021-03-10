@@ -183,10 +183,12 @@ public abstract class BeanUtils {
 			if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass())) {
 				return KotlinDelegate.instantiateClass(ctor, args);
 			}
-			//看这个分支
+			//java 看这个分支
 			else {
 				Class<?>[] parameterTypes = ctor.getParameterTypes();
 				Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
+
+				//构造方法的入参数！！！
 				Object[] argsWithDefaultValues = new Object[args.length];
 
 				/**

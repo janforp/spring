@@ -7,7 +7,7 @@ import org.springframework.util.ObjectUtils;
 import java.io.Serializable;
 
 /**
- * 封装了 <property  xxxxxx/> 标签的内容
+ * 封装了 <property name="name" value="小刘"/> 标签的内容
  *
  * Object to hold information and value for an individual bean property.
  * Using an object here, rather than just storing all properties in

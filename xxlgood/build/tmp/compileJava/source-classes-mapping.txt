@@ -98,14 +98,18 @@ com/javaxxl/aop3/Main.java
  com.javaxxl.aop3.Main$MyPointCut$1
 com/javaxxl/publicevent/EatEventListener.java
  com.javaxxl.publicevent.EatEventListener
-com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
- com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
+com/javaxxl/bpp/Student.java
+ com.javaxxl.bpp.Student
+com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
+ com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
 com/javaxxl/publicevent/EventMain.java
  com.javaxxl.publicevent.EventMain
+com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
+ com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/javaxxl/parent/BeanParentAttTest.java
  com.javaxxl.parent.BeanParentAttTest
-com/javaxxl/Main.java
- com.javaxxl.Main
+com/shengsiyuan/spring/lecture/SpringClient.java
+ com.shengsiyuan.spring.lecture.SpringClient
 com/javaxxl/lookup/LookUpTest.java
  com.javaxxl.lookup.LookUpTest
 com/javaxxl/propertyeditor/PropertyEditorMain.java
@@ -116,17 +120,13 @@ com/javaxxl/replacemethod/MethodReplacerTest.java
  com.javaxxl.replacemethod.MethodReplacerTest
 com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
  com.javaxxl.beanFactoryBeanPostProcessor.BeanFactoryBeanPostProcessorMain
-com/javaxxl/bpp/Student.java
- com.javaxxl.bpp.Student
 com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
  com.javaxxl.lifecycle.LifeCycleMain
-com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
- com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
 com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/javaxxl/bpp/BppMain.java
  com.javaxxl.bpp.BppMain
-com/shengsiyuan/spring/lecture/SpringClient.java
- com.shengsiyuan.spring.lecture.SpringClient
+com/javaxxl/Main.java
+ com.javaxxl.Main

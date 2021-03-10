@@ -28,11 +28,17 @@ import java.util.stream.Stream;
 @SuppressWarnings("serial")
 public class MutablePropertyValues implements PropertyValues, Serializable {
 
+	/**
+	 * 注入的 属性 列表
+	 */
 	private final List<PropertyValue> propertyValueList;
 
 	@Nullable
 	private Set<String> processedProperties;
 
+	/**
+	 * 该属性值是否已经被抓获了，就是注入的value都是字符串，但是实例对应的属性可能不一定是字符串，所以有一个转换的概念！！！
+	 */
 	private volatile boolean converted;
 
 	/**

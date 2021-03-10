@@ -1476,8 +1476,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Initialize the given BeanWrapper with the custom editors registered
-	 * with this factory. To be called for BeanWrappers that will create
+	 * Initialize the given BeanWrapper with the custom editors registered with this factory.
+	 * -- 使用在此工厂注册的自定义编辑器初始化给定的BeanWrapper。
+	 *
+	 * To be called for BeanWrappers that will create
 	 * and populate bean instances.
 	 * <p>The default implementation delegates to {@link #registerCustomEditors}.
 	 * Can be overridden in subclasses.
@@ -1781,10 +1783,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 */
 
 			if (System.getSecurityManager() != null) {
-				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
-						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
-			} else {
+				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>) () ->
 
+						//通过该方法
+						doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
+			} else {
 				//如果没有则解析并加载
 				return doResolveBeanClass(mbd, typesToMatch);
 			}
@@ -1867,7 +1870,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
-		// Resolve regularly, caching the result in the BeanDefinition...
+		// Resolve regularly, caching the result in the BeanDefinition... -- 定期解析，将结果缓存在BeanDefinition中...
 		return mbd.resolveBeanClass(beanClassLoader);
 	}
 

@@ -152,8 +152,12 @@ public abstract class AbstractBeanDefinition
 	/**
 	 * TODO 这个 beanClass 可能是String className 也可能是 Class<?> beanClass 后面通过 instanceof 去判断
 	 *
+	 * 在创建当前bd实例的时候，如果有classLoader则会实例化一个Class赋值给当前字段，否则就是className
+	 *
 	 * @see BeanDefinitionReaderUtils#createBeanDefinition(java.lang.String, java.lang.String, java.lang.ClassLoader)
 	 * @see AbstractBeanDefinition#hasBeanClass()
+	 * @see AbstractBeanDefinition#resolveBeanClass(java.lang.ClassLoader) 解析
+	 * @see AbstractBeanFactory#doResolveBeanClass(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Class[]) 通过className 解析得到Class对象
 	 */
 	@Nullable
 	private volatile Object beanClass;
@@ -565,6 +569,7 @@ public abstract class AbstractBeanDefinition
 		if (className == null) {
 			return null;
 		}
+		//加载到jvm并且获取一个Class实例
 		Class<?> resolvedClass = ClassUtils.forName(className, classLoader);
 		this.beanClass = resolvedClass;
 		return resolvedClass;

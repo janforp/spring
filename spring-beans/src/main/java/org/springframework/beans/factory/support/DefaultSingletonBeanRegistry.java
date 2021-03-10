@@ -152,6 +152,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 实例创建彻底完成之后，包括aware接口，init，前置处理器跟后置处理器
+	 *
 	 * Add the given singleton object to the singleton cache of this factory.
 	 * <p>To be called for eager registration of singletons.
 	 *
@@ -180,9 +182,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
-				this.singletonFactories.put(beanName, singletonFactory);
-				this.earlySingletonObjects.remove(beanName);
-				this.registeredSingletons.add(beanName);
+				this.singletonFactories.put(beanName, singletonFactory);//三级缓存 Map<String, ObjectFactory<?>>
+				this.earlySingletonObjects.remove(beanName);//二级缓存 Map<String, Object> earlySingletonObjects
+				this.registeredSingletons.add(beanName); // Set<String> registeredSingletons 保存已经注册的beanName有序集合
 			}
 		}
 	}
@@ -355,6 +357,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					 * singletonFactory 一般是传进来一个匿名内部类
 					 * @see AbstractAutowireCapableBeanFactory#createBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
 					 * 其实调用上面的方法 createBean
+					 *
+					 * 此时实例创建彻底完成了，包括aware接口，init，前置处理器跟后置处理器
 					 */
 					singletonObject = singletonFactory.getObject();
 

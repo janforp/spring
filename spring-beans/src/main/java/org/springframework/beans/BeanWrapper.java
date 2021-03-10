@@ -30,7 +30,11 @@ import java.beans.PropertyDescriptor;
  * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
  * @since 13 April 2001
  */
-public interface BeanWrapper extends ConfigurablePropertyAccessor {
+public interface BeanWrapper
+		/**
+		 * 属性访问器
+		 */
+		extends ConfigurablePropertyAccessor {
 
 	/**
 	 * Specify a limit for array and collection auto-growing.
