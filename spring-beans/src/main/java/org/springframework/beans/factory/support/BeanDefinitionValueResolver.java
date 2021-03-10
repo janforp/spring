@@ -180,7 +180,7 @@ class BeanDefinitionValueResolver {
 				copy.put(propKey, propValue);
 			});
 			return copy;
-		} else if (value instanceof TypedStringValue) {
+		} else if (value instanceof TypedStringValue) {//<property name="id" value="1"/> 这样的属性就会走该分支
 			// Convert value to target type here.
 			TypedStringValue typedStringValue = (TypedStringValue) value;
 			Object valueObject = evaluate(typedStringValue);

@@ -229,6 +229,15 @@ public abstract class AbstractBeanDefinition
 	@Nullable
 	private String factoryMethodName;
 
+	/**
+	 * <bean class="com.javaxxl.bpp.Student" id="student" init-method="start">
+	 * --		<constructor-arg index="0" type="int" value="1"/>
+	 * --		<constructor-arg index="1" value="小刘"/>
+	 * -- 		<constructor-arg name="teacher" ref="teacher"/>
+	 * </bean>
+	 *
+	 * 这样的注入方式该字段就会有值
+	 */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 

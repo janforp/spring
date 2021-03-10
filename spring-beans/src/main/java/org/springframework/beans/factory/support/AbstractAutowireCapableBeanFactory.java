@@ -577,7 +577,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			/**
-			 * 核心方法，创建对象，并且生命周期大部分动作再次执行
+			 * 核心方法，创建对象，并且生命周期大部分动作在此执行
 			 * 1.创建实例
 			 * 2.依赖注入
 			 * 3.执行初始化方法
@@ -627,7 +627,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		 */
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
-			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
+			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);//ConcurrentMap<String, BeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<>();
 		}
 		if (instanceWrapper == null) {
 			/**
@@ -635,7 +635,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 *
 			 * 非常复杂：通过反射实现
 			 * 1.通常是通过反射的方式拿到该bean的一个构造方法
-			 * 此时，如果是无参数的构造方法，则问题补打
+			 * 此时，如果是无参数的构造方法，则问题不大
 			 * 但是如果是有参数的构造方法，则可能有其他问题了，假设 A a = new A(B b)
 			 * 此时B类型的bean还没有实例化，则此时需要去先实例化B，再假设 B b = new B(A a)
 			 * 此时就很尴尬了，出现了循环依赖
@@ -1414,12 +1414,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 				/**
 				 * <bean class = "xxx" autowire = "byType/byName/constructor/no/default" />
-				 * 一般情况是 AUTOWIRE_NO
+				 * 一般情况是 AUTOWIRE_NO = 0
 				 */
 				|| mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR
 
 				/**
-				 * bean 标签有 <constructor-agr>子标签则有
+				 * bean 标签有 <constructor-agr>子标签则有 ----- 通过构造器注入的时候该条件会满足
 				 * xml解析成 bd 的时候会塞入到 bd
 				 */
 				|| mbd.hasConstructorArgumentValues()
@@ -1428,17 +1428,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				 * getBean的时候 args 中是否有参数
 				 */
 				|| !ObjectUtils.isEmpty(args)) {
-			return autowireConstructor(beanName, mbd, ctors, args);
+			return autowireConstructor(beanName, mbd, ctors, args);//构造器注入的时候走该分支
 		}
 
-		// Preferred constructors for default construction?：默认构造的首选构造函数？
+		// Preferred constructors for default construction?：默认构造的首选构造函数？默认是空
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
 		/**
-		 * 大部分都会执行到这里
+		 * 大部分都会执行到这里，属性注入的时候：<property name="id" value="1"/>
 		 * 未指定构造参数，没有@Autowired设定偏好，就是用默认构造方法创建实例
 		 *
 		 * No special handling: simply use no-arg constructor.：无需特殊处理：只需使用no-arg构造函数。
@@ -1650,7 +1650,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		 * 		<property name="subject" value="脱发小刘"/>
 		 * 	</bean>
 		 *
-		 * 	PropertyValues 就是 bean 并且的 property 子标签
+		 * 	PropertyValues 就是 bean 并且的 property 子标签,如果是ref引用，则是运行时引用对象
 		 */
 		PropertyValues pvs =
 				(mbd.hasPropertyValues() ?

@@ -1,6 +1,7 @@
 package com.shengsiyuan.spring.lecture;
 
 import com.javaxxl.bpp.Student;
+import com.javaxxl.bpp.Teacher;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -39,6 +40,8 @@ public class SpringClient {
 		reader.loadBeanDefinitions(resource);
 
 		//上面是解析配置文件，并且解析配置文件，生成 BeanDefinition 并且注册到工厂中
+		Teacher teacher = (Teacher) factory.getBean("teacher");
+		System.out.println(teacher);
 
 		Student service = (Student) factory.getBean("student");
 		System.out.println(service);

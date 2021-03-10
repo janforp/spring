@@ -348,7 +348,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 *  8.此时会执行到这里，因为此时 {@link AbstractBeanFactory#prototypesCurrentlyInCreation} 中已经有 A 了，所以 {@link AbstractBeanFactory#isPrototypeCurrentlyInCreation(java.lang.String)} 会返回 true
 			 *  9.进入下面的if代码块，最终抛出了异常，成功阻止了原型模式的循环依赖
 			 */
-			if (isPrototypeCurrentlyInCreation(beanName)) {
+			if (isPrototypeCurrentlyInCreation(beanName)) {//ThreadLocal<Object> prototypesCurrentlyInCreation
 
 				/**
 				 * Fail if we're already creating this bean instance:
@@ -1320,7 +1320,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Callback before prototype creation.
+	 * Callback before prototype creation. ： 创建原型之前进行回调 ，目的是为了避免原型模式的bean出现循环依赖
 	 * <p>The default implementation register the prototype as currently in creation.
 	 *
 	 * @param beanName the name of the prototype about to be created
@@ -2022,7 +2022,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void markBeanAsCreated(String beanName) {
 		if (!this.alreadyCreated.contains(beanName)) {
-			//alreadyCreated Set 中还没有该 beanName
+			//alreadyCreated Set 中还没有该 beanName: Set<String> alreadyCreated
 
 			synchronized (this.mergedBeanDefinitions) {
 				if (!this.alreadyCreated.contains(beanName)) {

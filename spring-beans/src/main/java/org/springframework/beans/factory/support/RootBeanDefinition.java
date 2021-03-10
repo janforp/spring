@@ -97,7 +97,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object constructorArgumentLock = new Object();
 
 	/**
-	 * Package-visible field for caching the resolved constructor or factory method.
+	 * Package-visible field for caching the resolved constructor or factory method.:解析的构造方法或工厂方法
 	 * -- 程序包可见的字段，用于缓存已解析的构造函数或工厂方法。
 	 *
 	 * 如果该字段有值，则说明该bd创建实例的构造方法已经解析过了，并且就是当前字段，后续可以直接使用
@@ -135,7 +135,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/**
 	 * Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied.
 	 *
-	 * 表示是否执行过 AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors 方法了
+	 * 表示是否执行过 {@link AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors} 方法了
 	 *
 	 * @see AbstractAutowireCapableBeanFactory#doCreateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
 	 * @see AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Class, java.lang.String)

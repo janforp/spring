@@ -47,7 +47,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			//默认构造方法
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
-				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
+				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;//首次实例化是没有缓存的，首次过后就会把构造方法缓存到对应的bd
 				if (constructorToUse == null) {
 					final Class<?> clazz = bd.getBeanClass();
 					if (clazz.isInterface()) {
@@ -63,9 +63,9 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 							 *
 							 * 此处获取指定无参数的构造器，就是默认构造方法
 							 */
-							constructorToUse = clazz.getDeclaredConstructor();
+							constructorToUse = clazz.getDeclaredConstructor();//拿到默认的构造方法
 						}
-						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
+						bd.resolvedConstructorOrFactoryMethod = constructorToUse;//缓存到bd，方便后面直接使用
 					} catch (Throwable ex) {
 						throw new BeanInstantiationException(clazz, "No default constructor found", ex);
 					}

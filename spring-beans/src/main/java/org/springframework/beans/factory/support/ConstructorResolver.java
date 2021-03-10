@@ -459,7 +459,7 @@ class ConstructorResolver {
 		return bw;
 	}
 
-	private Object instantiate(
+	private Object instantiate(//通过反射，使用构造器实例化一个bean
 			String beanName,
 			RootBeanDefinition mbd,
 			Constructor<?> constructorToUse,//实例化使用的构造器
