@@ -16,12 +16,12 @@ public class JdkDynamicProxy implements InvocationHandler {
 	/**
 	 * 被代理对象,调用该对象的任何方法都会被重定向到方法{@link JdkDynamicProxy#invoke(Object, Method, Object[])}
 	 */
-	private Object target;
+	private final Object target;
 
 	/**
 	 * 拦截器列表，这些拦截器就是为了增强 被代理对象的
 	 */
-	private List<MyMethodInterceptor> interceptorList;
+	private final List<MyMethodInterceptor> interceptorList;
 
 	/**
 	 * 创建JdkDynamicProxy,用来创建代理对象,以及添加拦截器
@@ -53,7 +53,7 @@ public class JdkDynamicProxy implements InvocationHandler {
 		//拦截器驱动
 		MyMethodInvocation invocation = new MyMethodInvocationImpl(targetMethod, interceptorList);
 		//先这些拦截器，再调用被代理对象的方法
-		return invocation.proceed();
+		return invocation.proceed();//驱动拦截器按顺序执行，最后调用被代理方法
 	}
 
 	/**
