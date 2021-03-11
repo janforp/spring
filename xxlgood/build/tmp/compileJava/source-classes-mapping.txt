@@ -135,14 +135,14 @@ com/javaxxl/aop0_多重代理/Test2Main.java
  com.javaxxl.aop0_多重代理.Test2Main
 com/javaxxl/aop1/Main.java
  com.javaxxl.aop1.Main
-com/javaxxl/aop1/MyMethodInvocationImpl.java
- com.javaxxl.aop1.MyMethodInvocationImpl
-com/javaxxl/aop1/JdkDynamicProxy.java
- com.javaxxl.aop1.JdkDynamicProxy
+com/javaxxl/aop0_chain/JdkDynamicProxy.java
+ com.javaxxl.aop0_chain.JdkDynamicProxy
 com/javaxxl/aop0_chain/Test3Main.java
  com.javaxxl.aop0_chain.Test3Main
  com.javaxxl.aop0_chain.Test3Main$1
  com.javaxxl.aop0_chain.Test3Main$OneHandler
  com.javaxxl.aop0_chain.Test3Main$TwoHandler
-com/javaxxl/aop0_chain/JdkDynamicProxy.java
- com.javaxxl.aop0_chain.JdkDynamicProxy
+com/javaxxl/aop1/MyMethodInvocationImpl.java
+ com.javaxxl.aop1.MyMethodInvocationImpl
+com/javaxxl/aop1/JdkDynamicProxy.java
+ com.javaxxl.aop1.JdkDynamicProxy

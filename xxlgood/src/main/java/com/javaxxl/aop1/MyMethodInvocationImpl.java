@@ -9,18 +9,17 @@ import java.util.List;
  * @author zhucj
  * @since 20210225
  */
-@SuppressWarnings("all")
 public class MyMethodInvocationImpl implements MyMethodInvocation {
 
 	/**
 	 * 封装了被代理方法，拦截器都执行完成之后就要调用该方法
 	 */
-	private TargetMethod targetMethod;
+	private final TargetMethod targetMethod;
 
 	/**
 	 * 拦截器链表
 	 */
-	private List<MyMethodInterceptor> interceptorList;
+	private final List<MyMethodInterceptor> interceptorList;
 
 	/**
 	 * 拦截器执行的次序
