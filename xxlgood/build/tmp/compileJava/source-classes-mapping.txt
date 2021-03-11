@@ -130,15 +130,10 @@ com/javaxxl/bpp/BppMain.java
  com.javaxxl.bpp.BppMain
 com/javaxxl/Main.java
  com.javaxxl.Main
-com/javaxxl/aop0_多重代理/JdkDynamicProxy2.java
- com.javaxxl.aop0_多重代理.JdkDynamicProxy2
 com/javaxxl/aop0_多重代理/Test2Main.java
  com.javaxxl.aop0_多重代理.Test2Main
-com/javaxxl/aop0_chain/Test3Main.java
- com.javaxxl.aop0_chain.Test3Main
- com.javaxxl.aop0_chain.Test3Main$1
- com.javaxxl.aop0_chain.Test3Main$OneHandler
- com.javaxxl.aop0_chain.Test3Main$TwoHandler
+com/javaxxl/aop0_多重代理/JdkDynamicProxy2.java
+ com.javaxxl.aop0_多重代理.JdkDynamicProxy2
 com/javaxxl/aop0_chain/AbstractHandler.java
  com.javaxxl.aop0_chain.AbstractHandler
  com.javaxxl.aop0_chain.AbstractHandler$HeadHandler
@@ -146,3 +141,8 @@ com/javaxxl/aop0_chain/JdkDynamicProxy.java
  com.javaxxl.aop0_chain.JdkDynamicProxy
 com/javaxxl/aop0_chain/TargetMethod.java
  com.javaxxl.aop0_chain.TargetMethod
+com/javaxxl/aop0_chain/Test3Main.java
+ com.javaxxl.aop0_chain.Test3Main
+ com.javaxxl.aop0_chain.Test3Main$1
+ com.javaxxl.aop0_chain.Test3Main$OneHandler
+ com.javaxxl.aop0_chain.Test3Main$TwoHandler

@@ -25,8 +25,9 @@ public abstract class AbstractHandler {
 		return nextHandler.invoke(targetMethod);
 	}
 
-	public void setNextHandler(AbstractHandler nextHandler) {
+	public AbstractHandler setNextHandler(AbstractHandler nextHandler) {
 		this.nextHandler = nextHandler;
+		return nextHandler;
 	}
 
 	public static class HeadHandler extends AbstractHandler {

@@ -14,18 +14,21 @@ import java.lang.reflect.InvocationTargetException;
 public class Test3Main {
 
 	public static void main(String[] args) {
+		//创建被代理对象
 		Cat cat = new Cat();
 
+		//组装责任链 start
 		//head --> oneHandler --> twoHandler
 		AbstractHandler headHandler = new AbstractHandler.HeadHandler();
-		OneHandler oneHandler = new OneHandler();
-		headHandler.setNextHandler(oneHandler);
-		oneHandler.setNextHandler(new TwoHandler());
+		headHandler.setNextHandler(new OneHandler()).setNextHandler(new TwoHandler());
+		//组装责任链 end
 
+		//创建代理对象
 		JdkDynamicProxy jdkDynamicProxy = new JdkDynamicProxy(cat, headHandler);
-
+		//获取代理对象的实例
 		Animal proxy = (Animal) jdkDynamicProxy.getProxy();
 
+		//通过代理对象实例调用方法
 		proxy.eat();
 	}
 
@@ -33,9 +36,9 @@ public class Test3Main {
 
 		@Override
 		Object invoke(TargetMethod targetMethod) throws InvocationTargetException, IllegalAccessException {
-			System.out.println("one handler begin");
+			System.out.println("责任链上的第一个增强 one handler begin");
 			Object ret = proceed(targetMethod);
-			System.out.println("one handler end");
+			System.out.println("责任链上的第一个增强 one handler end");
 			return ret;
 		}
 	}
@@ -44,9 +47,9 @@ public class Test3Main {
 
 		@Override
 		Object invoke(TargetMethod targetMethod) throws InvocationTargetException, IllegalAccessException {
-			System.out.println("two handler begin");
+			System.out.println("责任链上的第二个增强 two handler begin");
 			Object ret = proceed(targetMethod);
-			System.out.println("two handler end");
+			System.out.println("责任链上的第二个增强 two handler end");
 			return ret;
 		}
 	}

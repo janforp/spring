@@ -15,9 +15,12 @@ public class JdkDynamicProxy implements InvocationHandler {
 	/**
 	 * 被代理对象
 	 */
-	private Object target;
+	private final Object target;
 
-	private AbstractHandler headHandler;
+	/**
+	 * 持有该责任链!!!!!!!!!!
+	 */
+	private final AbstractHandler headHandler;
 
 	public JdkDynamicProxy(Object target, AbstractHandler headHandler) {
 		this.target = target;
@@ -34,7 +37,9 @@ public class JdkDynamicProxy implements InvocationHandler {
 	 */
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		//把所有的参数都封装起来
 		TargetMethod targetMethod = new TargetMethod(target, method, args);
+		//!!!!!!!!很关键！！！！
 		return headHandler.proceed(targetMethod);
 	}
 
