@@ -14,11 +14,19 @@ import java.lang.reflect.Constructor;
  * Objenesis-based extension of {@link CglibAopProxy} to create proxy instances
  * without invoking the constructor of the class. Used by default as of Spring 4.
  *
+ * -- {@link CglibAopProxy}的基于对象的扩展，以创建代理实例，
+ *
+ * ！！！！！！！而无需调用类的构造函数。
+ *
+ * 从Spring 4开始默认使用。！！！！！
+ *
  * @author Oliver Gierke
  * @author Juergen Hoeller
  * @since 4.0 自从 spring 4.0 之后就默认使用该方法生成代理对象!!!!
  *
  * Objenesis：肥胖症
+ *
+ * TODO 他跟 CglibAopProxy 有声明区别呢？
  */
 @SuppressWarnings("serial")
 class ObjenesisCglibAopProxy

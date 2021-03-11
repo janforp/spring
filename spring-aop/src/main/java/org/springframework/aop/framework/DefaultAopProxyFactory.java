@@ -27,6 +27,8 @@ import java.lang.reflect.Proxy;
  * @see AdvisedSupport#setProxyTargetClass
  * @see AdvisedSupport#setInterfaces
  * @since 12.03.2004
+ *
+ * 该类决定当前代理对象的生成方式！！！
  */
 @SuppressWarnings("serial")
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {

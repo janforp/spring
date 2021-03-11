@@ -73,7 +73,13 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class ProxyFactoryBean extends ProxyCreatorSupport
-		implements FactoryBean<Object>, BeanClassLoaderAware, BeanFactoryAware {
+
+		/**
+		 * 不一个普通bean
+		 */
+		implements FactoryBean<Object>,
+
+		BeanClassLoaderAware, BeanFactoryAware {
 
 	/**
 	 * TODO 非常重要！！！
@@ -248,10 +254,12 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	}
 
 	/**
-	 * Return a proxy. Invoked when clients obtain beans from this factory bean.
-	 * Create an instance of the AOP proxy to be returned by this factory.
+	 * 关键方法！！
+	 *
+	 * Return a proxy. Invoked when clients obtain beans from this factory bean. -- 返回代理。当客户从该工厂bean获得bean时调用。
+	 * Create an instance of the AOP proxy to be returned by this factory. -- 创建要由该工厂返回的AOP代理的实例。
 	 * The instance will be cached for a singleton, and create on each call to
-	 * {@code getObject()} for a proxy.
+	 * {@code getObject()} for a proxy. -- 该实例将被缓存一个单例，并在每次调用{@code getObject（）}时创建一个代理。
 	 *
 	 * @return a fresh AOP proxy reflecting the current state of this factory
 	 */

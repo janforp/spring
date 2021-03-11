@@ -34,6 +34,7 @@ public interface AopProxyFactory {
 	 * AdvisedSupport object
 	 * @return the corresponding AOP proxy
 	 * @throws AopConfigException if the configuration is invalid
+	 * @see DefaultAopProxyFactory#createAopProxy(org.springframework.aop.framework.AdvisedSupport)
 	 */
 	AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException;
 }

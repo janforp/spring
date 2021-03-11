@@ -24,8 +24,10 @@ import java.util.List;
  * based on JDK {@link java.lang.reflect.Proxy dynamic proxies}.
  *
  * <p>Creates a dynamic proxy, implementing the interfaces exposed by
- * the AopProxy. Dynamic proxies <i>cannot</i> be used to proxy methods
- * defined in classes, rather than interfaces.
+ * the AopProxy.
+ *
+ * Dynamic proxies cannot be used to proxy methods defined in classes, rather than interfaces.
+ * -- 动态代理不能用于代理类（而是接口）中定义的方法。
  *
  * <p>Objects of this type should be obtained through proxy factories,
  * configured by an {@link AdvisedSupport} class. This class is internal
