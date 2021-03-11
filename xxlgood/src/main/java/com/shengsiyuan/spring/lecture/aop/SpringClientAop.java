@@ -2,6 +2,7 @@ package com.shengsiyuan.spring.lecture.aop;
 
 import com.shengsiyuan.spring.lecture.aop.service.MyService;
 import org.springframework.aop.SpringProxy;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -50,6 +51,7 @@ public class SpringClientAop {
 		 *
 		 * 问题：TODO
 		 * 1.为什么获取beanName为 myAop 返回类 MyService 类型而不是一个 ProxyFactoryBean 类型的实例呢？
+		 * @see AbstractBeanFactory#getObjectForBeanInstance 因为 FactoryBean 可以管理一个 bean，但是他本身也是一个bean
 		 *
 		 * 可以断点进去看看哦！！！！！
 		 */
