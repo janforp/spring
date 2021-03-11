@@ -15,7 +15,7 @@ public class JdkDynamicProxy implements InvocationHandler {
 	/**
 	 * 被代理对象
 	 */
-	private Object target;
+	private final Object target;
 
 	public JdkDynamicProxy(Object target) {
 		this.target = target;
@@ -44,9 +44,11 @@ public class JdkDynamicProxy implements InvocationHandler {
 	 * @return 代理之后的对象
 	 */
 	public Object getProxy() {
+		//返回一个代理对象（其中就包含了一个被代理的目标对象）
 		return Proxy.newProxyInstance(
-				target.getClass().getClassLoader(),//类加载起
+				target.getClass().getClassLoader(),//类加载器
 				target.getClass().getInterfaces(), //代理类需要实现的接口集合
-				this); // 代理类虽然全部实现类接口方法，但是接口方法要依靠InvocationHandler去处理
+				this// 代理类虽然全部实现类接口方法，但是接口方法要依靠InvocationHandler去处理
+		);
 	}
 }

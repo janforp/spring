@@ -56,10 +56,10 @@ com/javaxxl/aop1/MyMethodInvocationImpl.java
  com.javaxxl.aop1.MyMethodInvocationImpl
 com/javaxxl/classutils/A.java
  com.javaxxl.classutils.A
-com/javaxxl/aop0/JdkDynamicProxy.java
- com.javaxxl.aop0.JdkDynamicProxy
-com/javaxxl/aop0/TestMain.java
- com.javaxxl.aop0.TestMain
+com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
+ com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
+com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
+ com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/javaxxl/aop1/TargetMethod.java
  com.javaxxl.aop1.TargetMethod
 com/javaxxl/aop0/Animal.java
@@ -100,12 +100,10 @@ com/javaxxl/publicevent/EatEventListener.java
  com.javaxxl.publicevent.EatEventListener
 com/javaxxl/bpp/Student.java
  com.javaxxl.bpp.Student
-com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
- com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
 com/javaxxl/publicevent/EventMain.java
  com.javaxxl.publicevent.EventMain
-com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
- com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
+com/javaxxl/aop0/JdkDynamicProxy.java
+ com.javaxxl.aop0.JdkDynamicProxy
 com/javaxxl/parent/BeanParentAttTest.java
  com.javaxxl.parent.BeanParentAttTest
 com/shengsiyuan/spring/lecture/SpringClient.java
@@ -120,6 +118,8 @@ com/javaxxl/replacemethod/MethodReplacerTest.java
  com.javaxxl.replacemethod.MethodReplacerTest
 com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
  com.javaxxl.beanFactoryBeanPostProcessor.BeanFactoryBeanPostProcessorMain
+com/javaxxl/aop0/TestMain.java
+ com.javaxxl.aop0.TestMain
 com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
