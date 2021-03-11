@@ -4,9 +4,12 @@ import org.springframework.lang.Nullable;
 
 /**
  * Interface to be implemented by objects used within a {@link BeanFactory} which
- * are themselves factories for individual objects. If a bean implements this
+ * are themselves factories for individual objects.
+ *
+ * If a bean implements this
  * interface, it is used as a factory for an object to expose, not directly as a
  * bean instance that will be exposed itself.
+ * -- 如果Bean实现此接口，则它将用作对象公开的工厂，而不是直接用作将自身公开的Bean实例。
  *
  * <p><b>NB: A bean that implements this interface cannot be used as a normal bean.</b>
  * A FactoryBean is defined in a bean style, but the object exposed for bean
@@ -47,6 +50,23 @@ import org.springframework.lang.Nullable;
  * @since 08.03.2003
  */
 public interface FactoryBean<T> {
+
+	/**
+	 * TODO 很重要！！！
+	 *
+	 * 如果Bean实现此接口，则它将用作对象公开的工厂，而不是直接用作将自身公开的Bean实例。
+	 *
+	 * FactoryBean 与 {@link BeanFactory} 的区别？!!!!!!
+	 *
+	 * 1.BeanFactory 是 Spring 的 IOC 工厂，它里面管理着Spring说创建出来的各种Bean对象，当我们在配置文件(注解)中声明了某个Bean的Id后，通过
+	 * 这个id就能获取到与该id所对应的class对象实例（可能新建，可能从缓存获取）
+	 * 2.FactoryBean本质上也是一个bean，它同其他bean一样，也是由BeanFactory所管理和维护，当然他的实例也会缓存到spring工厂(BeanFactory)中（如果是单例），
+	 * 他与普通bean的唯一区别在于，当spring创建另一个FactoryBean实例后，他接下来会判断当前所创建的Bean是否是一个FactoryBean实例，如果不是，那么就直接将
+	 * 创建出来的bean返回给客户端，如果是，那么他会对其进行进一步的处理，根据配置文件所配置的target,advisor,interfaces等信息，在运行期动态的构建出一个类，并且
+	 * 生成该类的一个实例，最后将该实例返回给客户端，因此，我们在声明一个FactoryBean的时候，通过id获取的并非是这个FactoryBean的实例，而是他动态生成出来的一个代理对象
+	 *
+	 * @see org.springframework.aop.framework.ProxyFactoryBean
+	 */
 
 	/**
 	 * The name of an attribute that can be
