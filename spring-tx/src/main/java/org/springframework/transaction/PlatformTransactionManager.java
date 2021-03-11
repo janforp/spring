@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.transaction;
 
 import org.springframework.lang.Nullable;
@@ -38,10 +22,10 @@ import org.springframework.lang.Nullable;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @since 16.05.2003
  * @see org.springframework.transaction.support.TransactionTemplate
  * @see org.springframework.transaction.interceptor.TransactionInterceptor
  * @see org.springframework.transaction.ReactiveTransactionManager
+ * @since 16.05.2003
  */
 public interface PlatformTransactionManager extends TransactionManager {
 
@@ -56,6 +40,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 	 * <p>An exception to the above rule is the read-only flag, which should be
 	 * ignored if no explicit read-only mode is supported. Essentially, the
 	 * read-only flag is just a hint for potential optimization.
+	 *
 	 * @param definition the TransactionDefinition instance (can be {@code null} for defaults),
 	 * describing propagation behavior, isolation level, timeout etc.
 	 * @return transaction status object representing the new or current transaction
@@ -68,8 +53,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 	 * @see TransactionDefinition#getTimeout
 	 * @see TransactionDefinition#isReadOnly
 	 */
-	TransactionStatus getTransaction(@Nullable TransactionDefinition definition)
-			throws TransactionException;
+	TransactionStatus getTransaction(@Nullable TransactionDefinition definition) throws TransactionException;
 
 	/**
 	 * Commit the given transaction, with regard to its status. If the transaction
@@ -87,6 +71,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 	 * database right before commit, with the resulting DataAccessException
 	 * causing the transaction to fail. The original exception will be
 	 * propagated to the caller of this commit method in such a case.
+	 *
 	 * @param status object returned by the {@code getTransaction} method
 	 * @throws UnexpectedRollbackException in case of an unexpected rollback
 	 * that the transaction coordinator initiated
@@ -110,6 +95,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 	 * The transaction will already have been completed and cleaned up when commit
 	 * returns, even in case of a commit exception. Consequently, a rollback call
 	 * after commit failure will lead to an IllegalTransactionStateException.
+	 *
 	 * @param status object returned by the {@code getTransaction} method
 	 * @throws TransactionSystemException in case of rollback or system errors
 	 * (typically caused by fundamental resource failures)
@@ -117,5 +103,4 @@ public interface PlatformTransactionManager extends TransactionManager {
 	 * is already completed (that is, committed or rolled back)
 	 */
 	void rollback(TransactionStatus status) throws TransactionException;
-
 }

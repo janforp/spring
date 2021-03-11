@@ -47,7 +47,29 @@ import java.util.List;
  * @see AdvisedSupport
  * @see ProxyFactory
  */
-final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {
+final class JdkDynamicAopProxy implements AopProxy,
+
+		/**
+		 * jdk动态代理
+		 * @see Proxy 动态代理类， 通过该类的静态方法获取代理对象实例
+		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[]) 该接口的重要方法
+		 */
+		InvocationHandler, Serializable {
+
+	/**
+	 * JDK动态代理是这样一种class:
+	 *
+	 * 在运行时候生成class，在生成它时你必须提供一组interface给它，然后该class就会声明它实现了这些interface，因此我们就可以将
+	 * 该class实例当作这些interface中的任何一个来用，当然，这个动态代理其实就是一个Proxy,它不会替你作实质性的工作，在生成它的实例
+	 * 时你必须提供一个handler，由它接替实际的工作！
+	 *
+	 * JDL的动态代理实现步骤：
+	 *
+	 * 1.创建一个实现接口 {@link InvocationHandler} 的类，它必须实现 {@link InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])} 方法
+	 * 2.创建被代理的类以及接口
+	 * 3.通过Proxy的静态方法 {@link Proxy#newProxyInstance(java.lang.ClassLoader, java.lang.Class[], java.lang.reflect.InvocationHandler)} 创建一个代理
+	 * 4.通过代理调用方法
+	 */
 
 	/**
 	 * use serialVersionUID from Spring 1.2 for interoperability.
@@ -171,6 +193,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				this.proxiedInterfaces, //生成代理类需要实现的接口集合
 
 				/**
+				 * InvocationHandler 实例
+				 *
 				 * JdkDynamicAopProxy 其实就是 InvocationHandler
 				 * 该类实现了 {@link InvocationHandler} 接口
 				 * 该方法最终会返回一个代理类对象

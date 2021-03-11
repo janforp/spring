@@ -12,6 +12,9 @@ import org.springframework.lang.Nullable;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see DefaultAopProxyFactory
+ * @see CglibAopProxy 生成代理对象方法1
+ * @see JdkDynamicAopProxy 生成代理对象方法2，代理接口
+ * @see ObjenesisCglibAopProxy  生成代理对象方法3，代理非接口的默认方法
  */
 public interface AopProxy {
 

@@ -42,8 +42,8 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 	/**
 	 * @param config the AOP configuration in the form of an
 	 * AdvisedSupport object
-	 * @return
-	 * @throws AopConfigException
+	 * @return 一个生成代理对象的实例
+	 * @throws AopConfigException 异常
 	 * @see org.springframework.aop.framework.ProxyCreatorSupport
 	 * @see ProxyFactory
 	 */
@@ -61,12 +61,14 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {
-				throw new AopConfigException("TargetSource cannot determine target class: "
-						+ "Either an interface or a target is required for proxy creation.");
+				throw new AopConfigException("TargetSource cannot determine target class: " + "Either an interface or a target is required for proxy creation.");
 			}
 			if (targetClass.isInterface() //一个接口
 
-					//或者该类型已经是一个被代理过的类型
+					/**
+					 * 或者该类型已经是一个被代理过的类型
+					 * 该类型已经是一个jdk动态代理对象来
+					 */
 					|| Proxy.isProxyClass(targetClass)) {
 
 				//如果被代理class是接口或者该类型已经是一个被代理过的类型，则使用jdk的动态代理
