@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean class="com.shengsiyuan.spring.lecture.aop.service.impl.MyServiceImpl" id="myService"/>
+
+	<bean class="com.shengsiyuan.spring.lecture.aop.advisor.MyAdvisor" id="myAdvisor"/>
+
+	<bean class="org.springframework.aop.framework.ProxyFactoryBean" id="myAop">
+		<property name="proxyInterfaces">
+			<value>com.shengsiyuan.spring.lecture.aop.service.MyService</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>myAdvisor</value>
+			</list>
+		</property>
+		<property name="target">
+			<ref bean="myService"/>
+		</property>
+	</bean>
+
+</beans>
