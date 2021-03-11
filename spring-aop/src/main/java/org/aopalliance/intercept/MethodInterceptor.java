@@ -27,7 +27,12 @@ import javax.annotation.Nullable;
  * @author Rod Johnson
  */
 @FunctionalInterface
-public interface MethodInterceptor extends Interceptor {
+public interface MethodInterceptor
+
+		/**
+		 * 拦截器
+		 */
+		extends Interceptor {
 
 	/**
 	 * Implement this method to perform extra treatments before and

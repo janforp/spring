@@ -14,7 +14,7 @@ import org.springframework.lang.NonNull;
 import java.lang.reflect.Method;
 
 /**
- * 只增强 {@link Animal} 的 eat 方法
+ * 只增强 {@link Animal#eat()} 的 eat 方法
  *
  * @author zhucj
  * @since 20210225
@@ -32,6 +32,9 @@ public class Main {
 		//3.添加方法拦截器以及指定切点
 		MyPointCut pointCut = new MyPointCut();
 		proxyFactory.addAdvisor(
+				/**
+				 * advisor：包含增强跟切面
+				 */
 				new DefaultPointcutAdvisor(pointCut, new MethodInterceptor01())
 		);
 		proxyFactory.addAdvisor(
@@ -43,9 +46,21 @@ public class Main {
 
 		proxy.eat();
 
-		System.out.println("------------------");
+		System.out.println("--------- 分隔符 ---------");
 
 		proxy.go();
+
+		/**
+		 * 执行结果：
+		 *
+		 * 拦截器1 开始
+		 * 拦截器2 开始
+		 * *************** 猫猫吃猫粮！！
+		 * 拦截器2 结束
+		 * 拦截器1 结束
+		 * --------- 分隔符 ---------
+		 * *************** 猫猫跑！！
+		 */
 	}
 
 	private static class MethodInterceptor01 implements MethodInterceptor {
@@ -74,6 +89,7 @@ public class Main {
 
 		@Override
 		public ClassFilter getClassFilter() {
+			//匹配所有的类
 			return clazz -> true;
 		}
 
@@ -82,6 +98,7 @@ public class Main {
 			return new MethodMatcher() {
 				@Override
 				public boolean matches(Method method, Class<?> targetClass) {
+					//匹配名称为 eat 的方法!!
 					return method.getName().equals("eat");
 				}
 

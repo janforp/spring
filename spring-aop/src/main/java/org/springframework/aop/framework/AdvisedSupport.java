@@ -1,6 +1,7 @@
 package org.springframework.aop.framework;
 
 import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.DynamicIntroductionAdvice;
 import org.springframework.aop.IntroductionAdvisor;
@@ -58,6 +59,10 @@ public class AdvisedSupport
 
 	/**
 	 * Package-protected to allow direct access for efficiency.
+	 *
+	 * 封装了被代理对象！
+	 *
+	 * @see AdvisedSupport#setTarget(java.lang.Object)
 	 */
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 
@@ -372,8 +377,7 @@ public class AdvisedSupport
 			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
 		}
 		if (pos > this.advisors.size()) {
-			throw new IllegalArgumentException(
-					"Illegal position " + pos + " in advisor list with size " + this.advisors.size());
+			throw new IllegalArgumentException("Illegal position " + pos + " in advisor list with size " + this.advisors.size());
 		}
 		this.advisors.add(pos, advisor);
 		adviceChanged();
@@ -388,9 +392,14 @@ public class AdvisedSupport
 		return this.advisors;
 	}
 
+	/**
+	 * @param advice the advice to add to the tail of the chain 我们一般会传一个自定义的 {@link MethodInterceptor}
+	 */
 	@Override
 	public void addAdvice(Advice advice) throws AopConfigException {
-		//当前已经有的增强个数
+		/**
+		 * 当前已经有的增强个数
+		 */
 		int pos = this.advisors.size();
 		addAdvice(pos, advice);
 	}
@@ -420,7 +429,10 @@ public class AdvisedSupport
 			 */
 			addAdvisor(
 					pos,
-					//Spring中Advice对应的接口就是 Advisor，Spring使用 Advisor 包装一个 AOP联盟的 Advice实例
+					/**
+					 * Spring中Advice对应的接口就是 Advisor，Spring使用 Advisor 包装一个 AOP联盟的 Advice实例
+					 * @see 我们一般会传一个自定义的 {@link MethodInterceptor}
+					 */
 					new DefaultPointcutAdvisor(advice)
 			);
 		}

@@ -33,14 +33,18 @@ public interface Pointcut {
 	/**
 	 * Return the ClassFilter for this pointcut.
 	 *
-	 * @return the ClassFilter (never {@code null})
+	 * Pointcut 持有类过滤器，过滤器作用：判断某个类是否符合切点位置
+	 *
+	 * @return the ClassFilter (never {@code null}) 类过滤器
 	 */
 	ClassFilter getClassFilter();
 
 	/**
 	 * Return the MethodMatcher for this pointcut.
 	 *
-	 * @return the MethodMatcher (never {@code null})
+	 * Pointcut 持有方法匹配器，作用：判断类中某个方法是否符合切点位置
+	 *
+	 * @return the MethodMatcher (never {@code null}) 方法匹配，在一个类匹配成功之后，继续匹配类中的方法
 	 */
 	MethodMatcher getMethodMatcher();
 

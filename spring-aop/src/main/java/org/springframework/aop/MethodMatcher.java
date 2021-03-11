@@ -67,6 +67,7 @@ public interface MethodMatcher {
 	 * is required if static matching passed
 	 *
 	 * 返回true：表示需要做运行时匹配，否则不需要
+	 * 一般是按照方法的入参数进行动态判断是否匹配
 	 */
 	boolean isRuntime();
 

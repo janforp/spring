@@ -20,6 +20,10 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class DefaultPointcutAdvisor
+
+		/**
+		 * pointCut切点:表示切面
+		 */
 		extends AbstractGenericPointcutAdvisor
 		implements Serializable {
 

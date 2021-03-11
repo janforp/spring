@@ -4,6 +4,7 @@ import com.javaxxl.aop0.Animal;
 import com.javaxxl.aop0.Cat;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.lang.NonNull;
 
@@ -24,6 +25,11 @@ public class Main {
 		ProxyFactory proxyFactory = new ProxyFactory(cat);
 
 		//3.添加方法拦截器
+		/**
+		 * @see AdvisedSupport#advisors 被添加到这个列表中了
+		 *
+		 * @see java/com/javaxxl/pointcut的使用源码.png
+		 */
 		proxyFactory.addAdvice(new MethodInterceptor01());
 		proxyFactory.addAdvice(new MethodInterceptor02());
 
@@ -32,7 +38,7 @@ public class Main {
 
 		proxy.eat();
 
-		System.out.println("------------------");
+		System.out.println("--------- 分隔符 ---------");
 
 		proxy.go();
 	}
