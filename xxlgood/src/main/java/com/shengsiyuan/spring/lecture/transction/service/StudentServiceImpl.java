@@ -20,5 +20,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public void saveStudent(Student student) {
 		studentDAO.saveStudent(student);
+
+		//throw new RuntimeException("发生了异常");
 	}
 }

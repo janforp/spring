@@ -8,7 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * TransctionClient
+ * TransactionClient
  *
  * @author zhucj
  * @since 20210325
