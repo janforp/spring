@@ -1,6 +1,7 @@
 package com.shengsiyuan.spring.lecture.aop;
 
 import com.shengsiyuan.spring.lecture.aop.service.MyService;
+import org.springframework.aop.framework.JdkDynamicAopProxy;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -76,6 +77,10 @@ public class SpringClientAop {
 		 * 可以断点进去看看哦！！！！！
 		 */
 		MyService myService = (MyService) factory.getBean("myAop");
+
+		/**
+		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[]) 调用代理对象的方法，回调到该方法
+		 */
 		myService.myMethod();
 
 		System.out.println(myService.getClass());

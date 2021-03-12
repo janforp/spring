@@ -100,7 +100,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 				/**
 				 * 获取一个代理工厂
 				 *
-				 * @see DefaultAopProxyFactory 代理工厂
+				 * @see DefaultAopProxyFactory 代理工厂 默认实例
 				 * @see JdkDynamicAopProxy
 				 * @see ObjenesisCglibAopProxy
 				 * @see AopProxy 分为 jdk 跟 cglib 2个实现

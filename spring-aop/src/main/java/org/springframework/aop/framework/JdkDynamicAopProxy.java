@@ -191,12 +191,16 @@ final class JdkDynamicAopProxy implements AopProxy,
 		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
 		return Proxy.newProxyInstance(
+				/**
+				 * @see jdk.internal.loader.ClassLoaders.AppClassLoader
+				 * @see jdk.internal.loader.ClassLoaders.PlatformClassLoader
+				 */
 				classLoader, //类加载器
 				this.proxiedInterfaces, //生成代理类需要实现的接口集合
 
 				/**
-				 * InvocationHandler 实例
-				 *
+				 * InvocationHandler 实例,该方法生成的代理对象的方法就会回调 this 所实现的 invoke 方法
+				 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 				 * JdkDynamicAopProxy 其实就是 InvocationHandler
 				 * 该类实现了 {@link InvocationHandler} 接口
 				 * 该方法最终会返回一个代理类对象
@@ -231,6 +235,7 @@ final class JdkDynamicAopProxy implements AopProxy,
 	}
 
 	/**
+	 * TODO 关键，拦截器/AOP实现的核心逻辑！！！！
 	 * Implementation of {@code InvocationHandler.invoke}.
 	 * <p>Callers will see exactly the exception thrown by the target,
 	 * unless a hook method throws an exception.
@@ -246,13 +251,10 @@ final class JdkDynamicAopProxy implements AopProxy,
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		Object oldProxy = null;
 		boolean setProxyContext = false;
-
 		//获取到创建 ProxyFactory 的时候提供的 target
 		TargetSource targetSource = this.advised.targetSource;
-
 		//真正的 target 引用
 		Object target = null;
-
 		try {
 			if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {
 				// 如果代理对象没有实现 equals 方法，并且当前调用方法是 equal 方法，则所以当前 JdkDynamicAopProxy 对象提供的 equal 方法
@@ -269,10 +271,8 @@ final class JdkDynamicAopProxy implements AopProxy,
 				// Service invocations on ProxyConfig with the proxy config...：使用代理配置在ProxyConfig上进行服务调用...
 				return AopUtils.invokeJoinpointUsingReflection(this.advised, method, args);
 			}
-
 			//保存返回值
 			Object retVal;
-
 			/**
 			 * 表示是否需要把当前代理对象暴露到 Aop 上下文中
 			 * 暴露之后应用程序就能拿到
@@ -326,11 +326,8 @@ final class JdkDynamicAopProxy implements AopProxy,
 				 */
 				retVal = invocation.proceed();
 			}
-
 			//核心逻辑已经完成
-
 			// Massage return value if necessary.
-
 			//获取方法返回值类型
 			Class<?> returnType = method.getReturnType();
 			if (retVal != null
