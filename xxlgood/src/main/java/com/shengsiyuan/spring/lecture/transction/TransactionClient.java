@@ -11,6 +11,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
@@ -80,6 +81,9 @@ public class TransactionClient {
 		 * @see org.springframework.orm.hibernate5.HibernateTransactionManager Hibernate版本的实现
 		 * @see 可以看mybatis的实现
 		 * @see AbstractPlatformTransactionManager
+		 * @see cn.com.servyou.xqy.framework.daoframework.transaction.MultipleDataSourcesTransactionManager 税友的实现
+		 *
+		 * @see TransactionAspectSupport#invokeWithinTransaction(java.lang.reflect.Method, java.lang.Class, org.springframework.transaction.interceptor.TransactionAspectSupport.InvocationCallback) 开启事务的方法
 		 */
 		//上面是解析配置文件，并且解析配置文件，生成 BeanDefinition 并且注册到工厂中
 		StudentService service = (StudentService) factory.getBean("studentServiceProxy");
@@ -87,7 +91,7 @@ public class TransactionClient {
 		Student student = new Student();
 		student.setName("zhangSan");
 		student.setAge(20);
-
+		//底层：开启事务，执行，提交事务
 		service.saveStudent(student);
 	}
 }

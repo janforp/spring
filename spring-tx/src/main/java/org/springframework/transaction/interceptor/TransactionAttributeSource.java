@@ -1,24 +1,8 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.transaction.interceptor;
 
-import java.lang.reflect.Method;
-
 import org.springframework.lang.Nullable;
+
+import java.lang.reflect.Method;
 
 /**
  * Strategy interface used by {@link TransactionInterceptor} for metadata retrieval.
@@ -28,10 +12,10 @@ import org.springframework.lang.Nullable;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @since 15.04.2003
  * @see TransactionInterceptor#setTransactionAttributeSource
  * @see TransactionProxyFactoryBean#setTransactionAttributeSource
  * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
+ * @since 15.04.2003
  */
 public interface TransactionAttributeSource {
 
@@ -43,6 +27,7 @@ public interface TransactionAttributeSource {
 	 * Returning {@code false} is therefore an optimization for non-affected
 	 * classes, whereas {@code true} simply means that the class needs to get
 	 * fully introspected for each method on the given class individually.
+	 *
 	 * @param targetClass the class to introspect
 	 * @return {@code false} if the class is known to have no transaction
 	 * attributes at class or method level; {@code true} otherwise. The default
@@ -56,6 +41,7 @@ public interface TransactionAttributeSource {
 	/**
 	 * Return the transaction attribute for the given method,
 	 * or {@code null} if the method is non-transactional.
+	 *
 	 * @param method the method to introspect
 	 * @param targetClass the target class (may be {@code null},
 	 * in which case the declaring class of the method must be used)
@@ -63,5 +49,4 @@ public interface TransactionAttributeSource {
 	 */
 	@Nullable
 	TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass);
-
 }

@@ -1,31 +1,7 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.transaction.interceptor;
-
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.lang.Nullable;
@@ -34,14 +10,21 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringValueResolver;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * Simple {@link TransactionAttributeSource} implementation that
  * allows attributes to be matched by registered name.
  *
  * @author Juergen Hoeller
- * @since 21.08.2003
  * @see #isMatch
  * @see MethodMapTransactionAttributeSource
+ * @since 21.08.2003
  */
 @SuppressWarnings("serial")
 public class NameMatchTransactionAttributeSource
@@ -53,16 +36,33 @@ public class NameMatchTransactionAttributeSource
 	 */
 	protected static final Log logger = LogFactory.getLog(NameMatchTransactionAttributeSource.class);
 
-	/** Keys are method names; values are TransactionAttributes. */
+	/**
+	 * * 	<bean id="studentServiceProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	 * * 		<property name="target" ref="studentService"/>
+	 * * 		<property name="transactionManager" ref="transactionManager"/>
+	 * * 		<property name="transactionAttributes">
+	 * * 			<props>
+	 * * 				<prop key="save*">PROPAGATION_REQUIRED</prop>
+	 * * 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+	 * * 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+	 * * 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+	 * *				{@link TransactionDefinition}
+	 * * 			</props>
+	 * * 		</property>
+	 * * 	</bean>
+	 *
+	 * Keys are method names; values are TransactionAttributes.
+	 * -- {remove*=PROPAGATION_REQUIRED,ISOLATION_DEFAULT, get*=PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly, update*=PROPAGATION_REQUIRED,ISOLATION_DEFAULT, save*=PROPAGATION_REQUIRED,ISOLATION_DEFAULT} 这些都是配置文件的东西
+	 */
 	private final Map<String, TransactionAttribute> nameMap = new HashMap<>();
 
 	@Nullable
 	private StringValueResolver embeddedValueResolver;
 
-
 	/**
 	 * Set a name/attribute map, consisting of method names
 	 * (e.g. "myMethod") and {@link TransactionAttribute} instances.
+	 *
 	 * @see #setProperties
 	 * @see TransactionAttribute
 	 */
@@ -75,6 +75,7 @@ public class NameMatchTransactionAttributeSource
 	 * <p>Expects method names as keys and String attributes definitions as values,
 	 * parsable into {@link TransactionAttribute} instances via a
 	 * {@link TransactionAttributeEditor}.
+	 *
 	 * @see #setNameMap
 	 * @see TransactionAttributeEditor
 	 */
@@ -94,6 +95,7 @@ public class NameMatchTransactionAttributeSource
 	 * Add an attribute for a transactional method.
 	 * <p>Method names can be exact matches, or of the pattern "xxx*",
 	 * "*xxx", or "*xxx*" for matching multiple methods.
+	 *
 	 * @param methodName the name of the method
 	 * @param attr attribute associated with the method
 	 */
@@ -113,7 +115,7 @@ public class NameMatchTransactionAttributeSource
 	}
 
 	@Override
-	public void afterPropertiesSet()  {
+	public void afterPropertiesSet() {
 		for (TransactionAttribute attr : this.nameMap.values()) {
 			if (attr instanceof DefaultTransactionAttribute) {
 				((DefaultTransactionAttribute) attr).resolveAttributeStrings(this.embeddedValueResolver);
@@ -121,10 +123,9 @@ public class NameMatchTransactionAttributeSource
 		}
 	}
 
-
 	@Override
 	@Nullable
-	public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
+	public TransactionAttribute getTransactionAttribute(Method method /** 我们的业务方法如：saveStudent **/, @Nullable Class<?> targetClass) {
 		if (!ClassUtils.isUserLevelMethod(method)) {
 			return null;
 		}
@@ -139,7 +140,7 @@ public class NameMatchTransactionAttributeSource
 			for (String mappedName : this.nameMap.keySet()) {
 				if (isMatch(methodName, mappedName) &&
 						(bestNameMatch == null || bestNameMatch.length() <= mappedName.length())) {
-					attr = this.nameMap.get(mappedName);
+					attr = this.nameMap.get(mappedName);//attr 就是配置的值，如： PROPAGATION_REQUIRED,ISOLATION_DEFAULT
 					bestNameMatch = mappedName;
 				}
 			}
@@ -152,6 +153,7 @@ public class NameMatchTransactionAttributeSource
 	 * Determine if the given method name matches the mapped name.
 	 * <p>The default implementation checks for "xxx*", "*xxx", and "*xxx*" matches,
 	 * as well as direct equality. Can be overridden in subclasses.
+	 *
 	 * @param methodName the method name of the class
 	 * @param mappedName the name in the descriptor
 	 * @return {@code true} if the names match
@@ -160,7 +162,6 @@ public class NameMatchTransactionAttributeSource
 	protected boolean isMatch(String methodName, String mappedName) {
 		return PatternMatchUtils.simpleMatch(mappedName, methodName);
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -183,5 +184,4 @@ public class NameMatchTransactionAttributeSource
 	public String toString() {
 		return getClass().getName() + ": " + this.nameMap;
 	}
-
 }
