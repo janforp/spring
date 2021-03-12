@@ -1,7 +1,7 @@
 com/javaxxl/aop0_多重代理/JdkDynamicProxy2.java
  com.javaxxl.aop0_多重代理.JdkDynamicProxy2
-com/javaxxl/publicevent/EventMain.java
- com.javaxxl.publicevent.EventMain
+com/javaxxl/aop1/TwoMethodInterceptor.java
+ com.javaxxl.aop1.TwoMethodInterceptor
 com/javaxxl/requiredproperties/Main.java
  com.javaxxl.requiredproperties.Main
 com/javaxxl/aop0/JdkDynamicProxy.java
@@ -30,15 +30,10 @@ com/javaxxl/lookup/GetBeanTest.java
  com.javaxxl.lookup.GetBeanTest
 com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
  com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
-com/javaxxl/Main.java
- com.javaxxl.Main
-com/javaxxl/aop3/Main.java
- com.javaxxl.aop3.Main
- com.javaxxl.aop3.Main$1
- com.javaxxl.aop3.Main$MethodInterceptor01
- com.javaxxl.aop3.Main$MethodInterceptor02
- com.javaxxl.aop3.Main$MyPointCut
- com.javaxxl.aop3.Main$MyPointCut$1
+com/javaxxl/aop1/MyMethodInvocation.java
+ com.javaxxl.aop1.MyMethodInvocation
+com/javaxxl/aop0_chain/TargetMethod.java
+ com.javaxxl.aop0_chain.TargetMethod
 com/javaxxl/aop0_多重代理/Test2Main.java
  com.javaxxl.aop0_多重代理.Test2Main
 com/javaxxl/bpp/Teacher.java
@@ -47,13 +42,10 @@ com/javaxxl/aop1/JdkDynamicProxy.java
  com.javaxxl.aop1.JdkDynamicProxy
 com/javaxxl/lifecycle/SmartDemoTwoLifeCycle.java
  com.javaxxl.lifecycle.SmartDemoTwoLifeCycle
-com/shengsiyuan/spring/lecture/aop/SpringClientAop.java
- com.shengsiyuan.spring.lecture.aop.SpringClientAop
-com/javaxxl/aop2/Main.java
- com.javaxxl.aop2.Main
- com.javaxxl.aop2.Main$1
- com.javaxxl.aop2.Main$MethodInterceptor01
- com.javaxxl.aop2.Main$MethodInterceptor02
+com/javaxxl/User.java
+ com.javaxxl.User
+com/javaxxl/propertyeditor/Student.java
+ com.javaxxl.propertyeditor.Student
 com/javaxxl/aop0/Cat.java
  com.javaxxl.aop0.Cat
 com/javaxxl/aop1/OneMethodInterceptor.java
@@ -64,10 +56,10 @@ com/javaxxl/circular/A.java
  com.javaxxl.circular.A
 com/javaxxl/classutils/B.java
  com.javaxxl.classutils.B
-com/javaxxl/lookup/LookUpTest.java
- com.javaxxl.lookup.LookUpTest
-com/javaxxl/propertyeditor/PropertyEditorMain.java
- com.javaxxl.propertyeditor.PropertyEditorMain
+com/javaxxl/circular/B.java
+ com.javaxxl.circular.B
+com/javaxxl/classutils/Main.java
+ com.javaxxl.classutils.Main
 com/javaxxl/aop1/MyMethodInterceptor.java
  com.javaxxl.aop1.MyMethodInterceptor
 com/javaxxl/aop4aspect/TargetInterfaceTestImpl.java
@@ -81,8 +73,8 @@ com/javaxxl/aop0_chain/Test3Main.java
  com.javaxxl.aop0_chain.Test3Main$1
  com.javaxxl.aop0_chain.Test3Main$OneHandler
  com.javaxxl.aop0_chain.Test3Main$TwoHandler
-com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
- com.javaxxl.beanFactoryBeanPostProcessor.BeanFactoryBeanPostProcessorMain
+com/javaxxl/lifecycle/DemoOneLifeCycle.java
+ com.javaxxl.lifecycle.DemoOneLifeCycle
 com/javaxxl/aop0/TestMain.java
  com.javaxxl.aop0.TestMain
 com/javaxxl/propertyeditor/DatePropertyEditorRegistrar.java
@@ -105,8 +97,8 @@ com/javaxxl/aop1/Main.java
  com.javaxxl.aop1.Main
 com/javaxxl/aop1/MyMethodInvocationImpl.java
  com.javaxxl.aop1.MyMethodInvocationImpl
-com/javaxxl/parent/BeanParentAttTest.java
- com.javaxxl.parent.BeanParentAttTest
+com/javaxxl/aop0_chain/JdkDynamicProxy.java
+ com.javaxxl.aop0_chain.JdkDynamicProxy
 com/shengsiyuan/spring/lecture/aop/advisor/MyAdvisor.java
  com.shengsiyuan.spring.lecture.aop.advisor.MyAdvisor
 com/javaxxl/UserServiceImpl.java
@@ -114,6 +106,37 @@ com/javaxxl/UserServiceImpl.java
 com/javaxxl/aop0_chain/AbstractHandler.java
  com.javaxxl.aop0_chain.AbstractHandler
  com.javaxxl.aop0_chain.AbstractHandler$HeadHandler
+com/javaxxl/classutils/A.java
+ com.javaxxl.classutils.A
+com/javaxxl/parent/Parent.java
+ com.javaxxl.parent.Parent
+com/javaxxl/classutils/D.java
+ com.javaxxl.classutils.D
+com/javaxxl/aop4aspect/AspectConfig.java
+ com.javaxxl.aop4aspect.AspectConfig
+com/shengsiyuan/spring/lecture/aop/SpringClientAop.java
+ com.shengsiyuan.spring.lecture.aop.SpringClientAop
+com/javaxxl/aop2/Main.java
+ com.javaxxl.aop2.Main
+ com.javaxxl.aop2.Main$1
+ com.javaxxl.aop2.Main$MethodInterceptor01
+ com.javaxxl.aop2.Main$MethodInterceptor02
+com/javaxxl/publicevent/EventMain.java
+ com.javaxxl.publicevent.EventMain
+com/javaxxl/parent/BeanParentAttTest.java
+ com.javaxxl.parent.BeanParentAttTest
+com/shengsiyuan/spring/lecture/SpringClient.java
+ com.shengsiyuan.spring.lecture.SpringClient
+com/javaxxl/lookup/LookUpTest.java
+ com.javaxxl.lookup.LookUpTest
+com/javaxxl/propertyeditor/PropertyEditorMain.java
+ com.javaxxl.propertyeditor.PropertyEditorMain
+com/javaxxl/BeanFactoryTest.java
+ com.javaxxl.BeanFactoryTest
+com/javaxxl/replacemethod/MethodReplacerTest.java
+ com.javaxxl.replacemethod.MethodReplacerTest
+com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
+ com.javaxxl.beanFactoryBeanPostProcessor.BeanFactoryBeanPostProcessorMain
 com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
@@ -122,35 +145,12 @@ com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/javaxxl/bpp/BppMain.java
  com.javaxxl.bpp.BppMain
-com/javaxxl/aop0_chain/TargetMethod.java
- com.javaxxl.aop0_chain.TargetMethod
-com/javaxxl/aop1/MyMethodInvocation.java
- com.javaxxl.aop1.MyMethodInvocation
-com/javaxxl/aop4aspect/AspectConfig.java
- com.javaxxl.aop4aspect.AspectConfig
-com/javaxxl/classutils/D.java
- com.javaxxl.classutils.D
-com/javaxxl/parent/Parent.java
- com.javaxxl.parent.Parent
-com/shengsiyuan/spring/lecture/SpringClient.java
- com.shengsiyuan.spring.lecture.SpringClient
-com/javaxxl/lifecycle/DemoOneLifeCycle.java
- com.javaxxl.lifecycle.DemoOneLifeCycle
-com/javaxxl/BeanFactoryTest.java
- com.javaxxl.BeanFactoryTest
-com/javaxxl/circular/B.java
- com.javaxxl.circular.B
-com/javaxxl/classutils/Main.java
- com.javaxxl.classutils.Main
-com/javaxxl/replacemethod/MethodReplacerTest.java
- com.javaxxl.replacemethod.MethodReplacerTest
-com/javaxxl/classutils/A.java
- com.javaxxl.classutils.A
-com/javaxxl/aop0_chain/JdkDynamicProxy.java
- com.javaxxl.aop0_chain.JdkDynamicProxy
-com/javaxxl/aop1/TwoMethodInterceptor.java
- com.javaxxl.aop1.TwoMethodInterceptor
-com/javaxxl/propertyeditor/Student.java
- com.javaxxl.propertyeditor.Student
-com/javaxxl/User.java
- com.javaxxl.User
+com/javaxxl/Main.java
+ com.javaxxl.Main
+com/javaxxl/aop3/Main.java
+ com.javaxxl.aop3.Main
+ com.javaxxl.aop3.Main$1
+ com.javaxxl.aop3.Main$MethodInterceptor01
+ com.javaxxl.aop3.Main$MethodInterceptor02
+ com.javaxxl.aop3.Main$MyPointCut
+ com.javaxxl.aop3.Main$MyPointCut$1

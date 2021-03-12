@@ -2111,8 +2111,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Get the object for the given bean instance, either the bean
-	 * instance itself or its created object in case of a FactoryBean.
+	 * Get the object for the given bean instance,
+	 *
+	 * either the bean instance itself or its created object in case of a FactoryBean.
+	 * -- 要么是该bean自身或者是FactoryBean创建的bean
 	 *
 	 * @param beanInstance the shared bean instance
 	 * @param name the name that may include factory dereference prefix
@@ -2186,6 +2188,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			 */
 			object = getCachedObjectForFactoryBean(beanName);
 		}
+		//如果缓存中没有，则去创建！！！
+
+		/**
+		 * @see org.springframework.aop.framework.ProxyFactoryBean#getObject() 典型使用案例！！！
+		 */
+
 		if (object == null) {
 			/**
 			 * 到这里说明，当前实例还没有从 {@link FactoryBean#getObject()} 获取过,缓存中没有
