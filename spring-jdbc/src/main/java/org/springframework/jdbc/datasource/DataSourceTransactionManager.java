@@ -332,6 +332,9 @@ public class DataSourceTransactionManager
 			logger.debug("Rolling back JDBC transaction on Connection [" + con + "]");
 		}
 		try {
+			/**
+			 * 最终还是通过数据库连接实现了事务的回滚
+			 */
 			con.rollback();
 		} catch (SQLException ex) {
 			throw translateException("JDBC rollback", ex);

@@ -1101,7 +1101,12 @@ public abstract class ClassUtils {
 	 */
 	public static String getQualifiedMethodName(Method method, @Nullable Class<?> clazz) {
 		Assert.notNull(method, "Method must not be null");
-		return (clazz != null ? clazz : method.getDeclaringClass()).getName() + '.' + method.getName();
+		//返回 className.methodName,如：com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl.saveStudent
+		return (
+				clazz != null ?
+						clazz : //如果class不为空，则使用 class.getName
+						method.getDeclaringClass() //否则使用 方法说什么的类.getName，因为方法肯定不会为空
+		).getName() + '.' + method.getName();
 	}
 
 	/**
