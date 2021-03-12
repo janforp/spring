@@ -78,7 +78,7 @@ public class SpringClientAop {
 		MyService myService = (MyService) factory.getBean("myAop");
 
 		/**
-		 * @see JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[]) 调用代理对象的方法，回调到该方法
+		 * @see org.springframework.aop.framework.JdkDynamicAopProxy#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[]) 调用代理对象的方法，回调到该方法
 		 */
 		myService.myMethod();
 

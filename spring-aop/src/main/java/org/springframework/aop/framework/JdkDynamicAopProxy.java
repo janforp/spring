@@ -314,7 +314,7 @@ final class JdkDynamicAopProxy implements AopProxy,
 				retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
 			} else {
 				/**
-				 * 有匹配当前方法的拦截器
+				 * 有匹配当前方法的拦截器！！！！！！！！！
 				 * @see com.javaxxl.aop3.Main
 				 */
 				// We need to create a method invocation...:们需要创建一个方法调用...
@@ -323,6 +323,8 @@ final class JdkDynamicAopProxy implements AopProxy,
 				/**
 				 * TODO 核心逻辑
 				 * @see ReflectiveMethodInvocation#proceed()
+				 *
+				 * 把所有的增强以及目标对象的方法都封装到这一个对象，让他内部进行一个自驱前进！！！！！！！！
 				 */
 				retVal = invocation.proceed();
 			}

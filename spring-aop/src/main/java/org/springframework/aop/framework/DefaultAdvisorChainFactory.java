@@ -51,6 +51,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		 * 适配器注册中心
 		 * 作用：1.可以注册 AdvisorAdaptor.
 		 * 适配器AdvisorAdaptor目的：1.将非Advisor类型的增强包装成为Advisor,2.将Advisor类型的增强提前出来对应的 MethodInterceptor
+		 * @see DefaultAdvisorAdapterRegistry
 		 */
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 
