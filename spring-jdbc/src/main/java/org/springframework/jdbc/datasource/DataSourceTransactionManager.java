@@ -97,7 +97,12 @@ import java.sql.Statement;
  * @since 02.05.2003
  */
 @SuppressWarnings("serial")
-public class DataSourceTransactionManager extends AbstractPlatformTransactionManager
+public class DataSourceTransactionManager
+
+		/**
+		 * 模版方法，实现父类定义的一些模版方法！！！
+		 */
+		extends AbstractPlatformTransactionManager
 		implements ResourceTransactionManager, InitializingBean {
 
 	@Nullable

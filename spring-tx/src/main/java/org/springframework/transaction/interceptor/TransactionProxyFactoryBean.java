@@ -14,10 +14,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.Properties;
 
 /**
- * Proxy factory bean for simplified declarative transaction handling.
- * This is a convenient alternative to a standard AOP
- * {@link org.springframework.aop.framework.ProxyFactoryBean}
- * with a separate {@link TransactionInterceptor} definition.
+ * Proxy factory bean for simplified declarative transaction handling. -- 代理工厂bean，用于简化声明式事务处理。
+ *
+ * convenient：方便的
+ * alternative：选择的
+ *
+ * This is a convenient alternative to a standard AOP {@link org.springframework.aop.framework.ProxyFactoryBean} with a separate {@link TransactionInterceptor} definition.
+ * -- 这是使用单独的{@link TransactionInterceptor}定义的标准AOP {@link org.springframework.aop.framework.ProxyFactoryBean}的便捷替代方法。
  *
  * <p><strong>HISTORICAL NOTE:</strong> This class was originally designed to cover the
  * typical case of declarative transaction demarcation: namely, wrapping a singleton
@@ -32,13 +35,12 @@ import java.util.Properties;
  * and @{@link org.springframework.transaction.annotation.EnableTransactionManagement
  * EnableTransactionManagement} annotations.</strong>
  *
- * <p>There are three main properties that need to be specified:
+ * <p>There are three main properties that need to be specified: -- 三个重要的属性
  * <ul>
- * <li>"transactionManager": the {@link PlatformTransactionManager} implementation to use
+ * <li>"transactionManager!!!!!!!!!": the {@link PlatformTransactionManager} implementation to use
  * (for example, a {@link org.springframework.transaction.jta.JtaTransactionManager} instance)
- * <li>"target": the target object that a transactional proxy should be created for
- * <li>"transactionAttributes": the transaction attributes (for example, propagation
- * behavior and "readOnly" flag) per target method name (or method name pattern)
+ * <li>"target!!!!!!!!!": the target object that a transactional proxy should be created for
+ * <li>"transactionAttributes!!!!!!!!": the transaction attributes (for example, propagation behavior and "readOnly" flag) per target method name (or method name pattern)
  * </ul>
  *
  * <p>If the "transactionManager" property is not set explicitly and this {@link FactoryBean}
@@ -101,6 +103,28 @@ public class TransactionProxyFactoryBean
 		extends AbstractSingletonProxyFactoryBean
 
 		implements BeanFactoryAware {
+
+	/**
+	 * *   <bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+	 * *        abstract="true">
+	 * *      <property name="transactionManager" ref="transactionManager"/>
+	 * *      <property name="transactionAttributes">
+	 * *        <props>
+	 * *          <prop key="insert*">PROPAGATION_REQUIRED</prop>
+	 * *          <prop key="update*">PROPAGATION_REQUIRED</prop>
+	 * *          <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+	 * *        </props>
+	 * *      </property>
+	 * *    </bean>
+	 * *
+	 * *    <bean id="myProxy" parent="baseTransactionProxy">
+	 * *      <property name="target" ref="myTarget"/>
+	 * *    </bean>
+	 * *
+	 * *    <bean id="yourProxy" parent="baseTransactionProxy">
+	 * *      <property name="target" ref="yourTarget"/>
+	 * *    </bean>
+	 */
 
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 

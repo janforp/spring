@@ -170,8 +170,8 @@ com/shengsiyuan/spring/lecture/dynamicproxy/DynamicProxyClient.java
  com.shengsiyuan.spring.lecture.dynamicproxy.DynamicProxyClient
 com/shengsiyuan/spring/lecture/dynamicproxy/RealSubject.java
  com.shengsiyuan.spring.lecture.dynamicproxy.RealSubject
-com/shengsiyuan/spring/lecture/transction/TransactionClient.java
- com.shengsiyuan.spring.lecture.transction.TransactionClient
+com/shengsiyuan/spring/lecture/transction/service/StudentServiceImpl.java
+ com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl
 com/shengsiyuan/spring/lecture/transction/dao/StudentDAO.java
  com.shengsiyuan.spring.lecture.transction.dao.StudentDAO
 com/shengsiyuan/spring/lecture/transction/dao/StudentDAOImpl.java
@@ -180,5 +180,5 @@ com/shengsiyuan/spring/lecture/transction/service/StudentService.java
  com.shengsiyuan.spring.lecture.transction.service.StudentService
 com/shengsiyuan/spring/lecture/transction/domain/Student.java
  com.shengsiyuan.spring.lecture.transction.domain.Student
-com/shengsiyuan/spring/lecture/transction/service/StudentServiceImpl.java
- com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl
+com/shengsiyuan/spring/lecture/transction/TransactionClient.java
+ com.shengsiyuan.spring.lecture.transction.TransactionClient

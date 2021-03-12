@@ -24,7 +24,10 @@ import org.springframework.util.ClassUtils;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
-		implements FactoryBean<Object>, BeanClassLoaderAware, InitializingBean {
+
+		implements FactoryBean<Object>,
+
+		BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * * <!-- 通过 aop 实现事务	-->
