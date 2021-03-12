@@ -62,6 +62,8 @@ public class AdvisedSupport
 	 *
 	 * 封装了被代理对象！
 	 *
+	 * 如果配置的是只是提供类 targetName，则在获取管理实例的时候也会在 拿到实例之后 赋值给该字段！
+	 *
 	 * @see AdvisedSupport#setTarget(java.lang.Object)
 	 */
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;

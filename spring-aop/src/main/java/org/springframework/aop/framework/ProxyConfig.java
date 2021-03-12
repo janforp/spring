@@ -21,7 +21,7 @@ public class ProxyConfig implements Serializable {
 	private static final long serialVersionUID = -8409359707199703185L;
 
 	/**
-	 * 如果为true,则默认所有cglib，否则使用jdk
+	 * 如果为true,则使用cglib，否则使用jdk动态代理
 	 */
 	private boolean proxyTargetClass = false;
 

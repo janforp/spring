@@ -57,8 +57,9 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 			return new DefaultPointcutAdvisor(advice);
 		}
 		for (AdvisorAdapter adapter : this.adapters) {
-			// Check that it is supported.
+			// Check that it is supported. -- 检查它是否受支持。
 			if (adapter.supportsAdvice(advice)) {
+				//如果传入的拦截器实例 被 adapter 中的任何一个支持，则封装成 DefaultPointcutAdvisor
 				return new DefaultPointcutAdvisor(advice);
 			}
 		}

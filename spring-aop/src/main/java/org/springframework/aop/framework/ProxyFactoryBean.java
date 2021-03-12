@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
+import org.springframework.aop.framework.adapter.DefaultAdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.UnknownAdviceTypeException;
 import org.springframework.aop.target.SingletonTargetSource;
@@ -72,7 +73,15 @@ import java.util.List;
  * @see Advised
  */
 @SuppressWarnings("serial")
-public class ProxyFactoryBean extends ProxyCreatorSupport
+public class ProxyFactoryBean
+
+		/**
+		 * 同时该类型的实例还可以创建AOP代理对象
+		 *
+		 * @see AdvisedSupport 最终该类初始化的拦截器链表就会存入该类的字段中
+		 * @see AdvisedSupport#advisors 拦截器链表
+		 */
+		extends ProxyCreatorSupport
 
 		/**
 		 * 不一个普通bean
@@ -137,13 +146,18 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 *
 	 * advisor 链是否已初始化。
 	 *
+	 * 拦截器链是否已经初始化过，保证只初始化一次！
+	 *
 	 * @see ProxyFactoryBean#initializeAdvisorChain() 初始化拦截器链的逻辑
+	 * @see AdvisedSupport#advisors 初始化之后的拦截器都会放到这个链表中
 	 */
 	private boolean advisorChainInitialized = false;
 
 	/**
 	 * If this is a singleton, the cached singleton proxy instance.
 	 * -- 如果这是一个单例，则为缓存的单例代理实例。
+	 *
+	 * 缓存的是该 FactoryBean 管理的对象
 	 */
 	@Nullable
 	private Object singletonInstance;
@@ -157,7 +171,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * @see #setInterfaces
 	 * @see AbstractSingletonProxyFactoryBean#setProxyInterfaces
 	 */
-	public void setProxyInterfaces(Class<?>[] proxyInterfaces) throws ClassNotFoundException {
+	public void setProxyInterfaces(Class<?>[] proxyInterfaces) {
 		setInterfaces(proxyInterfaces);
 	}
 
@@ -262,6 +276,29 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	/**
 	 * 关键方法！！
 	 *
+	 * * 配置文件
+	 * *
+	 * * <bean class="com.shengsiyuan.spring.lecture.aop.service.impl.MyServiceImpl" id="myService"/>
+	 * *
+	 * * 	<bean class="com.shengsiyuan.spring.lecture.aop.advisor.MyAdvisor" id="myAdvisor"/>
+	 * *
+	 * * 	<bean class="org.springframework.aop.framework.ProxyFactoryBean" id="myAop">
+	 * * 		<property name="proxyInterfaces">
+	 * * 			<value>com.shengsiyuan.spring.lecture.aop.service.MyService</value>
+	 * * 		</property>
+	 * * 		<property name="interceptorNames">
+	 * * 			<list>
+	 * * 				<value>myAdvisor</value>
+	 * * 			</list>
+	 * * 		</property>
+	 * * 		<property name="target">
+	 * * 			<ref bean="myService"/>
+	 * * 		</property>
+	 * * 	</bean>
+	 * *
+	 * * @see  org.springframework.aop.framework.ProxyFactoryBean
+	 * * @see  org.springframework.beans.factory.FactoryBean
+	 *
 	 * Return a proxy. Invoked when clients obtain beans from this factory bean. -- 返回代理。当客户从该工厂bean获得bean时调用。
 	 * Create an instance of the AOP proxy to be returned by this factory. -- 创建要由该工厂返回的AOP代理的实例。
 	 * The instance will be cached for a singleton, and create on each call to
@@ -274,14 +311,19 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	public Object getObject() throws BeansException {
 		/**
 		 *初始化拦截器链的逻辑
+		 * @see AdvisedSupport 最终该类初始化的拦截器链表就会存入该类的字段中
+		 * @see AdvisedSupport#advisors 拦截器链表
 		 */
 		initializeAdvisorChain();
 		if (isSingleton()) {
+			//该 FactoryBean 是单例的
 			return getSingletonInstance();
 		} else {
+			//该 FactoryBean 不是单例的
 			if (this.targetName == null) {
 				logger.info("Using non-singleton proxies with singleton targets is often undesirable. " + "Enable prototype proxies by setting the 'targetName' property.");
 			}
+			//创建一个原型模式的实例
 			return newPrototypeInstance();
 		}
 	}
@@ -334,7 +376,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	/**
 	 * Return the singleton instance of this class's proxy object,
 	 * lazily creating it if it hasn't been created already.
-	 * -- 回此类的代理对象的单例实例，如果尚未创建，则延迟创建它。
+	 * -- 返回此类的 代理对象！！！！ 的单例实例，如果尚未创建，则延迟创建它。
 	 *
 	 * @return the shared singleton proxy
 	 */
@@ -342,28 +384,52 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 		if (this.singletonInstance == null) {
 			//缓存没命中！
 
-			//从ioc工厂拿到实例
+			//从ioc工厂拿到被代理的实例，并且赋值
 			this.targetSource = freshTargetSource();
-			if (this.autodetectInterfaces && getProxiedInterfaces().length == 0 && !isProxyTargetClass()) {
+
+			if (this.autodetectInterfaces //字段探测接口，一般为 true
+
+					&& getProxiedInterfaces().length == 0 //被代理接口的数量为0，意思就是配置的是没有指定
+
+					/**
+					 * @see ProxyConfig#proxyTargetClass 如果为true,则使用cglib，否则使用jdk动态代理
+					 */
+					&& !isProxyTargetClass()) {
 				// Rely on AOP infrastructure to tell us what interfaces to proxy.-- 依靠AOP基础结构告诉我们代理的接口。
-				Class<?> targetClass = getTargetClass();//TODO
+				Class<?> targetClass = getTargetClass();//获取目标对象的类
 				if (targetClass == null) {
 					throw new FactoryBeanNotInitializedException("Cannot determine target class for proxy");
 				}
+				/**
+				 * 设置要代理的接口！
+				 */
 				setInterfaces(ClassUtils.getAllInterfacesForClass(targetClass, this.proxyClassLoader));
 			}
 			// Initialize the shared singleton instance.
 			super.setFrozen(this.freezeProxy);
 
-			//缓存
-			this.singletonInstance = getProxy(createAopProxy());
+			//生成代理对象并且缓存到 singletonInstance 字段
+			this.singletonInstance =
+					/**
+					 * 使用jdk动态代理或者cglib代理生成代理对象
+					 */
+					getProxy(
+							/**
+							 * 获取代理实例生成的方式
+							 */
+							createAopProxy()
+					);
 		}
+
+		//以后再次getObject的时候就使用该缓存类
 		return this.singletonInstance;
 	}
 
 	/**
 	 * Create a new prototype instance of this class's created proxy object,
 	 * backed by an independent AdvisedSupport configuration.
+	 *
+	 * -- 在独立的AdvisedSupport配置支持下，创建此类的已创建代理对象的新原型实例。
 	 *
 	 * @return a totally independent proxy, whose advice we may manipulate in isolation
 	 */
@@ -449,6 +515,26 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	}
 
 	/**
+	 * * 配置文件
+	 * *
+	 * * <bean class="com.shengsiyuan.spring.lecture.aop.service.impl.MyServiceImpl" id="myService"/>
+	 * *
+	 * * 	<bean class="com.shengsiyuan.spring.lecture.aop.advisor.MyAdvisor" id="myAdvisor"/>
+	 * *
+	 * * 	<bean class="org.springframework.aop.framework.ProxyFactoryBean" id="myAop">
+	 * * 		<property name="proxyInterfaces">
+	 * * 			<value>com.shengsiyuan.spring.lecture.aop.service.MyService</value>
+	 * * 		</property>
+	 * * 		<property name="interceptorNames">
+	 * * 			<list>
+	 * * 				<value>myAdvisor</value> TODO 这个方法就是初始化这个配置的拦截器链表
+	 * * 			</list>
+	 * * 		</property>
+	 * * 		<property name="target">
+	 * * 			<ref bean="myService"/>
+	 * * 		</property>
+	 * * 	</bean>
+	 *
 	 * Create the advisor (interceptor) chain. Advisors that are sourced
 	 * from a BeanFactory will be refreshed each time a new prototype instance
 	 * is added. Interceptors added programmatically through the factory API
@@ -456,6 +542,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 */
 	private synchronized void initializeAdvisorChain() throws AopConfigException, BeansException {
 		if (this.advisorChainInitialized) {
+			//拦截器链是否已经初始化过，保证只初始化一次！
 			return;
 		}
 
@@ -479,14 +566,22 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 							this.targetName == null
 							&&
 							/**
-							 * 并且 targetSource 也是默认的空实例
+							 * 并且 targetSource 也是默认的空实例 {@link SingletonTargetSource} 一般是这个类型的实例，一般该字段都会有值的
 							 */
 							this.targetSource == EMPTY_TARGET_SOURCE) {
 
 				throw new AopConfigException("Target required after globals");
 			}
 
-			// Materialize interceptor chain from bean names.-- 从bean名称中实现拦截器链。
+			/**
+			 *  Materialize(物化) interceptor chain from bean names.-- 从bean名称中实现拦截器链。
+			 *
+			 * <property name="interceptorNames">
+			 * 	<list>
+			 * 		<value>myAdvisor</value> TODO 这个方法就是初始化这个配置的拦截器链表
+			 * 	</list>
+			 * </property>
+			 */
 			for (String name : this.interceptorNames) {
 				if (name.endsWith(GLOBAL_SUFFIX)) {
 					//进入该分支说明：当前 name 是 * 结尾的，如：teacher*
@@ -504,9 +599,10 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 
 					// If we get here, we need to add a named interceptor.
 					// We must check if it's a singleton or prototype.
+					// 如果到达这里，我们需要添加一个命名拦截器。我们必须检查它是单例还是原型。
 					Object advice;
 					if (this.singleton || this.beanFactory.isSingleton(name)) {
-						// Add the real Advisor/Advice to the chain.
+						// Add the real Advisor/Advice to the chain. -- 将真正的Advisor / Advice添加到链中。
 						/**
 						 * 如果是单例，直接拿到单实例
 						 */
@@ -520,7 +616,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 						 */
 						advice = new PrototypePlaceholderAdvisor(name);
 					}
-					addAdvisorOnChainCreation(advice);
+					addAdvisorOnChainCreation(advice);//把该拦截器放到拦截器链表中
 				}
 			}
 		}
@@ -562,7 +658,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	}
 
 	/**
-	 * Add all global interceptors and pointcuts.
+	 * Add all global interceptors and pointcuts. -- 添加所有全局拦截器和切入点。
 	 */
 	private void addGlobalAdvisors(ListableBeanFactory beanFactory, String prefix) {
 		String[] globalAdvisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Advisor.class);
@@ -599,7 +695,13 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	private void addAdvisorOnChainCreation(Object next) {
 		// We need to convert to an Advisor if necessary so that our source reference
 		// matches what we find from superclass interceptors.
-		addAdvisor(namedBeanToAdvisor(next));
+		addAdvisor(
+				/**
+				 * 检查拦截器类型，确保添加到拦截器链表的是一个 Advice/Advisor 类型
+				 * @see DefaultAdvisorAdapterRegistry#wrap(java.lang.Object)
+				 */
+				namedBeanToAdvisor(next)
+		);
 	}
 
 	/**
@@ -613,6 +715,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 			// Not refreshing target: bean name not specified in 'interceptorNames'
 			return this.targetSource;
 		} else {
+			//配置的被代理实例是一个 beanName ，则需要创建该 bean实例
 			if (this.beanFactory == null) {
 				throw new IllegalStateException("No BeanFactory available anymore (probably due to serialization) " +
 						"- cannot resolve target with name '" + this.targetName + "'");
@@ -620,17 +723,26 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 			if (logger.isDebugEnabled()) {
 				logger.debug("Refreshing target with name '" + this.targetName + "'");
 			}
+			//需要创建该 bean实例
 			Object target = this.beanFactory.getBean(this.targetName);
-			return (target instanceof TargetSource ? (TargetSource) target : new SingletonTargetSource(target));
+			return (target instanceof TargetSource ?
+					(TargetSource) target
+
+					/**
+					 * 最终还是封装到 SingletonTargetSource
+					 */
+					: new SingletonTargetSource(target));
 		}
 	}
 
 	/**
 	 * Convert the following object sourced from calling getBean() on a name in the
 	 * interceptorNames array to an Advisor or TargetSource.
+	 * -- 将以下对象（从对interceptorNames数组中的名称的调用getBean（）所获得的源转换为Advisor或TargetSource）。
 	 */
 	private Advisor namedBeanToAdvisor(Object next) {
 		try {
+			/**@see DefaultAdvisorAdapterRegistry#wrap(java.lang.Object)***/
 			return this.advisorAdapterRegistry.wrap(next);
 		} catch (UnknownAdviceTypeException ex) {
 			// We expected this to be an Advisor or Advice,
