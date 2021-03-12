@@ -1,7 +1,6 @@
 package com.shengsiyuan.spring.lecture.aop;
 
 import com.shengsiyuan.spring.lecture.aop.service.MyService;
-import org.springframework.aop.framework.JdkDynamicAopProxy;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
