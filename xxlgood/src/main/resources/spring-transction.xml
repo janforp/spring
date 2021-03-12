@@ -25,18 +25,19 @@
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate">
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean class="com.shengsiyuan.spring.lecture.transction.dao.StudentDAOImpl" id="studentDAO">
+	<bean id="studentDAO" class="com.shengsiyuan.spring.lecture.transction.dao.StudentDAOImpl">
 		<property name="jdbcTemplate" ref="jdbcTemplate"/>
 	</bean>
 
-	<bean class="com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl" id="studentService">
+	<bean id="studentService" class="com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl">
 		<property name="studentDAO" ref="studentDAO"/>
 	</bean>
 
+	<!-- 通过 aop 实现事物	-->
 	<bean id="studentServiceProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="target" ref="studentService"/>
 		<property name="transactionManager" ref="transactionManager"/>

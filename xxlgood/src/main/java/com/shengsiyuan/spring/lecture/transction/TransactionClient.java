@@ -24,7 +24,7 @@ public class TransactionClient {
 		reader.loadBeanDefinitions(resource);
 
 		//上面是解析配置文件，并且解析配置文件，生成 BeanDefinition 并且注册到工厂中
-		StudentService service = (StudentService) factory.getBean("StudentServiceProxy");
+		StudentService service = (StudentService) factory.getBean("studentServiceProxy");
 
 		Student student = new Student();
 		student.setName("zhangsan");
