@@ -1,7 +1,7 @@
 com/javaxxl/aop0_多重代理/JdkDynamicProxy2.java
  com.javaxxl.aop0_多重代理.JdkDynamicProxy2
-com/javaxxl/aop1/TwoMethodInterceptor.java
- com.javaxxl.aop1.TwoMethodInterceptor
+com/javaxxl/Main.java
+ com.javaxxl.Main
 com/javaxxl/requiredproperties/Main.java
  com.javaxxl.requiredproperties.Main
 com/javaxxl/aop0/JdkDynamicProxy.java
@@ -20,8 +20,8 @@ com/javaxxl/publicevent/EatEvent.java
  com.javaxxl.publicevent.EatEvent
 com/javaxxl/replacemethod/TestChangeMethod.java
  com.javaxxl.replacemethod.TestChangeMethod
-com/javaxxl/aop1/TargetMethod.java
- com.javaxxl.aop1.TargetMethod
+com/shengsiyuan/spring/lecture/staticproxy/RealTarget.java
+ com.shengsiyuan.spring.lecture.staticproxy.RealTarget
 com/javaxxl/aop0/Animal.java
  com.javaxxl.aop0.Animal
 com/javaxxl/bpp/Student.java
@@ -30,16 +30,16 @@ com/javaxxl/lookup/GetBeanTest.java
  com.javaxxl.lookup.GetBeanTest
 com/javaxxl/bpp/MyInstantiationAwareBeanPostProcessor.java
  com.javaxxl.bpp.MyInstantiationAwareBeanPostProcessor
-com/javaxxl/aop1/MyMethodInvocation.java
- com.javaxxl.aop1.MyMethodInvocation
+com/shengsiyuan/spring/lecture/staticproxy/StaticProxyClient.java
+ com.shengsiyuan.spring.lecture.staticproxy.StaticProxyClient
 com/javaxxl/aop0_chain/TargetMethod.java
  com.javaxxl.aop0_chain.TargetMethod
 com/javaxxl/aop0_多重代理/Test2Main.java
  com.javaxxl.aop0_多重代理.Test2Main
 com/javaxxl/bpp/Teacher.java
  com.javaxxl.bpp.Teacher
-com/javaxxl/aop1/JdkDynamicProxy.java
- com.javaxxl.aop1.JdkDynamicProxy
+com/javaxxl/aop1_自己实现的拦截器链表/MyMethodInterceptor.java
+ com.javaxxl.aop1_自己实现的拦截器链表.MyMethodInterceptor
 com/javaxxl/lifecycle/SmartDemoTwoLifeCycle.java
  com.javaxxl.lifecycle.SmartDemoTwoLifeCycle
 com/javaxxl/User.java
@@ -48,8 +48,8 @@ com/javaxxl/propertyeditor/Student.java
  com.javaxxl.propertyeditor.Student
 com/javaxxl/aop0/Cat.java
  com.javaxxl.aop0.Cat
-com/javaxxl/aop1/OneMethodInterceptor.java
- com.javaxxl.aop1.OneMethodInterceptor
+com/shengsiyuan/spring/lecture/staticproxy/StaticProxyTarget.java
+ com.shengsiyuan.spring.lecture.staticproxy.StaticProxyTarget
 com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
  com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/javaxxl/circular/A.java
@@ -60,8 +60,8 @@ com/javaxxl/circular/B.java
  com.javaxxl.circular.B
 com/javaxxl/classutils/Main.java
  com.javaxxl.classutils.Main
-com/javaxxl/aop1/MyMethodInterceptor.java
- com.javaxxl.aop1.MyMethodInterceptor
+com/shengsiyuan/spring/lecture/dynamicproxy/RealSubject.java
+ com.shengsiyuan.spring.lecture.dynamicproxy.RealSubject
 com/javaxxl/aop4aspect/TargetInterfaceTestImpl.java
  com.javaxxl.aop4aspect.TargetInterfaceTestImpl
 com/shengsiyuan/spring/lecture/aop/service/impl/MyServiceImpl.java
@@ -93,10 +93,10 @@ com/javaxxl/ComponentB.java
  com.javaxxl.ComponentB
 com/javaxxl/classutils/C.java
  com.javaxxl.classutils.C
-com/javaxxl/aop1/Main.java
- com.javaxxl.aop1.Main
-com/javaxxl/aop1/MyMethodInvocationImpl.java
- com.javaxxl.aop1.MyMethodInvocationImpl
+com/javaxxl/aop1_自己实现的拦截器链表/MyMethodInvocation.java
+ com.javaxxl.aop1_自己实现的拦截器链表.MyMethodInvocation
+com/shengsiyuan/spring/lecture/dynamicproxy/Subject.java
+ com.shengsiyuan.spring.lecture.dynamicproxy.Subject
 com/javaxxl/aop0_chain/JdkDynamicProxy.java
  com.javaxxl.aop0_chain.JdkDynamicProxy
 com/shengsiyuan/spring/lecture/aop/advisor/MyAdvisor.java
@@ -114,22 +114,25 @@ com/javaxxl/classutils/D.java
  com.javaxxl.classutils.D
 com/javaxxl/aop4aspect/AspectConfig.java
  com.javaxxl.aop4aspect.AspectConfig
-com/javaxxl/bpp/BppMain.java
- com.javaxxl.bpp.BppMain
-com/javaxxl/Main.java
- com.javaxxl.Main
-com/javaxxl/publicevent/EventMain.java
- com.javaxxl.publicevent.EventMain
-com/javaxxl/parent/BeanParentAttTest.java
- com.javaxxl.parent.BeanParentAttTest
+com/javaxxl/BeanFactoryTest.java
+ com.javaxxl.BeanFactoryTest
+com/shengsiyuan/spring/lecture/aop/SpringClientAop.java
+ com.shengsiyuan.spring.lecture.aop.SpringClientAop
 com/shengsiyuan/spring/lecture/SpringClient.java
  com.shengsiyuan.spring.lecture.SpringClient
+com/javaxxl/parent/BeanParentAttTest.java
+ com.javaxxl.parent.BeanParentAttTest
+com/javaxxl/aop2/Main.java
+ com.javaxxl.aop2.Main
+ com.javaxxl.aop2.Main$1
+ com.javaxxl.aop2.Main$MethodInterceptor01
+ com.javaxxl.aop2.Main$MethodInterceptor02
+com/javaxxl/publicevent/EventMain.java
+ com.javaxxl.publicevent.EventMain
 com/javaxxl/lookup/LookUpTest.java
  com.javaxxl.lookup.LookUpTest
 com/javaxxl/propertyeditor/PropertyEditorMain.java
  com.javaxxl.propertyeditor.PropertyEditorMain
-com/javaxxl/BeanFactoryTest.java
- com.javaxxl.BeanFactoryTest
 com/javaxxl/replacemethod/MethodReplacerTest.java
  com.javaxxl.replacemethod.MethodReplacerTest
 com/javaxxl/beanFactoryBeanPostProcessor/BeanFactoryBeanPostProcessorMain.java
@@ -138,15 +141,12 @@ com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
  com.javaxxl.lifecycle.LifeCycleMain
+com/shengsiyuan/spring/lecture/staticproxy/Target.java
+ com.shengsiyuan.spring.lecture.staticproxy.Target
 com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
-com/shengsiyuan/spring/lecture/aop/SpringClientAop.java
- com.shengsiyuan.spring.lecture.aop.SpringClientAop
-com/javaxxl/aop2/Main.java
- com.javaxxl.aop2.Main
- com.javaxxl.aop2.Main$1
- com.javaxxl.aop2.Main$MethodInterceptor01
- com.javaxxl.aop2.Main$MethodInterceptor02
+com/javaxxl/bpp/BppMain.java
+ com.javaxxl.bpp.BppMain
 com/javaxxl/aop3/Main.java
  com.javaxxl.aop3.Main
  com.javaxxl.aop3.Main$1
@@ -154,3 +154,19 @@ com/javaxxl/aop3/Main.java
  com.javaxxl.aop3.Main$MethodInterceptor02
  com.javaxxl.aop3.Main$MyPointCut
  com.javaxxl.aop3.Main$MyPointCut$1
+com/javaxxl/aop1_自己实现的拦截器链表/TargetMethod.java
+ com.javaxxl.aop1_自己实现的拦截器链表.TargetMethod
+com/javaxxl/aop1_自己实现的拦截器链表/TwoMethodInterceptor.java
+ com.javaxxl.aop1_自己实现的拦截器链表.TwoMethodInterceptor
+com/javaxxl/aop1_自己实现的拦截器链表/JdkDynamicProxy.java
+ com.javaxxl.aop1_自己实现的拦截器链表.JdkDynamicProxy
+com/javaxxl/aop1_自己实现的拦截器链表/MyMethodInvocationImpl.java
+ com.javaxxl.aop1_自己实现的拦截器链表.MyMethodInvocationImpl
+com/javaxxl/aop1_自己实现的拦截器链表/OneMethodInterceptor.java
+ com.javaxxl.aop1_自己实现的拦截器链表.OneMethodInterceptor
+com/javaxxl/aop1_自己实现的拦截器链表/Main.java
+ com.javaxxl.aop1_自己实现的拦截器链表.Main
+com/shengsiyuan/spring/lecture/dynamicproxy/DynamicProxyClient.java
+ com.shengsiyuan.spring.lecture.dynamicproxy.DynamicProxyClient
+com/shengsiyuan/spring/lecture/dynamicproxy/DynamicProxySubject.java
+ com.shengsiyuan.spring.lecture.dynamicproxy.DynamicProxySubject

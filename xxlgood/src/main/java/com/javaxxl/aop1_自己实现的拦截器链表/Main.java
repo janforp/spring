@@ -1,4 +1,4 @@
-package com.javaxxl.aop1;
+package com.javaxxl.aop1_自己实现的拦截器链表;
 
 import com.javaxxl.aop0.Animal;
 import com.javaxxl.aop0.Cat;
@@ -27,7 +27,7 @@ public class Main {
 		Animal animal = (Animal) proxy.getProxy();
 		//
 		/**
-		 * 调用方法，其实就会调用 {@link com.javaxxl.aop1.JdkDynamicProxy#invoke} 方法，该方法会驱动拦截器前进
+		 * 调用方法，其实就会调用 {@link com.javaxxl.aop1_自己实现的拦截器链表.JdkDynamicProxy#invoke} 方法，该方法会驱动拦截器前进
 		 */
 		animal.eat();
 	}

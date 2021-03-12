@@ -96,6 +96,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * MethodMatchers included in this struct must already have been found to have matched
 	 * as far as was possibly statically. Passing an array might be about 10% faster,
 	 * but would complicate the code. And it would work only for static pointcuts.
+	 * -- 应该应用的拦截器，以及在运行时需要评估的所有InterceptorAndDynamicMethodMatchers。必须已经发现此结构中包含的MethodMatchers尽可能地静态匹配。传递数组的速度可能快大约10％，但会使代码复杂化。而且它仅适用于静态切入点。
 	 */
 	protected ReflectiveMethodInvocation(
 			Object proxy, //代理对象

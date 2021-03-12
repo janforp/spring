@@ -1,4 +1,4 @@
-package com.javaxxl.aop1;
+package com.javaxxl.aop1_自己实现的拦截器链表;
 
 import java.lang.reflect.InvocationTargetException;
 

@@ -511,7 +511,7 @@ public class AdvisedSupport
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, @Nullable Class<?> targetClass) {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
-		if (cached == null) {
+		if (cached == null) {//第一次执行目标方法缓存为空！
 			/**
 			 * @see DefaultAdvisorChainFactory#getInterceptorsAndDynamicInterceptionAdvice(org.springframework.aop.framework.Advised, java.lang.reflect.Method, java.lang.Class) 实现
 			 */
@@ -619,6 +619,9 @@ public class AdvisedSupport
 
 		public MethodCacheKey(Method method) {
 			this.method = method;
+			/**
+			 * 一个Class 的方法对象一般是不变的
+			 */
 			this.hashCode = method.hashCode();
 		}
 
