@@ -45,7 +45,7 @@ public class TransactionClient {
 		 * 		 * 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 		 * 		 * 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 		 * 		 * 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-		 * 		 *				{@link TransactionDefinition}
+		 * 		 *				{@link TransactionDefinition} TODO spring事务的隔离级别跟传播行为？？？？
 		 * 		 * 			</props>
 		 * 		 * 		</property>
 		 * 		 * 	</bean>
