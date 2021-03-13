@@ -835,6 +835,10 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 					if (status.isDebug()) {
 						logger.debug("Initiating transaction rollback");
 					}
+					/**
+					 * 模版方法
+					 * @see org.springframework.jdbc.datasource.DataSourceTransactionManager#doRollback(org.springframework.transaction.support.DefaultTransactionStatus)
+					 */
 					doRollback(status);
 				} else {
 					// Participating in larger transaction

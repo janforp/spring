@@ -21,6 +21,6 @@ public class StudentServiceImpl implements StudentService {
 	public void saveStudent(Student student) {
 		studentDAO.saveStudent(student);
 
-		//throw new RuntimeException("发生了异常");
+		throw new RuntimeException("发生了异常");
 	}
 }
