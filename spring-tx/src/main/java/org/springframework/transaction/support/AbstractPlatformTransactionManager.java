@@ -335,33 +335,45 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			throws TransactionException {
 
 		// Use defaults if no transaction definition given.
-		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
+		TransactionDefinition def = (
+				definition != null ?
+						definition // 指定了则使用指定的
 
+						/**
+						 * @see StaticTransactionDefinition 否则使用默认的
+						 */
+						: TransactionDefinition.withDefaults()
+		);
+
+		/**
+		 * @see org.springframework.jdbc.datasource.DataSourceTransactionManager#doGetTransaction() 子类实现
+		 */
 		Object transaction = doGetTransaction();
 		boolean debugEnabled = logger.isDebugEnabled();
 
-		if (isExistingTransaction(transaction)) {
+		if (isExistingTransaction(transaction)) {//是否发生了事务的嵌套？
 			// Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
 		// Check definition settings for new transaction.
 		if (def.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
+			//超时时间配置错误
 			throw new InvalidTimeoutException("Invalid transaction timeout", def.getTimeout());
 		}
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
 		if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
-			throw new IllegalTransactionStateException(
-					"No existing transaction found for transaction marked with propagation 'mandatory'");
-		} else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
-				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
-				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
+			throw new IllegalTransactionStateException("No existing transaction found for transaction marked with propagation 'mandatory'");
+		} else if (
+				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
+						def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
+						def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
 			SuspendedResourcesHolder suspendedResources = suspend(null);
 			if (debugEnabled) {
 				logger.debug("Creating new transaction with name [" + def.getName() + "]: " + def);
 			}
-			try {
+			try {//开启事务
 				return startTransaction(def, transaction, debugEnabled, suspendedResources);
 			} catch (RuntimeException | Error ex) {
 				resume(null, suspendedResources);
@@ -679,8 +691,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	@Override
 	public final void commit(TransactionStatus status) throws TransactionException {
 		if (status.isCompleted()) {
-			throw new IllegalTransactionStateException(
-					"Transaction is already completed - do not call commit or rollback more than once per transaction");
+			throw new IllegalTransactionStateException("Transaction is already completed - do not call commit or rollback more than once per transaction");
 		}
 
 		DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
@@ -700,11 +711,13 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			return;
 		}
 
+		//提交事务
 		processCommit(defStatus);
 	}
 
 	/**
-	 * Process an actual commit.
+	 * Process an actual commit. -- 处理实际的提交
+	 *
 	 * Rollback-only flags have already been checked and applied.
 	 *
 	 * @param status object representing the transaction
@@ -732,6 +745,10 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 						logger.debug("Initiating transaction commit");
 					}
 					unexpectedRollback = status.isGlobalRollbackOnly();
+
+					/**
+					 * 执行提交，子类自己实现
+					 */
 					doCommit(status);
 				} else if (isFailEarlyOnGlobalRollbackOnly()) {
 					unexpectedRollback = status.isGlobalRollbackOnly();

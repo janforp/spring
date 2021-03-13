@@ -32,6 +32,8 @@ public interface TransactionDefinition {
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p>This is typically the default setting of a transaction definition,
 	 * and typically defines a transaction synchronization scope.
+	 *
+	 * 需要传播
 	 */
 	int PROPAGATION_REQUIRED = 0;
 
@@ -52,6 +54,8 @@ public interface TransactionDefinition {
 	 * to configure your transaction manager appropriately (typically switching to
 	 * "synchronization on actual transaction").
 	 *
+	 * 传播支持
+	 *
 	 * @see org.springframework.transaction.support.AbstractPlatformTransactionManager#setTransactionSynchronization
 	 * @see org.springframework.transaction.support.AbstractPlatformTransactionManager#SYNCHRONIZATION_ON_ACTUAL_TRANSACTION
 	 */
@@ -62,6 +66,8 @@ public interface TransactionDefinition {
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization within a {@code PROPAGATION_MANDATORY}
 	 * scope will always be driven by the surrounding transaction.
+	 *
+	 * 传播的强制性
 	 */
 	int PROPAGATION_MANDATORY = 2;
 
@@ -78,6 +84,8 @@ public interface TransactionDefinition {
 	 * and resumed appropriately.
 	 *
 	 * @see org.springframework.transaction.jta.JtaTransactionManager#setTransactionManager
+	 *
+	 * 传播需要新
 	 */
 	int PROPAGATION_REQUIRES_NEW = 3;
 

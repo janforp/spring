@@ -42,6 +42,7 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.reactive.TransactionContextManager;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.CallbackPreferringPlatformTransactionManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -419,11 +420,15 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		 * Coroutines 相关 ignore end
 		 */
 
-		//确保 tm 是 PlatformTransactionManager 的实现，并且向上类型转换为 PlatformTransactionManager
+		/**
+		 * 确保 tm 是 PlatformTransactionManager 的实现，并且向上类型转换为 PlatformTransactionManager
+		 * 如果第三方提供的事务管理器不是该类型的，则直接抛出异常！！！
+		 */
 		PlatformTransactionManager ptm = asPlatformTransactionManager(tm);
 
 		/**
-		 * 返回方法（连接点）的唯一标识，如com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl.saveStudent
+		 * 返回方法（连接点）的唯一标识，
+		 * 如com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl.saveStudent
 		 */
 		final String joinpointIdentification = methodIdentification(
 				method,//目标方法，如 saveStudent
@@ -432,7 +437,12 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		);
 
 		if (txAttr == null || !(ptm instanceof CallbackPreferringPlatformTransactionManager)) {
-			// Standard transaction demarcation with getTransaction and commit/rollback calls.-- 使用getTransaction和commit / rollback调用进行标准事务划分。
+			// Standard transaction demarcation with getTransaction and commit/rollback calls.
+			/**
+			 * -- 使用getTransaction和commit / rollback调用进行标准事务划分。
+			 *
+			 * 真正的事务的创建
+			 */
 			TransactionInfo txInfo = createTransactionIfNecessary(ptm, txAttr, joinpointIdentification);
 
 			Object retVal;
@@ -669,6 +679,10 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		TransactionStatus status = null;
 		if (txAttr != null) {
 			if (tm != null) {
+				/**
+				 * 模版方法
+				 * @see AbstractPlatformTransactionManager#getTransaction(org.springframework.transaction.TransactionDefinition)
+				 */
 				status = tm.getTransaction(txAttr);
 			} else {
 				//没有配置事务管理器，则啥都不做
@@ -740,12 +754,16 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				logger.trace("Completing transaction for [" + txInfo.getJoinpointIdentification() + "]");
 			}
 			txInfo.getTransactionManager()
+					/**
+					 * 模版方法
+					 * @see AbstractPlatformTransactionManager#commit(org.springframework.transaction.TransactionStatus)
+					 */
 					.commit(txInfo.getTransactionStatus());
 		}
 	}
 
 	/**
-	 * Handle a throwable, completing the transaction.
+	 * Handle a throwable, completing the transaction. --
 	 * We may commit or roll back, depending on the configuration.
 	 *
 	 * @param txInfo information about the current transaction
@@ -1134,8 +1152,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 						logger.error("Application exception overridden by commit exception", ex);
 						if (ex2 instanceof TransactionSystemException) {
 							((TransactionSystemException) ex2).initApplicationException(ex);
-								}
-								return ex2;
+						}
+						return ex2;
 							}
 					);
 				}

@@ -269,14 +269,18 @@ public class DataSourceTransactionManager
 			// Switch to manual commit if necessary. This is very expensive in some JDBC drivers,
 			// so we don't want to do it unnecessarily (for example if we've explicitly
 			// configured the connection pool to set it already).
+			// 意思就是这个判断的目的是为了性能，尽量不直接去set成false,因为这个操作比较耗性能
 			if (con.getAutoCommit()) {
+				//如果返回是自动提交
 				txObject.setMustRestoreAutoCommit(true);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
+				//因为要开启事务，则需要改为手动提交！！！！，否则事务开启没有意义。
 				con.setAutoCommit(false);
 			}
 
+			//准备事务连接
 			prepareTransactionalConnection(con, definition);
 			txObject.getConnectionHolder().setTransactionActive(true);
 
@@ -312,12 +316,16 @@ public class DataSourceTransactionManager
 
 	@Override
 	protected void doCommit(DefaultTransactionStatus status) {
+		//针对每一次事务都会有一个该类型的对象生成
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) status.getTransaction();
+
+		//获取数据库连接
 		Connection con = txObject.getConnectionHolder().getConnection();
 		if (status.isDebug()) {
 			logger.debug("Committing JDBC transaction on Connection [" + con + "]");
 		}
 		try {
+			//通过jdbc数据库连接进行提交事务！！！！！
 			con.commit();
 		} catch (SQLException ex) {
 			throw translateException("JDBC commit", ex);
@@ -402,7 +410,13 @@ public class DataSourceTransactionManager
 
 		if (isEnforceReadOnly() && definition.isReadOnly()) {
 			try (Statement stmt = con.createStatement()) {
-				stmt.executeUpdate("SET TRANSACTION READ ONLY");
+				//将事务设置为只读事务！！！！
+				stmt.executeUpdate(
+						/**
+						 * TODO 这个语句的作用是什么呢？？？？？
+						 */
+						"SET TRANSACTION READ ONLY"
+				);
 			}
 		}
 	}
@@ -425,6 +439,8 @@ public class DataSourceTransactionManager
 	}
 
 	/**
+	 * 针对每一次事务都会有一个该类型的对象生成
+	 *
 	 * DataSource transaction object, representing a ConnectionHolder.
 	 * Used as transaction object by DataSourceTransactionManager.
 	 */
