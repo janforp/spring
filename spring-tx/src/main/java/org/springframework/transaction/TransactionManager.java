@@ -11,4 +11,17 @@ package org.springframework.transaction;
  */
 public interface TransactionManager {
 
+	/**
+	 * 针对数据库事务的操作：
+	 * setAutoCommit(false)
+	 *
+	 * target.method()
+	 *
+	 * conn.commit()
+	 * or
+	 * conn.rollback()
+	 */
+	default void fuxk() {
+		//doF**();
+	}
 }
