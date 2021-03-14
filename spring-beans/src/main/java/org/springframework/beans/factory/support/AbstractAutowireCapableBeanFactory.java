@@ -1363,9 +1363,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			//新加功能
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
-/**@see  @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()*/
+		/**@see  @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()*/
 		if (mbd.getFactoryMethodName() != null) {
-			//说明 bean 标签中配置了 factory-method 属性
+			//说明 bean 标签中配置了 factory-method 属性 或者该 bd 是通过 @Bean 注解配置的
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 

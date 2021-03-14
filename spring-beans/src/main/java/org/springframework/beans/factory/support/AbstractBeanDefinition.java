@@ -216,6 +216,27 @@ public abstract class AbstractBeanDefinition
 
 	/**
 	 * factory-bean 属性
+	 *
+	 * * @Configuration
+	 * * public class PersonConfiguration {
+	 * *
+	 * * 	 * 通过{@link ConfigurationClassPostProcessor#processConfigBeanDefinitions(org.springframework.beans.factory.support.BeanDefinitionRegistry)} 把该方法解析成 bd
+	 * * 	 *
+	 * * 	 * @see org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader 最终通过这个reader把该方法解析成一个bd
+	 * * 	 * @see org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader#loadBeanDefinitionsForBeanMethod(org.springframework.context.annotation.BeanMethod)
+	 * * 	@Bean(name = "person")//String beanName = (!names.isEmpty() ? names.remove(0) : methodName);//如果没有指定名称，则使用方法名称
+	 * * 	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+	 * * 	public Person getPerson() {
+	 * * 		System.out.println("getPerson 方法被调用了");
+	 * *
+	 * * 		Person person = new Person();
+	 * * 		person.setId(1);
+	 * * 		person.setName("zhangSan");
+	 * * 		return person;
+	 * * 	}
+	 * * }
+	 *
+	 * 如果是通过 配置类 配置的 bean，则此时该 bd 的 factoryBeanName 就是 PersonConfiguration
 	 */
 	@Nullable
 	private String factoryBeanName;
@@ -231,6 +252,26 @@ public abstract class AbstractBeanDefinition
 	 * <bean id = "person" class = "xx.xx.xxx.PersonFactory" factory-method = "staticBuildPerson"/>
 	 *
 	 * 如果是注解的方式配置的bean,则该字段就是当前@Bean对应的方法
+	 *  * @Configuration
+	 *  * public class PersonConfiguration {
+	 *  *
+	 *  * 	 * 通过{@link ConfigurationClassPostProcessor#processConfigBeanDefinitions(org.springframework.beans.factory.support.BeanDefinitionRegistry)} 把该方法解析成 bd
+	 *  * 	 *
+	 *  * 	 * @see org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader 最终通过这个reader把该方法解析成一个bd
+	 *  * 	 * @see org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader#loadBeanDefinitionsForBeanMethod(org.springframework.context.annotation.BeanMethod)
+	 *  * 	@Bean(name = "person")//String beanName = (!names.isEmpty() ? names.remove(0) : methodName);//如果没有指定名称，则使用方法名称
+	 *  * 	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+	 *  * 	public Person getPerson() {
+	 *  * 		System.out.println("getPerson 方法被调用了");
+	 *  *
+	 *  * 		Person person = new Person();
+	 *  * 		person.setId(1);
+	 *  * 		person.setName("zhangSan");
+	 *  * 		return person;
+	 *  * 	}
+	 *  * }
+	 *
+	 *  如果该 bd 是通过 配置类 配置的，则该 bd 的 factoryMethodName 字段为 getPerson
 	 *
 	 * @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()
 	 */
