@@ -243,7 +243,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * @since 5.0
 	 */
 	private <T> void doRegisterBean(
-			Class<T> beanClass,
+			Class<T> beanClass,/** @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration */
 			@Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers,
 			@Nullable Supplier<T> supplier,
@@ -289,7 +289,7 @@ public class AnnotatedBeanDefinitionReader {
 						 * @see AnnotationBeanNameGenerator#generateBeanName(org.springframework.beans.factory.config.BeanDefinition, org.springframework.beans.factory.support.BeanDefinitionRegistry)
 						 */
 						: this.beanNameGenerator.generateBeanName(abd, this.registry)
-		);
+		);//personConfiguration
 
 		//TODO:处理一些通用的注解，如 @Lazy.@Primary。。。。其实就是解析这些注解，并且把 value 设置到 abd 中
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);

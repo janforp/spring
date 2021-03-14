@@ -1740,5 +1740,4 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		return sb.toString();
 	}
-
 }

@@ -7,7 +7,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.AnnotationConfigUtils;
 
 /**
- * AnnotationSpringClient
+ * 基于注解跟基于xml的 bean 在创建时机上存在的唯一不同之处：
+ * 1.基于XML配置的方式，Bean对象的创建是在程序首次从工厂中获取该对象的时候才创建
+ * 2.基于注解的方法，Bean对象的创建是在注解处理器解析相应的 @Bean 注解时调用了该注解所修饰的方法，当该方法执行后，
+ * 相应的对象自然就已经被创建出来了，这时，spring就会将对象纳入到工厂的管理范围之内，当我们首次从工厂获取该bean对象的时候，该bean
+ * 对象实际上已经完成了创建并且被纳入工厂管理服务之内
  *
  * @author zhucj
  * @since 20210325
@@ -38,8 +42,17 @@ public class AnnotationIocSpringClient {
 		 */
 		annotationIoc.register(PersonConfiguration.class);
 
-		//刷新
+		/**
+		 * 刷新,具体
+		 * 1.对所有bean定义的解析
+		 * 2.完成所有注解的分析
+		 * 3.调用{@link PersonConfiguration#getPerson()}方法完成bean的实例化
+		 * 4.
+		 * 5.
+		 */
 		annotationIoc.refresh();
+
+		System.out.println("************* refresh 方法执行完毕");
 
 		Person person = (Person) annotationIoc.getBean("person");
 		System.out.println(person.getId() + " 名称为 " + person.getName());
