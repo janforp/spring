@@ -1,4 +1,4 @@
-package com.shengsiyuan.spring.lecture.aop;
+package com.shengsiyuan.spring.lecture;
 
 import com.shengsiyuan.spring.lecture.aop.service.MyService;
 import org.springframework.aop.framework.ProxyFactoryBean;
@@ -18,7 +18,7 @@ import java.util.Arrays;
  * @author zhucj
  * @since 20210325
  */
-public class SpringClientAop {
+public class AopSpringClient {
 
 	/**
 	 * TODO 很重要！！！

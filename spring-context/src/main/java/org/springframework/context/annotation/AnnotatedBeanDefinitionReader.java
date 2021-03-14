@@ -1,23 +1,4 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context.annotation;
-
-import java.lang.annotation.Annotation;
-import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -33,6 +14,9 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
+
 /**
  * Convenient adapter for programmatic registration of bean classes.
  *
@@ -43,8 +27,8 @@ import org.springframework.util.Assert;
  * @author Chris Beams
  * @author Sam Brannen
  * @author Phillip Webb
- * @since 3.0
  * @see AnnotationConfigApplicationContext#register
+ * @since 3.0
  */
 public class AnnotatedBeanDefinitionReader {
 
@@ -56,12 +40,12 @@ public class AnnotatedBeanDefinitionReader {
 
 	private ConditionEvaluator conditionEvaluator;
 
-
 	/**
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry.
 	 * <p>If the registry is {@link EnvironmentCapable}, e.g. is an {@code ApplicationContext},
 	 * the {@link Environment} will be inherited, otherwise a new
 	 * {@link StandardEnvironment} will be created and used.
+	 *
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @see #AnnotatedBeanDefinitionReader(BeanDefinitionRegistry, Environment)
@@ -74,6 +58,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry,
 	 * using the given {@link Environment}.
+	 *
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @param environment the {@code Environment} to use when evaluating bean definition
@@ -88,7 +73,6 @@ public class AnnotatedBeanDefinitionReader {
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
-
 	/**
 	 * Get the BeanDefinitionRegistry that this reader operates on.
 	 */
@@ -100,6 +84,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * Set the {@code Environment} to use when evaluating whether
 	 * {@link Conditional @Conditional}-annotated component classes should be registered.
 	 * <p>The default is a {@link StandardEnvironment}.
+	 *
 	 * @see #registerBean(Class, String, Class...)
 	 */
 	public void setEnvironment(Environment environment) {
@@ -124,11 +109,11 @@ public class AnnotatedBeanDefinitionReader {
 				(scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
 
-
 	/**
 	 * Register one or more component classes to be processed.
 	 * <p>Calls to {@code register} are idempotent; adding the same
 	 * component class more than once has no additional effect.
+	 *
 	 * @param componentClasses one or more component classes,
 	 * e.g. {@link Configuration @Configuration} classes
 	 */
@@ -141,6 +126,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 */
 	public void registerBean(Class<?> beanClass) {
@@ -150,6 +136,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * (or {@code null} for generating a default bean name)
@@ -162,6 +149,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param qualifiers specific qualifier annotations to consider,
 	 * in addition to qualifiers at the bean class level
@@ -174,6 +162,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * (or {@code null} for generating a default bean name)
@@ -191,6 +180,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations, using the given supplier for obtaining a new
 	 * instance (possibly declared as a lambda expression or method reference).
+	 *
 	 * @param beanClass the class of the bean
 	 * @param supplier a callback for creating an instance of the bean
 	 * (may be {@code null})
@@ -204,6 +194,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations, using the given supplier for obtaining a new
 	 * instance (possibly declared as a lambda expression or method reference).
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * (or {@code null} for generating a default bean name)
@@ -218,6 +209,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * (or {@code null} for generating a default bean name)
@@ -236,6 +228,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * @param qualifiers specific qualifier annotations to consider, if any,
@@ -265,11 +258,9 @@ public class AnnotatedBeanDefinitionReader {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
 					abd.setPrimary(true);
-				}
-				else if (Lazy.class == qualifier) {
+				} else if (Lazy.class == qualifier) {
 					abd.setLazyInit(true);
-				}
-				else {
+				} else {
 					abd.addQualifier(new AutowireCandidateQualifier(qualifier));
 				}
 			}
@@ -285,7 +276,6 @@ public class AnnotatedBeanDefinitionReader {
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 
-
 	/**
 	 * Get the Environment from the given registry if possible, otherwise return a new
 	 * StandardEnvironment.
@@ -297,5 +287,4 @@ public class AnnotatedBeanDefinitionReader {
 		}
 		return new StandardEnvironment();
 	}
-
 }

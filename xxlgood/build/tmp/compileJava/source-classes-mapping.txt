@@ -130,8 +130,8 @@ com/javaxxl/aop1_自己实现的拦截器链表/Main.java
  com.javaxxl.aop1_自己实现的拦截器链表.Main
 com/javaxxl/aop1_自己实现的拦截器链表/OneMethodInterceptor.java
  com.javaxxl.aop1_自己实现的拦截器链表.OneMethodInterceptor
-com/shengsiyuan/spring/lecture/aop/SpringClientAop.java
- com.shengsiyuan.spring.lecture.aop.SpringClientAop
+com/javaxxl/Main.java
+ com.javaxxl.Main
 com/javaxxl/aop2/Main.java
  com.javaxxl.aop2.Main
  com.javaxxl.aop2.Main$1
@@ -143,8 +143,13 @@ com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProces
  com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/javaxxl/parent/BeanParentAttTest.java
  com.javaxxl.parent.BeanParentAttTest
-com/shengsiyuan/spring/lecture/SpringClient.java
- com.shengsiyuan.spring.lecture.SpringClient
+com/javaxxl/aop3/Main.java
+ com.javaxxl.aop3.Main
+ com.javaxxl.aop3.Main$1
+ com.javaxxl.aop3.Main$MethodInterceptor01
+ com.javaxxl.aop3.Main$MethodInterceptor02
+ com.javaxxl.aop3.Main$MyPointCut
+ com.javaxxl.aop3.Main$MyPointCut$1
 com/shengsiyuan/spring/lecture/transction/dao/StudentDAOImpl.java
  com.shengsiyuan.spring.lecture.transction.dao.StudentDAOImpl
 com/javaxxl/lookup/LookUpTest.java
@@ -163,22 +168,23 @@ com/javaxxl/aop4aspect/AspectMain.java
  com.javaxxl.aop4aspect.AspectMain
 com/javaxxl/lifecycle/LifeCycleMain.java
  com.javaxxl.lifecycle.LifeCycleMain
-com/shengsiyuan/spring/lecture/transction/TransactionClient.java
- com.shengsiyuan.spring.lecture.transction.TransactionClient
+com/javaxxl/bpp/BppMain.java
+ com.javaxxl.bpp.BppMain
 com/javaxxl/publicevent/EatEventListener.java
  com.javaxxl.publicevent.EatEventListener
 com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/shengsiyuan/spring/lecture/transction/service/StudentServiceImpl.java
  com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl
-com/javaxxl/bpp/BppMain.java
- com.javaxxl.bpp.BppMain
-com/javaxxl/Main.java
- com.javaxxl.Main
-com/javaxxl/aop3/Main.java
- com.javaxxl.aop3.Main
- com.javaxxl.aop3.Main$1
- com.javaxxl.aop3.Main$MethodInterceptor01
- com.javaxxl.aop3.Main$MethodInterceptor02
- com.javaxxl.aop3.Main$MyPointCut
- com.javaxxl.aop3.Main$MyPointCut$1
+com/shengsiyuan/spring/lecture/aop/AopSpringClient.java
+ com.shengsiyuan.spring.lecture.aop.AopSpringClient
+com/shengsiyuan/spring/lecture/IocSpringClient.java
+ com.shengsiyuan.spring.lecture.IocSpringClient
+com/shengsiyuan/spring/lecture/annotation/PersonConfiguration.java
+ com.shengsiyuan.spring.lecture.annotation.PersonConfiguration
+com/shengsiyuan/spring/lecture/transction/TransactionSpringClient.java
+ com.shengsiyuan.spring.lecture.transction.TransactionSpringClient
+com/shengsiyuan/spring/lecture/annotation/AnnotationSpringClient.java
+ com.shengsiyuan.spring.lecture.annotation.AnnotationSpringClient
+com/shengsiyuan/spring/lecture/annotation/Person.java
+ com.shengsiyuan.spring.lecture.annotation.Person

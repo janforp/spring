@@ -1,4 +1,4 @@
-package com.shengsiyuan.spring.lecture.transction;
+package com.shengsiyuan.spring.lecture;
 
 import com.shengsiyuan.spring.lecture.transction.domain.Student;
 import com.shengsiyuan.spring.lecture.transction.service.StudentService;
@@ -24,7 +24,7 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
  * @see TransactionManager#fuxk() 解析哦！！！！
  * @since 20210325
  */
-public class TransactionClient {
+public class TransactionSpringClient {
 
 	public static void main(String[] args) {
 		Resource resource = new ClassPathResource("spring-transaction.xml");

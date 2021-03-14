@@ -13,7 +13,7 @@ import org.springframework.core.io.Resource;
  * @author zhucj
  * @since 20210325
  */
-public class SpringClient {
+public class XmlIocSpringClient {
 
 	/**
 	 * 关于Spring Bean实例(bd)的注册流程

@@ -1,30 +1,14 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context.annotation;
+
+import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.springframework.beans.factory.annotation.Autowire;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.core.annotation.AliasFor;
 
 /**
  * Indicates that a method produces a bean to be managed by the Spring container.
@@ -203,7 +187,6 @@ import org.springframework.core.annotation.AliasFor;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see Configuration
  * @see Scope
  * @see DependsOn
@@ -212,8 +195,9 @@ import org.springframework.core.annotation.AliasFor;
  * @see org.springframework.stereotype.Component
  * @see org.springframework.beans.factory.annotation.Autowired
  * @see org.springframework.beans.factory.annotation.Value
+ * @since 3.0
  */
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Bean {
@@ -222,8 +206,9 @@ public @interface Bean {
 	 * Alias for {@link #name}.
 	 * <p>Intended to be used when no other attributes are needed, for example:
 	 * {@code @Bean("customBeanName")}.
-	 * @since 4.3.3
+	 *
 	 * @see #name
+	 * @since 4.3.3
 	 */
 	@AliasFor("name")
 	String[] value() default {};
@@ -234,6 +219,7 @@ public @interface Bean {
 	 * If specified, the method name is ignored.
 	 * <p>The bean name and aliases may also be configured via the {@link #value}
 	 * attribute if no other attributes are declared.
+	 *
 	 * @see #value
 	 */
 	@AliasFor("value")
@@ -246,6 +232,7 @@ public @interface Bean {
 	 * <p>The default mode does allow for annotation-driven autowiring. "no" refers to
 	 * externally driven autowiring only, not affecting any autowiring demands that the
 	 * bean class itself expresses through annotations.
+	 *
 	 * @see Autowire#BY_NAME
 	 * @see Autowire#BY_TYPE
 	 * @deprecated as of 5.1, since {@code @Bean} factory method argument resolution and
@@ -258,6 +245,7 @@ public @interface Bean {
 	 * Is this bean a candidate for getting autowired into some other bean?
 	 * <p>Default is {@code true}; set this to {@code false} for internal delegates
 	 * that are not meant to get in the way of beans of the same type in other places.
+	 *
 	 * @since 5.1
 	 */
 	boolean autowireCandidate() default true;
@@ -267,6 +255,7 @@ public @interface Bean {
 	 * Not commonly used, given that the method may be called programmatically directly
 	 * within the body of a Bean-annotated method.
 	 * <p>The default value is {@code ""}, indicating no init method to be called.
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean
 	 * @see org.springframework.context.ConfigurableApplicationContext#refresh()
 	 */
@@ -296,9 +285,9 @@ public @interface Bean {
 	 * <p>Note: Only invoked on beans whose lifecycle is under the full control of the
 	 * factory, which is always the case for singletons but not guaranteed for any
 	 * other scope.
+	 *
 	 * @see org.springframework.beans.factory.DisposableBean
 	 * @see org.springframework.context.ConfigurableApplicationContext#close()
 	 */
 	String destroyMethod() default AbstractBeanDefinition.INFER_METHOD;
-
 }
