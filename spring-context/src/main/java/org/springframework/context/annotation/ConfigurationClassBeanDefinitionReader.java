@@ -194,13 +194,13 @@ class ConfigurationClassBeanDefinitionReader {
 		if (configClass.skippedBeanMethods.contains(methodName)) {
 			return;
 		}
-
+		//拿到@Bean注解中配置的所有属性
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
-		// Consider name and any aliases
+		// Consider name and any aliases：@Bean(name = "person")，则拿到[person]
 		List<String> names = new ArrayList<>(Arrays.asList(bean.getStringArray("name")));
-		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);
+		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);//如果没有指定名称，则使用方法名称
 
 		// Register aliases even when overridden
 		for (String alias : names) {

@@ -150,12 +150,12 @@ com/javaxxl/aop3/Main.java
  com.javaxxl.aop3.Main$MethodInterceptor02
  com.javaxxl.aop3.Main$MyPointCut
  com.javaxxl.aop3.Main$MyPointCut$1
+com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
+ com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/shengsiyuan/spring/lecture/annotation/PersonConfiguration.java
  com.shengsiyuan.spring.lecture.annotation.PersonConfiguration
 com/javaxxl/publicevent/EventMain.java
  com.javaxxl.publicevent.EventMain
-com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
- com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 com/shengsiyuan/spring/lecture/AopSpringClient.java
  com.shengsiyuan.spring.lecture.AopSpringClient
 com/javaxxl/parent/BeanParentAttTest.java

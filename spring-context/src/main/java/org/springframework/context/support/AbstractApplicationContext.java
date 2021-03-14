@@ -33,6 +33,7 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.PayloadApplicationEvent;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.event.AbstractApplicationEventMulticaster;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
@@ -650,6 +651,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * @see com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
 				 *
 				 * 该方法还会把 @Bean 标注的方法解析成 bd 注册到 ioc 中
+				 * 通过{@link ConfigurationClassPostProcessor#processConfigBeanDefinitions(org.springframework.beans.factory.support.BeanDefinitionRegistry)} 把该方法解析成 bd
+				 * @see org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader 最终通过这个reader把@Bean解析成一个bd
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
