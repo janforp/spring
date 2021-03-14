@@ -2,6 +2,7 @@ package com.shengsiyuan.spring.lecture;
 
 import com.shengsiyuan.spring.lecture.annotation.Person;
 import com.shengsiyuan.spring.lecture.annotation.PersonConfiguration;
+import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -28,6 +29,8 @@ public class AnnotationIocSpringClient {
 		 * Resource resource = new ClassPathResource("spring-construct-property.xml");
 		 * XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
 		 * reader.loadBeanDefinitions(resource);
+		 *
+		 * @see AnnotatedBeanDefinitionReader#register(java.lang.Class[]) 工厂是委托给该实例进行注册的
 		 */
 		annotationIoc.register(PersonConfiguration.class);
 

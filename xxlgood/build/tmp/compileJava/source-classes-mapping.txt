@@ -176,15 +176,15 @@ com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/shengsiyuan/spring/lecture/transction/service/StudentServiceImpl.java
  com.shengsiyuan.spring.lecture.transction.service.StudentServiceImpl
-com/shengsiyuan/spring/lecture/aop/AopSpringClient.java
- com.shengsiyuan.spring.lecture.aop.AopSpringClient
-com/shengsiyuan/spring/lecture/IocSpringClient.java
- com.shengsiyuan.spring.lecture.IocSpringClient
 com/shengsiyuan/spring/lecture/annotation/PersonConfiguration.java
  com.shengsiyuan.spring.lecture.annotation.PersonConfiguration
-com/shengsiyuan/spring/lecture/transction/TransactionSpringClient.java
- com.shengsiyuan.spring.lecture.transction.TransactionSpringClient
-com/shengsiyuan/spring/lecture/annotation/AnnotationSpringClient.java
- com.shengsiyuan.spring.lecture.annotation.AnnotationSpringClient
 com/shengsiyuan/spring/lecture/annotation/Person.java
  com.shengsiyuan.spring.lecture.annotation.Person
+com/shengsiyuan/spring/lecture/TransactionSpringClient.java
+ com.shengsiyuan.spring.lecture.TransactionSpringClient
+com/shengsiyuan/spring/lecture/AopSpringClient.java
+ com.shengsiyuan.spring.lecture.AopSpringClient
+com/shengsiyuan/spring/lecture/XmlIocSpringClient.java
+ com.shengsiyuan.spring.lecture.XmlIocSpringClient
+com/shengsiyuan/spring/lecture/AnnotationIocSpringClient.java
+ com.shengsiyuan.spring.lecture.AnnotationIocSpringClient

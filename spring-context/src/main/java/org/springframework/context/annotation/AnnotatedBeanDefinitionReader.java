@@ -124,8 +124,9 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
-	 * Register a bean from the given bean class, deriving its metadata from
-	 * class-declared annotations.
+	 * Register a bean from the given bean class, deriving its metadata from class-declared annotations.
+	 *
+	 * -- 从给定的bean类中注册一个bean，并从类声明的批注中派生其元数据。
 	 *
 	 * @param beanClass the class of the bean
 	 */
@@ -239,22 +240,59 @@ public class AnnotatedBeanDefinitionReader {
 	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
 	 * @since 5.0
 	 */
-	private <T> void doRegisterBean(Class<T> beanClass, @Nullable String name,
-			@Nullable Class<? extends Annotation>[] qualifiers, @Nullable Supplier<T> supplier,
+	private <T> void doRegisterBean(
+			Class<T> beanClass,
+			@Nullable String name,
+			@Nullable Class<? extends Annotation>[] qualifiers,
+			@Nullable Supplier<T> supplier,
 			@Nullable BeanDefinitionCustomizer[] customizers) {
 
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
+		/**
+		 *  * 使用示例：
+		 *  *
+		 *  *     @Conditional(OsxCondition.class)
+		 *  *     @Bean
+		 *  *     public Student student(){
+		 *  *         return new Student();
+		 *  * 	   }
+		 *  *
+		 *  * 	 public class OsxCondition implements Condition {
+		 *  *
+		 *  *     @Override
+		 *  *     public boolean matches(ConditionContext context, Annotated
+		 *  *         String property = context.getEnvironment().getProperty
+		 *  *         if(property.equals("Mac OS X")){
+		 *  *             return true;
+		 *  *         }
+		 *  *         return false;
+		 *  *     }
+		 *  * 	 }
+		 *  *
+		 *  * 	 意思就是说，要实例化 student的条件为，当前的系统必须是 Mac OS X 系统，否则就不会实例化他
+		 */
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
-
+		//一般为null
 		abd.setInstanceSupplier(supplier);
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
-		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
+		String beanName = (
+				name != null ? //传入的name是否有值？
+						name //有则使用
 
+						/**
+						 *
+						 * @see AnnotationBeanNameGenerator#generateBeanName(org.springframework.beans.factory.config.BeanDefinition, org.springframework.beans.factory.support.BeanDefinitionRegistry)
+						 */
+						: this.beanNameGenerator.generateBeanName(abd, this.registry)
+		);
+
+		//TODO:处理一些通用的注解，如 @Lazy.@Primary。。。。其实就是解析这些注解，并且把 value 设置到 abd 中
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
+			//TODO
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
 					abd.setPrimary(true);
@@ -271,8 +309,14 @@ public class AnnotatedBeanDefinitionReader {
 			}
 		}
 
+		//跟 xml 一样，解析完成之后，最后还是封装到一个 BeanDefinitionHolder 中
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+		//看看是否需要使用代理，如果不需要则返回原来的bd，否则返回代理之后的bd，一般是一个 ScopedProxyFactoryBean
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+
+		/**
+		 * 注册到工厂，之后跟xml没有任何区别
+		 */
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

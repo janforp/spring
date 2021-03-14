@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.context.annotation;
 
 import java.lang.annotation.Documented;
@@ -53,10 +37,10 @@ import java.lang.annotation.Target;
  *
  * @author Phillip Webb
  * @author Sam Brannen
- * @since 4.0
  * @see Condition
+ * @since 4.0
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Conditional {
@@ -64,7 +48,29 @@ public @interface Conditional {
 	/**
 	 * All {@link Condition} classes that must {@linkplain Condition#matches match}
 	 * in order for the component to be registered.
+	 * -- 必须匹配才能注册组件的所有Condition类
+	 *
+	 * * 使用示例：
+	 * *
+	 * *     @Conditional(OsxCondition.class)
+	 * *     @Bean
+	 * *     public Student student(){
+	 * *         return new Student();
+	 * * 	   }
+	 * *
+	 * * 	 public class OsxCondition implements Condition {
+	 * *
+	 * *     @Override
+	 * *     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+	 * *         String property = context.getEnvironment().getProperty("os.name");
+	 * *         if(property.equals("Mac OS X")){
+	 * *             return true;
+	 * *         }
+	 * *         return false;
+	 * *     }
+	 * * 	 }
+	 * *
+	 * * 	 意思就是说，要实例化 student的条件为，当前的系统必须是 Mac OS X 系统，否则就不会实例化他
 	 */
 	Class<? extends Condition>[] value();
-
 }

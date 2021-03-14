@@ -16,12 +16,12 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
+
+import java.lang.annotation.Annotation;
 
 /**
  * A {@link ScopeMetadataResolver} implementation that by default checks for
@@ -33,8 +33,8 @@ import org.springframework.util.Assert;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 2.5
  * @see org.springframework.context.annotation.Scope
+ * @since 2.5
  */
 public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
@@ -42,9 +42,9 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
 	protected Class<? extends Annotation> scopeAnnotationType = Scope.class;
 
-
 	/**
 	 * Construct a new {@code AnnotationScopeMetadataResolver}.
+	 *
 	 * @see #AnnotationScopeMetadataResolver(ScopedProxyMode)
 	 * @see ScopedProxyMode#NO
 	 */
@@ -55,6 +55,7 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 	/**
 	 * Construct a new {@code AnnotationScopeMetadataResolver} using the
 	 * supplied default {@link ScopedProxyMode}.
+	 *
 	 * @param defaultProxyMode the default scoped-proxy mode
 	 */
 	public AnnotationScopeMetadataResolver(ScopedProxyMode defaultProxyMode) {
@@ -62,10 +63,10 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 		this.defaultProxyMode = defaultProxyMode;
 	}
 
-
 	/**
 	 * Set the type of annotation that is checked for by this
 	 * {@code AnnotationScopeMetadataResolver}.
+	 *
 	 * @param scopeAnnotationType the target annotation type
 	 */
 	public void setScopeAnnotationType(Class<? extends Annotation> scopeAnnotationType) {
@@ -73,14 +74,16 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 		this.scopeAnnotationType = scopeAnnotationType;
 	}
 
-
 	@Override
 	public ScopeMetadata resolveScopeMetadata(BeanDefinition definition) {
 		ScopeMetadata metadata = new ScopeMetadata();
 		if (definition instanceof AnnotatedBeanDefinition) {
 			AnnotatedBeanDefinition annDef = (AnnotatedBeanDefinition) definition;
 			AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(
-					annDef.getMetadata(), this.scopeAnnotationType);
+					annDef.getMetadata(),
+
+					//Scope.class
+					this.scopeAnnotationType);
 			if (attributes != null) {
 				metadata.setScopeName(attributes.getString("value"));
 				ScopedProxyMode proxyMode = attributes.getEnum("proxyMode");
@@ -92,5 +95,4 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 		}
 		return metadata;
 	}
-
 }

@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.annotation;
 
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -36,21 +20,24 @@ import org.springframework.util.Assert;
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 2.5
  * @see AnnotatedBeanDefinition#getMetadata()
  * @see org.springframework.core.type.StandardAnnotationMetadata
+ * @since 2.5
  */
 @SuppressWarnings("serial")
 public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
 
+	/**
+	 * this.metadata = AnnotationMetadata.introspect(beanClass);
+	 */
 	private final AnnotationMetadata metadata;
 
 	@Nullable
 	private MethodMetadata factoryMethodMetadata;
 
-
 	/**
 	 * Create a new AnnotatedGenericBeanDefinition for the given bean class.
+	 *
 	 * @param beanClass the loaded bean class
 	 */
 	public AnnotatedGenericBeanDefinition(Class<?> beanClass) {
@@ -65,6 +52,7 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 	 * {@link org.springframework.context.annotation.ScannedGenericBeanDefinition
 	 * ScannedGenericBeanDefinition}, however the semantics of the latter indicate that a
 	 * bean was discovered specifically via component-scanning as opposed to other means.
+	 *
 	 * @param metadata the annotation metadata for the bean class in question
 	 * @since 3.1.1
 	 */
@@ -72,8 +60,7 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 		Assert.notNull(metadata, "AnnotationMetadata must not be null");
 		if (metadata instanceof StandardAnnotationMetadata) {
 			setBeanClass(((StandardAnnotationMetadata) metadata).getIntrospectedClass());
-		}
-		else {
+		} else {
 			setBeanClassName(metadata.getClassName());
 		}
 		this.metadata = metadata;
@@ -82,6 +69,7 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 	/**
 	 * Create a new AnnotatedGenericBeanDefinition for the given annotation metadata,
 	 * based on an annotated class and a factory method on that class.
+	 *
 	 * @param metadata the annotation metadata for the bean class in question
 	 * @param factoryMethodMetadata metadata for the selected factory method
 	 * @since 4.1.1
@@ -93,7 +81,6 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 		this.factoryMethodMetadata = factoryMethodMetadata;
 	}
 
-
 	@Override
 	public final AnnotationMetadata getMetadata() {
 		return this.metadata;
@@ -104,5 +91,4 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 	public final MethodMetadata getFactoryMethodMetadata() {
 		return this.factoryMethodMetadata;
 	}
-
 }

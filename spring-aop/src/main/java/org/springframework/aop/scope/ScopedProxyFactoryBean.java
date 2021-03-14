@@ -1,22 +1,4 @@
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.aop.scope;
-
-import java.lang.reflect.Modifier;
 
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.ProxyConfig;
@@ -31,6 +13,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import java.lang.reflect.Modifier;
 
 /**
  * Convenient proxy factory bean for scoped objects.
@@ -48,24 +32,32 @@ import org.springframework.util.ClassUtils;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @since 2.0
  * @see #setProxyTargetClass
+ * @since 2.0
  */
 @SuppressWarnings("serial")
-public class ScopedProxyFactoryBean extends ProxyConfig
+public class ScopedProxyFactoryBean
+
+		extends ProxyConfig
+
 		implements FactoryBean<Object>, BeanFactoryAware, AopInfrastructureBean {
 
-	/** The TargetSource that manages scoping. */
+	/**
+	 * The TargetSource that manages scoping.
+	 */
 	private final SimpleBeanTargetSource scopedTargetSource = new SimpleBeanTargetSource();
 
-	/** The name of the target bean. */
+	/**
+	 * The name of the target bean.
+	 */
 	@Nullable
 	private String targetBeanName;
 
-	/** The cached singleton proxy. */
+	/**
+	 * The cached singleton proxy.
+	 */
 	@Nullable
 	private Object proxy;
-
 
 	/**
 	 * Create a new ScopedProxyFactoryBean instance.
@@ -73,7 +65,6 @@ public class ScopedProxyFactoryBean extends ProxyConfig
 	public ScopedProxyFactoryBean() {
 		setProxyTargetClass(true);
 	}
-
 
 	/**
 	 * Set the name of the bean that is to be scoped.
@@ -117,7 +108,6 @@ public class ScopedProxyFactoryBean extends ProxyConfig
 		this.proxy = pf.getProxy(cbf.getBeanClassLoader());
 	}
 
-
 	@Override
 	public Object getObject() {
 		if (this.proxy == null) {
@@ -138,5 +128,4 @@ public class ScopedProxyFactoryBean extends ProxyConfig
 	public boolean isSingleton() {
 		return true;
 	}
-
 }
