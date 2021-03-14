@@ -229,6 +229,10 @@ public abstract class AbstractBeanDefinition
 	 *
 	 * 2.使用静态工厂方法创建对象
 	 * <bean id = "person" class = "xx.xx.xxx.PersonFactory" factory-method = "staticBuildPerson"/>
+	 *
+	 * 如果是注解的方式配置的bean,则该字段就是当前@Bean对应的方法
+	 *
+	 * @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()
 	 */
 	@Nullable
 	private String factoryMethodName;
