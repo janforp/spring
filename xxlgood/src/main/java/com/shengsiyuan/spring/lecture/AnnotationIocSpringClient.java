@@ -54,7 +54,21 @@ public class AnnotationIocSpringClient {
 
 		System.out.println("************* refresh 方法执行完毕");
 
+		PersonConfiguration personConfiguration = (PersonConfiguration) annotationIoc.getBean("personConfiguration");
 		Person person = (Person) annotationIoc.getBean("person");
+
+		/**
+		 * PersonConfiguration 的类型为
+		 *
+		 * class com.shengsiyuan.spring.lecture.annotation.PersonConfiguration$$EnhancerBySpringCGLIB$$fd26128
+		 *
+		 * 它是被 cglib 代理过的？为什么呢？TODO
+		 */
+		System.out.println("PersonConfiguration 的类型为 " + personConfiguration.getClass());
+
+		//Person 的类型为 class com.shengsiyuan.spring.lecture.annotation.Person
+		System.out.println("Person 的类型为 " + person.getClass());
+
 		System.out.println(person.getId() + " 名称为 " + person.getName());
 	}
 }

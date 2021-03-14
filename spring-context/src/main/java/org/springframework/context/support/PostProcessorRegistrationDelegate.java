@@ -41,7 +41,7 @@ final class PostProcessorRegistrationDelegate {
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory,
 			/**
-			 * 硬编码传进来的bfpp
+			 * 硬编码传进来的 beanFactory后处理器{@link BeanFactoryPostProcessor}
 			 */
 			List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -61,7 +61,7 @@ final class PostProcessorRegistrationDelegate {
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 
 		/**
-		 * 存储已经执行过的 bfpp 的 beanName
+		 * 存储已经执行过的 beanFactory后处理器{@link BeanFactoryPostProcessor} 的 beanName
 		 */
 		Set<String> processedBeans = new HashSet<>();
 
@@ -136,13 +136,13 @@ final class PostProcessorRegistrationDelegate {
 					currentRegistryProcessors.add(
 
 							/**
-							 * 获取bf获取bean
+							 * 获取bf获取bean,如果有通过注解注入的bean，则会有{@link org.springframework.context.annotation.ConfigurationClassPostProcessor}
 							 */
 							beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class)
 					);
 
 					//已经执行过的集合:因为马上要执行相关接口方法了，所以添加到这里。表示已经执行
-					processedBeans.add(ppName);
+					processedBeans.add(ppName);//ppName可能是 org.springframework.context.annotation.internalConfigurationAnnotationProcessor
 				}
 			}
 
@@ -156,8 +156,10 @@ final class PostProcessorRegistrationDelegate {
 			registryProcessors.addAll(currentRegistryProcessors);
 
 			/**
-			 * 执行每个bdrpp的方法
+			 * 执行每个 beanFactory后处理器{@link BeanFactoryPostProcessor} 的方法
 			 * @see PostProcessorRegistrationDelegate#invokeBeanDefinitionRegistryPostProcessors(java.util.Collection, org.springframework.beans.factory.support.BeanDefinitionRegistry, org.springframework.core.metrics.ApplicationStartup)
+			 *
+			 * 在该方法会把 @Bean 修饰的 bd 实例化到 bdMap 中
 			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 			/**

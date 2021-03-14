@@ -648,6 +648,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * @see BeanFactoryPostProcessor 该接口中定义的方法还没有执行
 				 * @see BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
 				 * @see com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
+				 *
+				 * 该方法还会把 @Bean 标注的方法解析成 bd 注册到 ioc 中
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
@@ -687,7 +689,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 */
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.--很重要：实例化单实例(非懒加载的)
+				/**
+				 * TODO !!! Instantiate all remaining (non-lazy-init) singletons.--很重要：实例化单实例(非懒加载的)
+				 * 1.XMl配置文件中的单例 bean
+				 * 2.com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson() 通过注解配置的bean
+				 */
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -910,7 +916,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
+		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(
+				beanFactory,
+				/**
+				 * @see BeanFactoryPostProcessor beanFactory后处理器
+				 */
+				getBeanFactoryPostProcessors()
+		);
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
@@ -1091,6 +1103,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * -- 完成此上下文的Bean工厂的初始化，
 	 * initializing all remaining singleton beans.
 	 * -- 初始化所有剩余的单例bean。
+	 *
+	 * 1.XMl配置文件中的单例 bean
+	 * 2.com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson() 通过注解配置的bean
+	 *
+	 * @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.-- 为此上下文初始化转换服务
@@ -1142,7 +1159,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 */
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.--预初始化非懒加载的单实例bean了
+		/**
+		 * Instantiate all remaining (non-lazy-init) singletons.--预初始化非懒加载的单实例bean了
+		 * @see DefaultListableBeanFactory#preInstantiateSingletons() 实现
+		 *
+		 * 1.XMl配置文件中的单例 bean
+		 * 2.com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson() 通过注解配置的bean
+		 * @see com.shengsiyuan.spring.lecture.annotation.PersonConfiguration#getPerson()
+		 */
 		beanFactory.preInstantiateSingletons();
 	}
 

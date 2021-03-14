@@ -185,6 +185,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	/**
 	 * List of bean definition names, in registration order.
+	 *
+	 * 按注册顺序排列的 bd names
 	 */
 	private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
 
