@@ -563,14 +563,14 @@ class ConstructorResolver {
 	 */
 	public BeanWrapper instantiateUsingFactoryMethod(
 			String beanName, RootBeanDefinition mbd, @Nullable Object[] explicitArgs) {
-
+		//使用工厂方法实例化bean
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
 
 		Object factoryBean;
 		Class<?> factoryClass;
 		boolean isStatic;
-
+		//personConfiguration其实就是当前@Bean的配置类
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
@@ -581,7 +581,7 @@ class ConstructorResolver {
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
-			this.beanFactory.registerDependentBean(factoryBeanName, beanName);
+			this.beanFactory.registerDependentBean(factoryBeanName, beanName);//注册依赖关系，就是工厂跟工厂方法直接的关系
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		} else {
@@ -595,8 +595,8 @@ class ConstructorResolver {
 			isStatic = true;
 		}
 
-		Method factoryMethodToUse = null;
-		ArgumentsHolder argsHolderToUse = null;
+		Method factoryMethodToUse = null;//使用的工厂方法
+		ArgumentsHolder argsHolderToUse = null;//使用的参数
 		Object[] argsToUse = null;
 
 		if (explicitArgs != null) {
@@ -650,7 +650,7 @@ class ConstructorResolver {
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
 						mbd.constructorArgumentsResolved = true;
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;
-					}
+					}//实例化bean
 					bw.setBeanInstance(instantiate(beanName, mbd, factoryBean, uniqueCandidate, EMPTY_ARGS));
 					return bw;
 				}
@@ -811,6 +811,7 @@ class ConstructorResolver {
 						this.beanFactory.getAccessControlContext());
 			} else {
 				return this.beanFactory.getInstantiationStrategy().instantiate(
+						/**@see SimpleInstantiationStrategy#instantiate(org.springframework.beans.factory.support.RootBeanDefinition, java.lang.String, org.springframework.beans.factory.BeanFactory, java.lang.Object, java.lang.reflect.Method, java.lang.Object...)*/
 						mbd, beanName, this.beanFactory, factoryBean, factoryMethod, args);
 			}
 		} catch (Throwable ex) {
