@@ -128,8 +128,8 @@ class ConfigurationClassBeanDefinitionReader {
 	}
 
 	/**
-	 * Read a particular {@link ConfigurationClass}, registering bean definitions
-	 * for the class itself and all of its {@link Bean} methods.
+	 * Read a particular {@link ConfigurationClass}, registering bean definitions for the class itself and all of its {@link Bean} methods.
+	 * --阅读特定的{@link ConfigurationClass}，为类本身及其所有{@link Bean}方法注册bean定义。
 	 */
 	private void loadBeanDefinitionsForConfigurationClass(
 			ConfigurationClass configClass, TrackedConditionEvaluator trackedConditionEvaluator) {
@@ -146,7 +146,7 @@ class ConfigurationClassBeanDefinitionReader {
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
-		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
+		for (BeanMethod beanMethod : configClass.getBeanMethods()) {//获取该配置类中所有的@Bean方法
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
@@ -182,8 +182,10 @@ class ConfigurationClassBeanDefinitionReader {
 	 */
 	@SuppressWarnings("deprecation")  // for RequiredAnnotationBeanPostProcessor.SKIP_REQUIRED_CHECK_ATTRIBUTE
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
+		//获取封装的配置类
 		ConfigurationClass configClass = beanMethod.getConfigurationClass();
 		MethodMetadata metadata = beanMethod.getMetadata();
+		//方法名称
 		String methodName = metadata.getMethodName();
 
 		// Do we need to mark the bean as skipped by its condition?
@@ -194,16 +196,24 @@ class ConfigurationClassBeanDefinitionReader {
 		if (configClass.skippedBeanMethods.contains(methodName)) {
 			return;
 		}
-		//拿到@Bean注解中配置的所有属性
+		/**
+		 * 拿到@Bean注解中配置的所有属性
+		 * 如：name:student
+		 *    autowire:no 等
+		 */
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
-		// Consider name and any aliases：@Bean(name = "person")，则拿到[person]
+		/**
+		 * Consider name and any aliases：@Bean(name = "person")，则拿到[person]
+		 * 拿到 name 的值
+		 */
 		List<String> names = new ArrayList<>(Arrays.asList(bean.getStringArray("name")));
 		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);//如果没有指定名称，则使用方法名称
 
 		// Register aliases even when overridden
 		for (String alias : names) {
+			//注册别名
 			this.registry.registerAlias(beanName, alias);
 		}
 
@@ -230,6 +240,9 @@ class ConfigurationClassBeanDefinitionReader {
 			beanDef.setUniqueFactoryMethodName(methodName);
 		} else {
 			// instance @Bean method
+			/**
+			 * 实例@Bean方法
+			 */
 			beanDef.setFactoryBeanName(configClass.getBeanName());
 			beanDef.setUniqueFactoryMethodName(methodName);
 		}
