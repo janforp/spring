@@ -71,6 +71,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
 	 * @see org.springframework.aop.config.AopConfigUtils#registerOrEscalateApcAsRequired(java.lang.Class, org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object)
 	 * 上面的方法就会向容器注册一个框架bean
+	 * @see org.springframework.context.annotation.AnnotationConfigUtils#registerPostProcessor(org.springframework.beans.factory.support.BeanDefinitionRegistry, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.String) 这里用到了
 	 */
 	int ROLE_INFRASTRUCTURE = 2;
 

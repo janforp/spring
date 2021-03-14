@@ -4,6 +4,7 @@ import com.shengsiyuan.spring.lecture.annotation.Person;
 import com.shengsiyuan.spring.lecture.annotation.PersonConfiguration;
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 
 /**
  * AnnotationSpringClient
@@ -21,6 +22,9 @@ public class AnnotationIocSpringClient {
 		 * DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
 		 */
 		AnnotationConfigApplicationContext annotationIoc
+				/**
+				 * @see AnnotationConfigUtils#registerAnnotationConfigProcessors(org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object)
+				 */
 				= new AnnotationConfigApplicationContext();
 
 		/**

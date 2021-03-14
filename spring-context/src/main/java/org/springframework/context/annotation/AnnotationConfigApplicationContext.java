@@ -62,6 +62,7 @@ public class AnnotationConfigApplicationContext
 		StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start("spring.context.annotated-bean-reader.create");
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		createAnnotatedBeanDefReader.end();
+		//扫描
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
