@@ -42,17 +42,18 @@ public class AnnotationIocSpringClient {
 		 */
 		annotationIoc.register(PersonConfiguration.class);
 
+		System.out.println("************* refresh 方法执行 开始");
+
 		/**
 		 * 刷新,具体
 		 * 1.对所有bean定义的解析
 		 * 2.完成所有注解的分析
-		 * 3.调用{@link PersonConfiguration#getPerson()}方法完成bean的实例化
-		 * 4.
-		 * 5.
+		 * 3.把 @Bean 标注的方法解析成一个 bd 注册到ioc
+		 * 4.调用{@link PersonConfiguration#getPerson()}方法完成bean的实例化
 		 */
 		annotationIoc.refresh();
 
-		System.out.println("************* refresh 方法执行完毕");
+		System.out.println("************* refresh 方法执行 结束");
 
 		PersonConfiguration personConfiguration = (PersonConfiguration) annotationIoc.getBean("personConfiguration");
 		Person person = (Person) annotationIoc.getBean("person");

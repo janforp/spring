@@ -152,8 +152,8 @@ com/javaxxl/aop3/Main.java
  com.javaxxl.aop3.Main$MyPointCut$1
 com/javaxxl/beanFactoryBeanPostProcessor/ReplaceObscenitiesBeanFactoryPostProcessor.java
  com.javaxxl.beanFactoryBeanPostProcessor.ReplaceObscenitiesBeanFactoryPostProcessor
-com/shengsiyuan/spring/lecture/annotation/PersonConfiguration.java
- com.shengsiyuan.spring.lecture.annotation.PersonConfiguration
+com/javaxxl/Main.java
+ com.javaxxl.Main
 com/javaxxl/publicevent/EventMain.java
  com.javaxxl.publicevent.EventMain
 com/shengsiyuan/spring/lecture/AopSpringClient.java
@@ -184,7 +184,7 @@ com/javaxxl/requiredproperties/MyClassPathXmlApplicationContext.java
  com.javaxxl.requiredproperties.MyClassPathXmlApplicationContext
 com/javaxxl/bpp/BppMain.java
  com.javaxxl.bpp.BppMain
-com/javaxxl/Main.java
- com.javaxxl.Main
+com/shengsiyuan/spring/lecture/annotation/PersonConfiguration.java
+ com.shengsiyuan.spring.lecture.annotation.PersonConfiguration
 com/shengsiyuan/spring/lecture/AnnotationIocSpringClient.java
  com.shengsiyuan.spring.lecture.AnnotationIocSpringClient
