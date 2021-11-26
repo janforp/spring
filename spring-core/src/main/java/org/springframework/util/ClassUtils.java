@@ -1327,8 +1327,7 @@ public abstract class ClassUtils {
 						return method;
 					}
 				} else {
-					Method specificMethod =
-							ReflectionUtils.findMethod(targetClass, method.getName(), method.getParameterTypes());
+					Method specificMethod = ReflectionUtils.findMethod(targetClass, method.getName(), method.getParameterTypes());
 					return (specificMethod != null ? specificMethod : method);
 				}
 			} catch (SecurityException ex) {

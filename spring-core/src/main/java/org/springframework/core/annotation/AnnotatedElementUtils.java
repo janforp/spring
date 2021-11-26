@@ -16,6 +16,12 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.annotation.MergedAnnotation.Adapt;
+import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collections;
@@ -23,12 +29,6 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.springframework.core.BridgeMethodResolver;
-import org.springframework.core.annotation.MergedAnnotation.Adapt;
-import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
 
 /**
  * General utility methods for finding annotations, meta-annotations, and
@@ -624,8 +624,7 @@ public abstract class AnnotatedElementUtils {
 	@Nullable
 	public static <A extends Annotation> A findMergedAnnotation(AnnotatedElement element, Class<A> annotationType) {
 		// Shortcut: directly present on the element, with no merging needed?
-		if (AnnotationFilter.PLAIN.matches(annotationType) ||
-				AnnotationsScanner.hasPlainJavaAnnotationsOnly(element)) {
+		if (AnnotationFilter.PLAIN.matches(annotationType) || AnnotationsScanner.hasPlainJavaAnnotationsOnly(element)) {
 			return element.getDeclaredAnnotation(annotationType);
 		}
 		// Exhaustive retrieval of merged annotations...

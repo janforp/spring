@@ -231,7 +231,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		 *
 		 * 通过三级缓存如何解决setter循环依赖呢？
 		 * 例子A依赖B，B依赖A
-		 * 1.实例化A，拿到A的构造方法，通过反射创建A的早期实例，这个早期对象被封装成 ObjectFactory aObjectFactory 对象，放到了三级缓存中{@link DefaultSingletonBeanRegistry#singletonFactories}
+		 * 1.实例化A，拿到A的构造方法，通过反射创建A的早期实例，这个早期对象被封装成 ObjectFactory objectFactory 对象，放到了三级缓存中{@link DefaultSingletonBeanRegistry#singletonFactories}
 		 * 2.处理A的依赖，此时发现A依赖了B，所以接下来就会根据B类型到容器中 getBean(B.class) 获取B的实例，这里就发生了递归
 		 * 3.实例化B，拿到B的构造方法，通过反射创建B的早期实例，这个早期对象被封装成 ObjectFactory bObjectFactory 对象，放到了三级缓存中{@link DefaultSingletonBeanRegistry#singletonFactories}
 		 * 4.处理B的依赖，此时发现B依赖了A，所以接下来就会根据A类型到容器中 getBean(A.class) 获取A的实例，这里又发生了递归

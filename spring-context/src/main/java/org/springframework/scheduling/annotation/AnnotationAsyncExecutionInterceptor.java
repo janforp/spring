@@ -1,28 +1,12 @@
-/*
- * Copyright 2002-2017 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.scheduling.annotation;
-
-import java.lang.reflect.Method;
-import java.util.concurrent.Executor;
 
 import org.springframework.aop.interceptor.AsyncExecutionInterceptor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.Executor;
 
 /**
  * Specialization of {@link AsyncExecutionInterceptor} that delegates method execution to
@@ -33,15 +17,16 @@ import org.springframework.lang.Nullable;
  *
  * @author Chris Beams
  * @author Stephane Nicoll
- * @since 3.1.2
  * @see org.springframework.scheduling.annotation.Async
  * @see org.springframework.scheduling.annotation.AsyncAnnotationAdvisor
+ * @since 3.1.2
  */
 public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionInterceptor {
 
 	/**
 	 * Create a new {@code AnnotationAsyncExecutionInterceptor} with the given executor
 	 * and a simple {@link AsyncUncaughtExceptionHandler}.
+	 *
 	 * @param defaultExecutor the executor to be used by default if no more specific
 	 * executor has been qualified at the method level using {@link Async#value()};
 	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
@@ -52,6 +37,7 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 
 	/**
 	 * Create a new {@code AnnotationAsyncExecutionInterceptor} with the given executor.
+	 *
 	 * @param defaultExecutor the executor to be used by default if no more specific
 	 * executor has been qualified at the method level using {@link Async#value()};
 	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
@@ -63,13 +49,13 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 		super(defaultExecutor, exceptionHandler);
 	}
 
-
 	/**
 	 * Return the qualifier or bean name of the executor to be used when executing the
 	 * given method, specified via {@link Async#value} at the method or declaring
 	 * class level. If {@code @Async} is specified at both the method and class level, the
 	 * method's {@code #value} takes precedence (even if empty string, indicating that
 	 * the default executor should be used preferentially).
+	 *
 	 * @param method the method to inspect for executor qualifier metadata
 	 * @return the qualifier if specified, otherwise empty string indicating that the
 	 * {@linkplain #setExecutor(Executor) default executor} should be used
@@ -86,5 +72,4 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 		}
 		return (async != null ? async.value() : null);
 	}
-
 }

@@ -16,18 +16,18 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.MethodFilter;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.MethodFilter;
 
 /**
  * Helper for resolving synthetic {@link Method#isBridge bridge Methods} to the
@@ -73,8 +73,7 @@ public final class BridgeMethodResolver {
 		if (bridgedMethod == null) {
 			// Gather all methods with matching name and parameter size.
 			List<Method> candidateMethods = new ArrayList<>();
-			MethodFilter filter = candidateMethod ->
-					isBridgedCandidateFor(candidateMethod, bridgeMethod);
+			MethodFilter filter = candidateMethod -> isBridgedCandidateFor(candidateMethod, bridgeMethod);
 			ReflectionUtils.doWithMethods(bridgeMethod.getDeclaringClass(), candidateMethods::add, filter);
 			if (!candidateMethods.isEmpty()) {
 				bridgedMethod = candidateMethods.size() == 1 ?
